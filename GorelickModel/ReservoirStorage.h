@@ -235,6 +235,11 @@ private:
 	double transferLimit;
 	double totalRequest;
 	
+	//// Releases
+	
+	double RreleaseRequest;
+	double DbuybackQuantity;
+	
 	ofstream out2;
 };
 

@@ -2830,10 +2830,19 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
 	
-	double LMreleaseCap = 10.0;
+	double LMreleaseCap = 1000000.0;
 		// for now, equal to Raleigh-Durham Interconnection (above)
+		// assume no cap, this is a very large number
 	double LMreleaseMin = 0.0;
 		// no minimum contractual release
+	
+	/////////////////////////////////////////////////////////////////////////
+	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
+	
+	double ReleaseContractLength = 100.0*52;
+		// number of weeks the contract is good
+	double ReleaseContractPrice = 30000000;
+		// total cost of the releases contract, to be paid on an annual basis?
 	
 	/////////////////////////////////////////////////////////////////////////
 	
@@ -2846,6 +2855,8 @@ void Simulation::realizationLoop()
         // setting initial infrastructure values, storage and capacities
         // must all be equal to 0 at beginning of each realization, before 60yrs go by
 
+	ofstream out100;
+	ofstream out101;
 	//systemStorage.openResFiles();
 	//openFile(out1,"raleighDemand.csv");
 	//openFile(out3,"riskOfFailureFile.csv");
@@ -2951,6 +2962,60 @@ void Simulation::realizationLoop()
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 
+			if (formulation > 0)
+				// allow transfers, apply raw releases before risk of failure is calculated
+			{
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
+				
+				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin);
+
+				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
+				
+				if (durham.weeklyBuybackVolume > 0.0)
+				{
+					durham.payForBuybacks();
+					raleigh.acceptBuybackPayment();
+				}
+				
+				if (week == 1)
+				{
+					raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
+					durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
+						// annual payment
+				}
+				
+				if (realization == 1) {
+					openFile(out100,"output/codeCheckReleases.csv");
+					out100<<raleigh.weeklyReleaseVolume<<",";
+					
+						// use these three lines to output a "checker" file to see if code gets this far
+					ofstream out101;
+					openFile(out101,"output/codeCheckBuybacks.csv");
+					out101<<durham.weeklyBuybackVolumeVolume<<",";
+						// use these three lines to output a "checker" file to see if code gets this far
+				
+					if(week==1)
+					{
+						out100<<endl;
+						out101<<endl;
+					}
+				}
+			
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
+				
+				if (raleigh.weeklyReleaseVolume > 0.0 or durham.weeklyBuybackVolume > 0.0)
+				{
+					systemStorage.updateStorage(week-1);
+				}
+				
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
+			}
+			
+			
 			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
                 // gives the ROF of this given week
 
@@ -2999,15 +3064,8 @@ void Simulation::realizationLoop()
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
 			if(formulation > 0)
-                // transfers allowed
+                // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
 			{
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
-				
-				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin);
-
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				
 				//Transfer requests are granted based on the limitations of infrastructure
 				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand);
                     // who gets transfers based on want and availability
@@ -3025,12 +3083,14 @@ void Simulation::realizationLoop()
 				{
 					cary.Fund.add((durham.weeklyTransferVolume + owasa.weeklyTransferVolume + raleigh.weeklyTransferVolume)*transferCosts);
 				}
+				
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			}
 			//Update reservoir storage levels
 			systemStorage.setSpillover(week-1);
 			systemStorage.updateStorage(week-1);
-                // set min releases and advance a timestep
+                // set min releases
 
 			//Retrieve the weekly transfers
 			// Get current weekly demand baseline values for each utility

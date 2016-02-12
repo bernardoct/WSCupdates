@@ -164,9 +164,9 @@ void ReservoirStorage::initializeReservoirStorage(double durhamCap, double CCRCa
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////// RAW RELEASE "INTERCONNECTION" CONTRAINTS ////////////////////////////////////////////
 	
-	DurhamRaleighMaximumDailyRelease = DurhamReleaseCap;
+	// DurhamRaleighMaximumDailyRelease = DurhamReleaseCap;
 		// maximum water releasable, in MGD
-	DurhamRaleighMinimumDailyRelease = DurhamReleaseMin;
+	// DurhamRaleighMinimumDailyRelease = DurhamReleaseMin;
 		// minimum water releasable, in MGD
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ void ReservoirStorage::initializeReservoirStorage(double durhamCap, double CCRCa
 	
 	RreleaseRequest = 0;
 		// Raleigh request for releases from Durham supply
-	DreleasebuybackRequest = 0;
+	DbuybackQuantity = 0;
 		// Durham request buy back releases owed to Raleigh
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -270,9 +270,9 @@ void ReservoirStorage::initializeReservoirStorageROF(double durhamCap, double CC
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////// RAW RELEASE "INTERCONNECTION" CONTRAINTS ////////////////////////////////////////////
 	
-	DurhamRaleighMaximumDailyRelease = DurhamReleaseCap;
+	// DurhamRaleighMaximumDailyRelease = DurhamReleaseCap;
 		// maximum water releasable, in MGD
-	DurhamRaleighMinimumDailyRelease = DurhamReleaseMin;
+	// DurhamRaleighMinimumDailyRelease = DurhamReleaseMin;
 		// minimum water releasable, in MGD
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ void ReservoirStorage::initializeReservoirStorageROF(double durhamCap, double CC
 	
 	RreleaseRequest = 0;
 		// Raleigh request for releases from Durham supply
-	DreleasebuybackRequest = 0;
+	DbuybackQuantity = 0;
 		// Durham request buy back releases owed to Raleigh
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,7 +362,7 @@ void ReservoirStorage::updateReservoirStorageROF(double durhamS, double teerS, d
 	
 	RreleaseRequest = 0;
 		// Raleigh request for releases from Durham supply
-	DreleasebuybackRequest = 0;
+	DbuybackQuantity = 0;
 		// Durham request buy back releases owed to Raleigh
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -400,7 +400,7 @@ void ReservoirStorage::updateReservoirStorageROF()
 	
 	RreleaseRequest = 0;
 		// Raleigh request for releases from Durham supply
-	DreleasebuybackRequest = 0;
+	DbuybackQuantity = 0;
 		// Durham request buy back releases owed to Raleigh
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -453,17 +453,6 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 	else
 		raleighRequestO = 0.0;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////// if Raleigh requests, then see whether they want Durham's water first or JL water (should be based on price) //////////
-	////// if Durham is first choice, check if Durham is willing or has enough available to release downstream         //////////
-	////// this will be subject to the type of contract between the cities.... what kind of releases are allowed?      //////////
-	////// if JL is first choice, make sure that if JL is not available, the transfer request to Durham remains        //////////
-	////// if Durham is requesting along with Raleigh, they can pay Raleigh to not release the water (paper transfer)  //////////
-	////// 		in this case, will risk need to be re-evaluated for either utility after the transaction? 			   //////////
-	////// 
-	
-	
-	
 
 	////Cary wants at least a 5 MGD buffer of unused capacity in its treatment plant
 	caryTreatmentBuffer = 5.0*numdays;
@@ -1007,8 +996,10 @@ double ReservoirStorage::updateDurhamStorage()
 	}
 
 	////Little River Reservoir/Lake Michie Water Balance
-	durhamStorage = durhamStorage + durhamInflow + durhamRequest - durhamDemand3 - evap*1069.0 - durhamSpillage;
-	//Boundry conditions
+	durhamStorage = durhamStorage + durhamInflow + durhamRequest - durhamDemand3 - evap*1069.0 - durhamSpillage - RreleaseRequest;
+		// raw release request has been included
+	
+	//Boundary conditions
 	if (durhamStorage>durhamCapacity)
 	{
 		durhamSpillage+=durhamStorage - durhamCapacity;
@@ -1221,7 +1212,8 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	}
 	////Inflows are divided between the water storage supply and water quality supply proportionatly (14.7BG supply storage, 20 BG quality storage)
 	////Durham reservoir releases and wastewater returns are added to Falls Lake inflows
-	fallsSupplyInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(14.7/34.7);
+	fallsSupplyInflow = (fallsInflow + durhamSpillage + RreleaseRequest - fallsArea*evapF + durhamReturn - teerDiversion)*(14.7/34.7);
+		// includes raw release request
 	fallsQualityInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn -teerDiversion)*(20/34.7);
 
 	////Environmental Releases come from the water quality storage portion of Falls Lake
@@ -1588,7 +1580,8 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 	DurhamOWASACapacity = 16;
 }
 
-/// CALCULATING RELASES FUNCTION ///////////////////////////////////////////////////////////
+/// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
@@ -1597,8 +1590,9 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 	double RcriticalStorageLevel = 0.2;
 	double DcriticalStorageLevel = 0.2;
 	double DbuybackStorageLevel = 0.21;
-	double RreleaseRequest = 0.0;
-	double DbuybackQuantity = 0.0;
+	
+	RreleaseRequest = 0.0;
+	DbuybackQuantity = 0.0;
 
 	if ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) < RcriticalStorageLevel)
 		// if raleigh is requesting transfers or not
@@ -1638,11 +1632,22 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 			RreleaseRequest = 0.0;
 		}
 		
-		double DnewStorage = durhamStorage - RreleaseRequest;
-		
-		if (DnewStorage/durhamCapacity < DbuybackStorageLevel)
+		if (durhamSpillage > 0.0)
 		{
-			DbuybackQuantity = (DbuybackStorageLevel*durhamCapacity - DnewStorage);
+			RreleaseRequest -= durhamSpillage;
+				// if Durham is spilling water, no need to "release"
+		}
+		
+		if (RreleaseRequest < 0.0)
+		{
+			RreleaseRequest = 0.0;
+				// ensure non-negative value (possibly introduced when accounting for spillage)
+		}
+		
+		if ((durhamStorage - RreleaseRequest)/durhamCapacity < DbuybackStorageLevel)
+			// this statement asks if the resultant available storage for durham is lower than desired
+		{
+			DbuybackQuantity = (DbuybackStorageLevel*durhamCapacity - (durhamStorage - RreleaseRequest));
 			RreleaseRequest -= DbuybackQuantity;
 				// adjust request to reflect what Durham is willing to give
 		}
@@ -1652,6 +1657,18 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 		RreleaseRequest = 0.0;
 		DbuybackQuantity = 0.0;
 	}
+	
+	return;
+}
+
+void ReservoirStorage::getRaleighReleases()
+{
+	return RreleaseRequest;
+}
+
+void ReservoirStorage::getDurhamBuybackRequest()
+{
+	return DbuybackQuantity;
 }
 
 

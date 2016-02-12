@@ -255,11 +255,6 @@ int main (int argc, char *argv[])
         // RUNNING FROM AN INPUT FILE... now just looking at
         // optimized outputs, not actually optimizing here
 	{
-		ofstream out10;
-		openFile(out10,"output/codeCheck.csv");
-		out10<<1<<endl;
-			// use these three lines to output a "checker" file to see if code gets this far
-			
 		int c_num_obj = 29;
             // 6 OBJ VALUES are combined from each utility,
             // this can look at them separately

@@ -97,6 +97,9 @@ class WaterUtility
 	double insuranceRevenue;
 	double infBuffer;
 	
+	double weeklyReleaseVolume;
+	double weeklyBuybackVolume;
+	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	void calcWaterPrice(double elasticity_Of_Demand[]);
 	void calcSurchargePrice(double elasticity_Of_Demand[], int constant);

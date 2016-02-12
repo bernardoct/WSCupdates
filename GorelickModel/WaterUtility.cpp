@@ -333,6 +333,39 @@ void WaterUtility::payForTransfers(double transferCosts)
 	}
 	return;
 }
+
+/////////////////////////// pay for releases function ///////////////////////////////////////////////////////////////////////
+
+void WaterUtility::payForReleases(double contractValue, double contractLengthWeeks)
+{
+	Fund.subtract(contractValue/contractLengthWeeks*52.0);
+		// DO I NEED TO PRESENT VALUE THIS NOW OR IS IT DONE LATER?
+		// THIS IS NOW AN ANNUAL PAYMENT
+}
+
+void WaterUtility::acceptReleasePayment(double contractValue, double contractLengthWeeks)
+{
+	Fund.add(contractValue/contractLengthWeeks*52.0);
+}
+
+//////////////////////////// pay for buybacks ///////////////////////////////////////////////////////////////////////////////
+
+void WaterUtility::payForBuybacks()
+{
+	double buybackratePerMG = 3000.0/1000000.0;
+		// in millions of dollars per MG
+	Fund.subtract(buybackratePerMG*weeklyBuybackVolume);
+}
+
+void WaterUtility::acceptBuybackPayment()
+{
+	double buybackratePerMG = 3000.0/1000000.0;
+		// in millions of dollars per MG
+	Fund.add(buybackratePerMG*weeklyBuybackVolume);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void WaterUtility::clearVariablesForSimulation()
         // happens before looping
 {
