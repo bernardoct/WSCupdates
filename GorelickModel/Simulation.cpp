@@ -2993,7 +2993,7 @@ void Simulation::realizationLoop()
 						// use these three lines to output a "checker" file to see if code gets this far
 					ofstream out101;
 					openFile(out101,"output/codeCheckBuybacks.csv");
-					out101<<durham.weeklyBuybackVolumeVolume<<",";
+					out101<<durham.weeklyBuybackVolume<<",";
 						// use these three lines to output a "checker" file to see if code gets this far
 				
 					if(week==1)

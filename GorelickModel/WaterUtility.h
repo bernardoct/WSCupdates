@@ -126,6 +126,11 @@ class WaterUtility
 	void priceInsurance(int yr, int rlztn);
 	void payForTransfers(double tC);
 	
+	void payForReleases(double contractValue, double contractLengthWeeks);
+	void acceptReleasePayment(double contractValue, double contractLengthWeeks);
+	void payForBuybacks();
+	void acceptBuybackPayment();
+	
 	//~~~~~~~~~~~~~~~~ Private class members ~~~~~~~~~~~~~~~~~~~~~~~
 	private:
 	

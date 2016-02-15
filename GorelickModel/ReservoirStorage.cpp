@@ -1661,12 +1661,12 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 	return;
 }
 
-void ReservoirStorage::getRaleighReleases()
+double ReservoirStorage::getRaleighReleases()
 {
 	return RreleaseRequest;
 }
 
-void ReservoirStorage::getDurhamBuybackRequest()
+double ReservoirStorage::getDurhamBuybackRequest()
 {
 	return DbuybackQuantity;
 }
