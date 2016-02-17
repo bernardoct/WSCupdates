@@ -21,7 +21,7 @@ public:
 	
 	void setInflow(double durham, double ccr, double ul, double stq, double falls, double wb, double clayton, double crabtree, double jordan, double lillington, double ralRet, double durRet, double durRet2, double owasaRet, double evaporationf, double evaporationwb, double evaporation, double lRR);
 	
-	void calcRawReleases(double DreleaseMax, double DreleaseMin);
+	void calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, double DbuybackStorageLevel, int realization, ofstream &streamFile, int year, int week);
 	double getRaleighReleases();
 	double getDurhamBuybackRequest();
 	

@@ -350,17 +350,15 @@ void WaterUtility::acceptReleasePayment(double contractValue, double contractLen
 
 //////////////////////////// pay for buybacks ///////////////////////////////////////////////////////////////////////////////
 
-void WaterUtility::payForBuybacks()
+void WaterUtility::payForBuybacks(double buybackratePerMG)
+	// buyback rate in millions of dollars per MG
 {
-	double buybackratePerMG = 3000.0/1000000.0;
-		// in millions of dollars per MG
 	Fund.subtract(buybackratePerMG*weeklyBuybackVolume);
 }
 
-void WaterUtility::acceptBuybackPayment()
+void WaterUtility::acceptBuybackPayment(double buybackratePerMG)
+	// buyback rate in millions of dollars per MG
 {
-	double buybackratePerMG = 3000.0/1000000.0;
-		// in millions of dollars per MG
 	Fund.add(buybackratePerMG*weeklyBuybackVolume);
 }
 

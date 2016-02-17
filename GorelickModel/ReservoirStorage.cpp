@@ -1582,26 +1582,20 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
+void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, double DbuybackStorageLevel, int realization, ofstream &streamFile, int year, int week)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
 	// of water Durham wants to "buy back" to avoid releasing it.
 {
-	double RcriticalStorageLevel = 0.2;
-	double DcriticalStorageLevel = 0.2;
-	double DbuybackStorageLevel = 0.21;
-	
 	RreleaseRequest = 0.0;
 	DbuybackQuantity = 0.0;
 
 	if ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) < RcriticalStorageLevel)
-		// if raleigh is requesting transfers or not
+		// if raleigh is requesting releases or not
 	{
-		double Rdeficit = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
-			// difference in Raleigh storage between what they have and what they need (is positive here if there is a deficit)
-	
-		RreleaseRequest = Rdeficit;
+		RreleaseRequest = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
 			// Raleigh's request is equal to the deficit they wish to cover
+			// this quantity is the level below critical storage level that Raleigh has in the current week.
 
 		if (RreleaseRequest/7.0 > DreleaseMax)
 		{
@@ -1644,18 +1638,64 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin)
 				// ensure non-negative value (possibly introduced when accounting for spillage)
 		}
 		
+		if ((durhamStorage - RreleaseRequest)/durhamCapacity < DcriticalStorageLevel)
+			// if the resultant storage level is below the critical threshold
+		{
+			RreleaseRequest -= (DcriticalStorageLevel*durhamCapacity - (durhamStorage - RreleaseRequest));
+				// limit the request by the deficit relative to durham's critical threshold
+			if (RreleaseRequest < 0.0)
+			{
+				RreleaseRequest = 0.0;
+					// ensure non-negative value (possibly introduced when accounting for spillage)
+			}
+		}
+		
 		if ((durhamStorage - RreleaseRequest)/durhamCapacity < DbuybackStorageLevel)
 			// this statement asks if the resultant available storage for durham is lower than desired
 		{
-			DbuybackQuantity = (DbuybackStorageLevel*durhamCapacity - (durhamStorage - RreleaseRequest));
-			RreleaseRequest -= DbuybackQuantity;
-				// adjust request to reflect what Durham is willing to give
+			if ((DbuybackStorageLevel*durhamCapacity - (durhamStorage - RreleaseRequest)) > RreleaseRequest)
+				// the case where Raleigh requests release, it drops Durham's reservoir too low,
+				// but the requested release volume, if bought back, will still not bring Durham's
+				// supply level back to the buyback threshold.  in other words, if the deficit created
+				// by the possible release, between the level durham wishes to maintain via buybacks
+				// and the expected water level, is greater than the volume of the requested releases,
+				// using this deficit as a correction factor and assuming it is all bought back
+				// will result in a negative release request volume.
+			{
+				DbuybackQuantity = RreleaseRequest;
+				RreleaseRequest = 0.0;
+			}
+			else 
+			{
+				DbuybackQuantity = (DbuybackStorageLevel*durhamCapacity - (durhamStorage - RreleaseRequest));
+				RreleaseRequest -= DbuybackQuantity;
+					// adjust request to reflect what Durham is willing to give
+			}
+				
+			//if (RreleaseRequest < 0.0)
+			//{
+			//	RreleaseRequest = 0.0;
+					// ensure non-negative value (possibly introduced when accounting for spillage)
+					// this happens here when the new storage level is below DcriticalStorageLevel as well as
+					// the buyback level.  could adjust this if statement if i want to, but this works.
+			//}
 		}
 	}
 	else 
 	{
 		RreleaseRequest = 0.0;
 		DbuybackQuantity = 0.0;
+	}
+
+	if (realization == 1)
+		// for each week, output all this info to a csv
+	{
+		streamFile << year << "," << week << ",";
+		streamFile << ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) << ",";
+		streamFile << (durhamStorage/durhamCapacity) << ",";
+		streamFile << durhamSpillage << ",";
+		streamFile << RreleaseRequest << ",";
+		streamFile << DbuybackQuantity << endl;
 	}
 	
 	return;

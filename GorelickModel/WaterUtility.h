@@ -128,8 +128,8 @@ class WaterUtility
 	
 	void payForReleases(double contractValue, double contractLengthWeeks);
 	void acceptReleasePayment(double contractValue, double contractLengthWeeks);
-	void payForBuybacks();
-	void acceptBuybackPayment();
+	void payForBuybacks(double buybackratePerMG);
+	void acceptBuybackPayment(double buybackratePerMG);
 	
 	//~~~~~~~~~~~~~~~~ Private class members ~~~~~~~~~~~~~~~~~~~~~~~
 	private:

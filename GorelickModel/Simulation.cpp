@@ -2839,10 +2839,19 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
 	
+	int allowReleases = 1;
+		// logical to decide if releases are allowed or not
+	
 	double ReleaseContractLength = 100.0*52;
 		// number of weeks the contract is good
 	double ReleaseContractPrice = 30000000;
 		// total cost of the releases contract, to be paid on an annual basis?
+		
+	double RcriticalStorageLevel = 0.60;
+	double DcriticalStorageLevel = 0.30;
+	double DbuybackStorageLevel = 0.31;
+	
+	double buybackratePerMG = 3000.0/1000000.0;
 	
 	/////////////////////////////////////////////////////////////////////////
 	
@@ -2857,6 +2866,14 @@ void Simulation::realizationLoop()
 
 	ofstream out100;
 	ofstream out101;
+	
+	ofstream outNew;
+	
+	openFile(out100,"output/JLtransfersRaleigh.csv");
+	openFile(out101,"output/JLtransfersDurham.csv");
+	
+	openFile(outNew, "output/calcRawReleasesFunctionData.csv");
+
 	//systemStorage.openResFiles();
 	//openFile(out1,"raleighDemand.csv");
 	//openFile(out3,"riskOfFailureFile.csv");
@@ -2962,21 +2979,22 @@ void Simulation::realizationLoop()
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 
-			if (formulation > 0)
+			if (formulation > 0 and allowReleases == 1)
 				// allow transfers, apply raw releases before risk of failure is calculated
 			{
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 				
-				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin);
+				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, DbuybackStorageLevel, realization, outNew);
 
 				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
 				
 				if (durham.weeklyBuybackVolume > 0.0)
 				{
-					durham.payForBuybacks();
-					raleigh.acceptBuybackPayment();
+					durham.payForBuybacks(buybackratePerMG);
+					raleigh.acceptBuybackPayment(buybackratePerMG);
 				}
 				
 				if (week == 1)
@@ -2986,23 +3004,6 @@ void Simulation::realizationLoop()
 						// annual payment
 				}
 				
-				if (realization == 1) {
-					openFile(out100,"output/codeCheckReleases.csv");
-					out100<<raleigh.weeklyReleaseVolume<<",";
-					
-						// use these three lines to output a "checker" file to see if code gets this far
-					ofstream out101;
-					openFile(out101,"output/codeCheckBuybacks.csv");
-					out101<<durham.weeklyBuybackVolume<<",";
-						// use these three lines to output a "checker" file to see if code gets this far
-				
-					if(week==1)
-					{
-						out100<<endl;
-						out101<<endl;
-					}
-				}
-			
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
 				
@@ -3074,6 +3075,17 @@ void Simulation::realizationLoop()
 				owasa.weeklyTransferVolume = systemStorage.getOWASATransfers();
 				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
                     // each utility assigned the costs of the transfers they get
+				
+				if (realization == 1) 
+				{
+					if (week == 1)
+					{
+						out100<<endl;
+						out101<<endl;
+					}
+					out100<<year<<","<<week<<","<<raleigh.weeklyTransferVolume<<",";
+					out101<<year<<","<<week<<","<<durham.weeklyTransferVolume<<",";
+				}
 				
 				durham.payForTransfers(transferCosts);
 				owasa.payForTransfers(transferCosts);
@@ -3179,10 +3191,15 @@ void Simulation::realizationLoop()
 			}
 
 		} // End weekly loop
+		
 
 		// Saving the average annual cost from each 15-year realization
 
 	} //end realization loop
+	
+	out100.close();
+	out101.close();
+	outNew.close();
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();
