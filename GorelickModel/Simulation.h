@@ -19,8 +19,8 @@ public:
 	void setNumYears(int c_terminateYear);
 	
 	void preconditionData(double unit_demand_multiplier, double future_demand_multiplier, bool firstTime);
-	void realizationLoop();
-	void calculation (double *c_xreal, double *c_obj, double *c_constr);
+	void realizationLoop(ofstream &outReal, int rank);
+	void calculation (double *c_xreal, double *c_obj, double *c_constr, ofstream &datareturn, int rank);
 	void calculateWaterPrices();
 	void calculateWaterSurcharges();
 	

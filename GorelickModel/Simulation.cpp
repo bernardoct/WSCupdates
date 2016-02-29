@@ -713,7 +713,7 @@ void Simulation::generateStreamflows()
 	return;
 }
 
-void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
+void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, ofstream &datareturn, int rank)
 {
 	// Decision variable
 	if (borgToggle ==3)
@@ -1266,7 +1266,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	// to this point, only assigned decision variables to their model variables,
 	// now we are actually running the model.
 
-	realizationLoop();
+	realizationLoop(datareturn, rank);
         // reservoir simulation done here
 
 	//Writing objective variables
@@ -2792,7 +2792,7 @@ void Simulation::triggerInfrastructure(int realization)
 return;
 }
 
-void Simulation::realizationLoop()
+void Simulation::realizationLoop(ofstream &outReal, int rank)
 {
 	double durhamActualInflow, owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow;
 	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
@@ -2830,7 +2830,7 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
 	
-	double LMreleaseCap = 1000000.0;
+	double LMreleaseCap = 0.0;
 		// for now, equal to Raleigh-Durham Interconnection (above)
 		// assume no cap, this is a very large number
 	double LMreleaseMin = 0.0;
@@ -2844,14 +2844,79 @@ void Simulation::realizationLoop()
 	
 	double ReleaseContractLength = 100.0*52;
 		// number of weeks the contract is good
-	double ReleaseContractPrice = 30000000;
-		// total cost of the releases contract, to be paid on an annual basis?
-		
-	double RcriticalStorageLevel = 0.60;
-	double DcriticalStorageLevel = 0.30;
-	double DbuybackStorageLevel = 0.31;
+	double ReleaseContractPrice = 30000000.0/1000000.0;
+		// total cost of the releases contract in millions, to be paid on an annual basis?
+	
+	double RcriticalStorageLevel;
+	double DcriticalStorageLevel;
+	double DbuybackStorageLevel;
+	
+	if (rank == 0) 
+	{
+		RcriticalStorageLevel = 0.50;
+		DcriticalStorageLevel = 0.30;
+		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
+			// currently arbitrarily set, later should be optimized
+	}
+	else if (rank == 1) 
+	{
+		RcriticalStorageLevel = 0.50;
+		DcriticalStorageLevel = 0.30;
+		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
+			// currently arbitrarily set, later should be optimized
+	}
+	else if (rank == 2)
+	{
+		RcriticalStorageLevel = 0.50;
+		DcriticalStorageLevel = 0.30;
+		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
+			// currently arbitrarily set, later should be optimized
+	}
+	else 
+	{
+		RcriticalStorageLevel = 0.50;
+		DcriticalStorageLevel = 0.30;
+		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
+			// currently arbitrarily set, later should be optimized
+	}
+		// NEED TO COMMENT OUT THIS IF STATEMENT WHEN DOING MORE THAN A FEW SIMULATIONS
 	
 	double buybackratePerMG = 3000.0/1000000.0;
+		// currently equal to cost per quantity of treated transfer
+	
+	/////////////////////////////////////////////////////////////////////////
+	//////////// VARIABLES TO ORGANIZE OUTPUTS //////////////////////////////
+	
+	double realizationReleaseVol;
+	double realizationBuybackVol;
+	double realizationTransferVolToRaleigh;
+	double realizationTransferVolToDurham;
+		// averaged annual release, buyback, or transfer quantities in a given realization
+	
+	double realizationReleaseCostToRaleigh;
+	double realizationBuybackCostToDurham;
+	double realizationTransferCostToDurham;
+	double realizationTransferCostToRaleigh;
+		// total (entire timeseries) costs of releases, buybacks, and transfers in a given realization
+	
+	ofstream out100;
+	ofstream out101;
+	
+	ofstream outNew;
+	
+	openFile(out100,"output/JLtransfersRaleigh.csv");
+	openFile(out101,"output/JLtransfersDurham.csv");
+	
+	openFile(outNew, "output/calcRawReleasesFunctionData.csv");
+	
+	outReal << "Realization Number" << ",";
+	outReal << "Raleigh Average Weekly Release Volume (MGW)" << "," << "Durham Average Weekly Buyback Volume (MGW)" << ",";
+	outReal << "Total Realization Cost of Releases to Raleigh" << "," << "Total Realization Cost of Releases to Durham" << ",";
+	outReal << "Raleigh Average Weekly Transfer Volume (MGW)" << "," << "Durham Average Weekly Transfer Volume (MGW)" << ",";
+	outReal << "Total Realization Cost of Transfers to Raleigh" << "," << "Total Realization Cost of Transfers to Durham" << endl;
+		// csv column headers
+	
+	int weekcounter;
 	
 	/////////////////////////////////////////////////////////////////////////
 	
@@ -2864,22 +2929,29 @@ void Simulation::realizationLoop()
         // setting initial infrastructure values, storage and capacities
         // must all be equal to 0 at beginning of each realization, before 60yrs go by
 
-	ofstream out100;
-	ofstream out101;
-	
-	ofstream outNew;
-	
-	openFile(out100,"output/JLtransfersRaleigh.csv");
-	openFile(out101,"output/JLtransfersDurham.csv");
-	
-	openFile(outNew, "output/calcRawReleasesFunctionData.csv");
-
 	//systemStorage.openResFiles();
 	//openFile(out1,"raleighDemand.csv");
 	//openFile(out3,"riskOfFailureFile.csv");
 	for (int realization = 0; realization < numRealizations; realization++)
 	{
-
+		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
+		
+		realizationReleaseVol = 0.0;
+		realizationBuybackVol = 0.0;
+		realizationTransferVolToRaleigh = 0.0;
+		realizationTransferVolToDurham = 0.0;
+			// reset averaged annual release, buyback, or transfer quantities in a given realization
+	
+		realizationReleaseCostToRaleigh = 0.0;
+		realizationBuybackCostToDurham = 0.0;
+		realizationTransferCostToDurham = 0.0;
+		realizationTransferCostToRaleigh = 0.0;
+			// reset total (entire timeseries) costs of releases, buybacks, and transfers in a given realization
+		
+		weekcounter = 0;
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
 		// Initialize demand and reservoir storage objects (year, month, week, daysPerWeek, leapYearCounter)
 		simDates.initializeDates(startSimulationYear,1,1,7,0);
 
@@ -2985,7 +3057,7 @@ void Simulation::realizationLoop()
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 				
-				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, DbuybackStorageLevel, realization, outNew);
+				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, DbuybackStorageLevel, realization, outNew, year, week);
 
 				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
@@ -2995,6 +3067,9 @@ void Simulation::realizationLoop()
 				{
 					durham.payForBuybacks(buybackratePerMG);
 					raleigh.acceptBuybackPayment(buybackratePerMG);
+					
+					realizationReleaseCostToRaleigh -= buybackratePerMG*systemStorage.getDurhamBuybackRequest();
+					realizationBuybackCostToDurham += buybackratePerMG*systemStorage.getDurhamBuybackRequest();
 				}
 				
 				if (week == 1)
@@ -3002,12 +3077,19 @@ void Simulation::realizationLoop()
 					raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
 					durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
 						// annual payment
+					
+					realizationReleaseCostToRaleigh += (ReleaseContractPrice/ReleaseContractLength*52.0);
+					realizationBuybackCostToDurham -= (ReleaseContractPrice/ReleaseContractLength*52.0);
 				}
+				
+				realizationReleaseVol += systemStorage.getRaleighReleases();
+				realizationBuybackVol += systemStorage.getDurhamBuybackRequest();
+				
 				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
 				
-				if (raleigh.weeklyReleaseVolume > 0.0 or durham.weeklyBuybackVolume > 0.0)
+				if (raleigh.weeklyReleaseVolume > 0.0)
 				{
 					systemStorage.updateStorage(week-1);
 				}
@@ -3078,13 +3160,13 @@ void Simulation::realizationLoop()
 				
 				if (realization == 1) 
 				{
-					if (week == 1)
-					{
-						out100<<endl;
-						out101<<endl;
-					}
-					out100<<year<<","<<week<<","<<raleigh.weeklyTransferVolume<<",";
-					out101<<year<<","<<week<<","<<durham.weeklyTransferVolume<<",";
+					//if (week == 1)
+					//{
+					//	out100<<endl;
+					//	out101<<endl;
+					//}
+					out100<<year<<","<<week<<","<<raleigh.weeklyTransferVolume<<endl;
+					out101<<year<<","<<week<<","<<durham.weeklyTransferVolume<<endl;
 				}
 				
 				durham.payForTransfers(transferCosts);
@@ -3096,8 +3178,15 @@ void Simulation::realizationLoop()
 					cary.Fund.add((durham.weeklyTransferVolume + owasa.weeklyTransferVolume + raleigh.weeklyTransferVolume)*transferCosts);
 				}
 				
+				realizationTransferVolToRaleigh += systemStorage.getRaleighTransfers();
+				realizationTransferVolToDurham += systemStorage.getDurhamTransfers();
+				
+				realizationTransferCostToRaleigh += transferCosts*systemStorage.getRaleighTransfers();
+				realizationTransferCostToDurham += transferCosts*systemStorage.getDurhamTransfers();
+				
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+				
+				weekcounter += 1;
 			}
 			//Update reservoir storage levels
 			systemStorage.setSpillover(week-1);
@@ -3192,6 +3281,16 @@ void Simulation::realizationLoop()
 
 		} // End weekly loop
 		
+		
+		///////////////////// WRITE REALIZATION AVERAGES //////////////////////////////////////////////////////////////////
+		
+		outReal << realization << ",";
+		outReal << realizationReleaseVol/weekcounter << "," << realizationBuybackVol/weekcounter << ",";
+		outReal << realizationReleaseCostToRaleigh << "," << realizationBuybackCostToDurham << ",";
+		outReal << realizationTransferVolToRaleigh/weekcounter << "," << realizationTransferVolToDurham/weekcounter << ",";
+		outReal << realizationTransferCostToRaleigh << "," << realizationTransferCostToDurham << endl;
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Saving the average annual cost from each 15-year realization
 

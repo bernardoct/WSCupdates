@@ -62,10 +62,13 @@ void usage(int argc, char* argv[])
 // Global simulation object
 Simulation simulation;
 
-void calculationWrapperFunction(double *xreal, double *obj, double *constr)
-{
-	simulation.calculation(xreal, obj, constr);
-}
+//void calculationWrapperFunction(double *xreal, double *obj, double *constr)
+//{
+//	simulation.calculation(xreal, obj, constr);
+//}
+	// THIS IS DIFFERENT BECAUSE I ADDED AN OUTPUT.  NEED TO UNCOMMENT THIS WHEN OPTIMIZING
+	// DONT FORGET ABOUT THIS
+	// everything related to using the moea is commented out to let me create some outputs
 
 int main (int argc, char *argv[])
 {
@@ -186,69 +189,69 @@ int main (int argc, char *argv[])
 	if (simulation.borgToggle < 3)
 	{
 
-		c_num_obj = 6;//Number of objective variables
+		// c_num_obj = 6;//Number of objective variables
 
-		// JDH 11/12: Turning off constraints for now (below here, only for parallel version)
-		c_num_constr = 0;
-		general_1d_allocate(c_obj, c_num_obj);
-		//general_1d_allocate(c_constr, c_num_constr);
+		// // JDH 11/12: Turning off constraints for now (below here, only for parallel version)
+		// c_num_constr = 0;
+		// general_1d_allocate(c_obj, c_num_obj);
+		// //general_1d_allocate(c_constr, c_num_constr);
 
-		simulation.initializeFormulation(c_num_obj, c_num_constr); // number of decisions, objectives, constraints
+		// simulation.initializeFormulation(c_num_obj, c_num_constr); // number of decisions, objectives, constraints
 
-		// Interface with Borg-MS (parallel)
-		#ifdef PARALLEL
+		// // Interface with Borg-MS (parallel)
+		// #ifdef PARALLEL
 
-			// BORG_Debug_on();
-			// BORG_Algorithm_ms_max_time(0.008);
-			// BORG_Algorithm_output_aerovis();
+			// // BORG_Debug_on();
+			// // BORG_Algorithm_ms_max_time(0.008);
+			// // BORG_Algorithm_output_aerovis();
 
-			char runtime[256];
-			char outputFilename[256];
-			FILE* outputFile = NULL;
+			// char runtime[256];
+			// char outputFilename[256];
+			// FILE* outputFile = NULL;
 
-			BORG_Algorithm_ms_startup(&argc, &argv);
-			BORG_Algorithm_ms_max_evaluations(10000);
-			BORG_Algorithm_output_frequency(10);
-			BORG_Problem problem = BORG_Problem_create(c_num_dec, c_num_obj, c_num_constr, calculationWrapperFunction);
+			// BORG_Algorithm_ms_startup(&argc, &argv);
+			// BORG_Algorithm_ms_max_evaluations(10000);
+			// BORG_Algorithm_output_frequency(10);
+			// BORG_Problem problem = BORG_Problem_create(c_num_dec, c_num_obj, c_num_constr, calculationWrapperFunction);
 
-			// Set all the parameter bounds and epsilons
-			setProblemDefinition(problem, simulation.formulation);
+			// // Set all the parameter bounds and epsilons
+			// setProblemDefinition(problem, simulation.formulation);
 
-			// This is set up to run only one seed at a time.
+			// // This is set up to run only one seed at a time.
 
-			sprintf(runtime, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.runtime", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
-			sprintf(outputFilename, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.set", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
-			BORG_Algorithm_output_runtime(runtime);
+			// sprintf(runtime, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.runtime", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
+			// sprintf(outputFilename, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.set", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
+			// BORG_Algorithm_output_runtime(runtime);
 
-			BORG_Random_seed(seed);
-			BORG_Archive result = BORG_Algorithm_ms_run(problem);
+			// BORG_Random_seed(seed);
+			// BORG_Archive result = BORG_Algorithm_ms_run(problem);
 
-			// If this is the master node, print out the final archive
-			if (result != NULL) {
-				outputFile = fopen(outputFilename, "w");
-				if (!outputFile) {
-					BORG_Debug("Unable to open final output file\n");
-				}
-				BORG_Archive_print(result, outputFile);
-				BORG_Archive_destroy(result);
-				fclose(outputFile);
-			}
+			// // If this is the master node, print out the final archive
+			// if (result != NULL) {
+				// outputFile = fopen(outputFilename, "w");
+				// if (!outputFile) {
+					// BORG_Debug("Unable to open final output file\n");
+				// }
+				// BORG_Archive_print(result, outputFile);
+				// BORG_Archive_destroy(result);
+				// fclose(outputFile);
+			// }
 
-			BORG_Algorithm_ms_shutdown();
-			BORG_Problem_destroy(problem);
+			// BORG_Algorithm_ms_shutdown();
+			// BORG_Problem_destroy(problem);
 
-		#else // Interface with MOEA Framework
+		// #else // Interface with MOEA Framework
 
-			MOEA_Init(c_num_obj, c_num_constr); // pass number of objectives and formulation to MOEA
+			// MOEA_Init(c_num_obj, c_num_constr); // pass number of objectives and formulation to MOEA
 
-			while (MOEA_Next_solution() == MOEA_SUCCESS)
-			{
-				MOEA_Read_doubles(c_num_dec, c_xreal);//Input decision variables
-				simulation.calculation(c_xreal, c_obj, c_constr); // Run simulation iteration
-				MOEA_Write(c_obj, c_constr);//write new objective functions
-			}
+			// while (MOEA_Next_solution() == MOEA_SUCCESS)
+			// {
+				// MOEA_Read_doubles(c_num_dec, c_xreal);//Input decision variables
+				// simulation.calculation(c_xreal, c_obj, c_constr); // Run simulation iteration
+				// MOEA_Write(c_obj, c_constr);//write new objective functions
+			// }
 
-		#endif
+		// #endif
 
 	}
 	else // If running from parameter input file (no constraints here)
@@ -277,17 +280,31 @@ int main (int argc, char *argv[])
 		int rank2 = rank + 256;
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
+		std::string filename3 = "output/variedTransfersNR";
+		
 		std::string completeFilename;
+		std::string completeFilename2;
+		
 		std::stringstream sstm;
+		std::stringstream sstm2;
+		
 		sstm<< filename1<<rank <<filename2;
+		sstm2 << filename3 << rank << filename2;
+		
 		completeFilename = sstm.str();
+		completeFilename2 = sstm2.str();
+		
 		ofstream out1;
+		ofstream datareturn;
+		
 		openFile(out1, completeFilename);
+		openFile(datareturn, completeFilename2);
+		
 		//for (int i = 0; i < 2; i++)
 		//{
 			simulation.solutionNumber = rank;
             //simulation.solutionNumber = 1;
-			simulation.calculation(c_xreal, c_obj, c_constr);
+			simulation.calculation(c_xreal, c_obj, c_constr, datareturn, rank);
 			for (int x = 0; x< c_num_dec; x++)
 			{
 				out1<<simulation.parameterInput[simulation.solutionNumber][x]<<",";
@@ -300,6 +317,7 @@ int main (int argc, char *argv[])
 		//}
 		MPI_Finalize();
 		out1.close();
+		datareturn.close();
 	}
 
 	zap(c_obj);

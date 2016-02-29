@@ -996,7 +996,7 @@ double ReservoirStorage::updateDurhamStorage()
 	}
 
 	////Little River Reservoir/Lake Michie Water Balance
-	durhamStorage = durhamStorage + durhamInflow + durhamRequest - durhamDemand3 - evap*1069.0 - durhamSpillage - RreleaseRequest;
+	durhamStorage = durhamStorage + durhamInflow + durhamRequest - durhamDemand3 - evap*1069.0 - durhamSpillage;
 		// raw release request has been included
 	
 	//Boundary conditions
@@ -1212,9 +1212,9 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	}
 	////Inflows are divided between the water storage supply and water quality supply proportionatly (14.7BG supply storage, 20 BG quality storage)
 	////Durham reservoir releases and wastewater returns are added to Falls Lake inflows
-	fallsSupplyInflow = (fallsInflow + durhamSpillage + RreleaseRequest - fallsArea*evapF + durhamReturn - teerDiversion)*(14.7/34.7);
+	fallsSupplyInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(14.7/34.7);
 		// includes raw release request
-	fallsQualityInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn -teerDiversion)*(20/34.7);
+	fallsQualityInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(20/34.7);
 
 	////Environmental Releases come from the water quality storage portion of Falls Lake
 	fallsLakeQualityStorage += fallsQualityInflow - fallsSpillage;
@@ -1686,6 +1686,12 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		RreleaseRequest = 0.0;
 		DbuybackQuantity = 0.0;
 	}
+	
+	durhamStorage -= RreleaseRequest;
+	fallsLakeSupplyStorage += RreleaseRequest;
+		// ADJUST THE EXISTING STORAGE LEVELS
+		// DOING SO HERE CHANGES R AND D DECISIONS
+		// TO USE JL IN THE CURRENT WEEK
 
 	if (realization == 1)
 		// for each week, output all this info to a csv
@@ -1695,7 +1701,9 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		streamFile << (durhamStorage/durhamCapacity) << ",";
 		streamFile << durhamSpillage << ",";
 		streamFile << RreleaseRequest << ",";
-		streamFile << DbuybackQuantity << endl;
+		streamFile << DbuybackQuantity << ",";
+		streamFile << fallsLakeSupplyStorage << ",";
+		streamFile << durhamStorage << endl;
 	}
 	
 	return;
