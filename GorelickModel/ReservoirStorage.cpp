@@ -1582,7 +1582,9 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, double DbuybackStorageLevel, int realization, ofstream &streamFile, int year, int week)
+void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
+									   double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, double RSCALEFACTOR, double DSCALEFACTOR,
+									   int realization, ofstream &streamFile, int year, int week)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
 	// of water Durham wants to "buy back" to avoid releasing it.
@@ -1590,19 +1592,40 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 	RreleaseRequest = 0.0;
 	DbuybackQuantity = 0.0;
 
-	if ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) < RcriticalStorageLevel)
+	if (RROFactual > RROFtrigger)
 		// if raleigh is requesting releases or not
+		// AFTER MARCH 15, 2016: now based on ROF triggers
 	{
-		RreleaseRequest = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
+		RreleaseRequest = (RROFactual - RROFtrigger) * RSCALEFACTOR;
+			// initial request is based on the current risk level 
+			// relative to the trigger risk level, scaled by some factor
+			// to convert a percentage difference in risk to MGW
+		
+		// RreleaseRequest = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
 			// Raleigh's request is equal to the deficit they wish to cover
 			// this quantity is the level below critical storage level that Raleigh has in the current week.
+			// THIS WAS A PAST DETERMINATE OF THE INITIAL RELEASE REQUEST, NO LONGER USED
 
+		if (fallsLakeSupplyStorage/fallsLakeSupplyCapacity >= RcriticalStorageLevel)	
+		{
+			RreleaseRequest = 0.0;
+				// if Falls Lake is already filled to a given level, no releases requested
+		}
+		
+		if ((fallsLakeSupplyStorage + RreleaseRequest)/fallsLakeSupplyCapacity >= RcriticalStorageLevel)
+		{
+			RreleaseRequest = fallsLakeSupplyCapacity*RcriticalStorageLevel - fallsLakeSupplyStorage;
+				// if the intial request brings the falls lake storage level above critical level,
+				// then the request is limited
+		}
+			
 		if (RreleaseRequest/7.0 > DreleaseMax)
 		{
 			RreleaseRequest = 7.0*DreleaseMax;
 				// this represents the size of the release in MG in the given WEEK
 		} 
-		else if (RreleaseRequest/7.0 < DreleaseMin)
+		
+		if (RreleaseRequest/7.0 < DreleaseMin)
 		{
 			RreleaseRequest = 0.0;
 				// this and the directly above statement cover release constraints
@@ -1649,6 +1672,20 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 					// ensure non-negative value (possibly introduced when accounting for spillage)
 			}
 		}
+		
+		if (DROFactual > DROFtrigger)
+		{
+			DbuybackStorageLevel = DcriticalStorageLevel + (DROFactual - DROFtrigger) * DSCALEFACTOR;
+				// if Durham has ROF levels above the trigger for transfers,
+				// it will act to buy back releases at a proportional level
+				// to its risk.
+		}
+		else 
+		{
+			DbuybackStorageLevel = DcriticalStorageLevel;
+				// if not at risk, will not buy back releases
+		}
+		
 		
 		if ((durhamStorage - RreleaseRequest)/durhamCapacity < DbuybackStorageLevel)
 			// this statement asks if the resultant available storage for durham is lower than desired

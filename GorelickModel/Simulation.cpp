@@ -1002,6 +1002,11 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 		owasa.TTriggerI = 2;
 		raleigh.TTriggerI = 2;
 		raleigh.TTriggerN = 2;
+		
+		raleigh.RRtrigger = 2;
+		durham.RRtrigger  = 2;
+			// raw release triggers
+		
 		durham.jordanLakeAlloc = 0;
 		raleigh.jordanLakeAlloc = 0;
 		owasa.jordanLakeAlloc = 0;
@@ -1017,6 +1022,12 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 		owasa.TTriggerI = xreal[5];
 		raleigh.TTriggerI = xreal[6];
 		raleigh.TTriggerN = xreal[6];
+		
+		durham.RRtrigger  = xreal[4];
+		raleigh.RRtrigger = xreal[6];
+			// raw release triggers
+			// for now, same as treated transfer triggers
+			// should be their own variables later
 
 		if((xreal[7]+xreal[8]+xreal[9]+xreal[10])>1.0)
 		{
@@ -1093,9 +1104,22 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	////Infrastructure rankings - what order should new infrastructure be built once it is triggered?
 	///OWASA infrastructure
 	owasa.infMatrix[0][0] = xreal[27];////University Lake expansion
+		// ranking values for when to buildC
+		// between 0 and 1 (higher = build first)
+		// once built, this number is changed to 1
+		
 	owasa.infMatrix[0][2] = 17;
+		// permitting period, cant be built until 17th year
+		
 	owasa.infMatrix[0][4] = 107.0;
+		// total cost, $MM
+		
 	owasa.infMatrix[0][5] = 3 + rand() % 3;
+		// construction time
+		
+	// index = 1 toggle to begin construction
+	// index = 3 means counter of years of construction
+		
 	owasa.infMatrix[1][0] = xreal[28];////Cane Creek expansion
 	owasa.infMatrix[1][2] = 17;
 	owasa.infMatrix[1][4] = 127.0;
@@ -2830,7 +2854,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
 	
-	double LMreleaseCap = 0.0;
+	double LMreleaseCap = 1000000.0;
 		// for now, equal to Raleigh-Durham Interconnection (above)
 		// assume no cap, this is a very large number
 	double LMreleaseMin = 0.0;
@@ -2847,42 +2871,22 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	double ReleaseContractPrice = 30000000.0/1000000.0;
 		// total cost of the releases contract in millions, to be paid on an annual basis?
 	
-	double RcriticalStorageLevel;
-	double DcriticalStorageLevel;
-	double DbuybackStorageLevel;
-	
-	if (rank == 0) 
-	{
-		RcriticalStorageLevel = 0.50;
-		DcriticalStorageLevel = 0.30;
-		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
-			// currently arbitrarily set, later should be optimized
-	}
-	else if (rank == 1) 
-	{
-		RcriticalStorageLevel = 0.50;
-		DcriticalStorageLevel = 0.30;
-		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
-			// currently arbitrarily set, later should be optimized
-	}
-	else if (rank == 2)
-	{
-		RcriticalStorageLevel = 0.50;
-		DcriticalStorageLevel = 0.30;
-		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
-			// currently arbitrarily set, later should be optimized
-	}
-	else 
-	{
-		RcriticalStorageLevel = 0.50;
-		DcriticalStorageLevel = 0.30;
-		DbuybackStorageLevel = DcriticalStorageLevel + 0.02;
-			// currently arbitrarily set, later should be optimized
-	}
-		// NEED TO COMMENT OUT THIS IF STATEMENT WHEN DOING MORE THAN A FEW SIMULATIONS
-	
+	double RcriticalStorageLevel = 0.90;
+	double DcriticalStorageLevel = 0.50;
+		// currently arbitrarily set, later should be optimized
+		// previous to March 15, 2016, releases were based on 
+		// R and D reservoir levels alone, now they are based on
+		// the same ROF values as treated transfers
+
 	double buybackratePerMG = 3000.0/1000000.0;
 		// currently equal to cost per quantity of treated transfer
+	double ReleaseRequestScaleFactor = 10000.0;
+		// a factor introduced to generate an initial release request
+		// by raleigh based on the difference between current week ROF
+		// and the ROF trigger value.
+	double DbuybackScaleFactor = 10.0;
+		// a similar scale factor to determine the buyback threshold
+		// for durham
 	
 	/////////////////////////////////////////////////////////////////////////
 	//////////// VARIABLES TO ORGANIZE OUTPUTS //////////////////////////////
@@ -3050,54 +3054,6 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 			owasa.fillRestrictionsArray(season);
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
-
-			if (formulation > 0 and allowReleases == 1)
-				// allow transfers, apply raw releases before risk of failure is calculated
-			{
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
-				
-				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, DbuybackStorageLevel, realization, outNew, year, week);
-
-				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
-				
-				if (durham.weeklyBuybackVolume > 0.0)
-				{
-					durham.payForBuybacks(buybackratePerMG);
-					raleigh.acceptBuybackPayment(buybackratePerMG);
-					
-					realizationReleaseCostToRaleigh -= buybackratePerMG*systemStorage.getDurhamBuybackRequest();
-					realizationBuybackCostToDurham += buybackratePerMG*systemStorage.getDurhamBuybackRequest();
-				}
-				
-				if (week == 1)
-				{
-					raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
-					durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
-						// annual payment
-					
-					realizationReleaseCostToRaleigh += (ReleaseContractPrice/ReleaseContractLength*52.0);
-					realizationBuybackCostToDurham -= (ReleaseContractPrice/ReleaseContractLength*52.0);
-				}
-				
-				realizationReleaseVol += systemStorage.getRaleighReleases();
-				realizationBuybackVol += systemStorage.getDurhamBuybackRequest();
-				
-				
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
-				
-				if (raleigh.weeklyReleaseVolume > 0.0)
-				{
-					systemStorage.updateStorage(week-1);
-				}
-				
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
-			}
-			
 			
 			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
                 // gives the ROF of this given week
@@ -3146,6 +3102,67 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
+			if (formulation > 0 and allowReleases == 1)
+				// allow transfers, apply raw releases 
+				// in a given week, transfers calculated before transfers
+				// however, ROF is not updated.  this should work out as long as
+				// release quantities are not capped at a low level
+				// (think: first week of a month of triggered ROF will see large
+				// transfers and releases, but the releases in first week will lead to
+				// no transfers in following weeks)
+			{
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
+				
+				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
+												raleigh.RRtrigger, durham.RRtrigger, raleigh.riskOfFailure, durham.riskOfFailure, ReleaseRequestScaleFactor, DbuybackScaleFactor, 
+												realization, outNew, year, week);
+					// NEED TO INCLUDE as release triggers instead of reservoir levels:
+					//	raleigh.TTriggerN
+					//  durham.TTriggerN
+
+				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
+				
+				if (durham.weeklyBuybackVolume > 0.0)
+				{
+					durham.payForBuybacks(buybackratePerMG);
+					raleigh.acceptBuybackPayment(buybackratePerMG);
+					
+					realizationReleaseCostToRaleigh -= buybackratePerMG*systemStorage.getDurhamBuybackRequest();
+					realizationBuybackCostToDurham += buybackratePerMG*systemStorage.getDurhamBuybackRequest();
+				}
+				
+				if (week == 1)
+				{
+					raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
+					durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
+						// annual payment
+					
+					realizationReleaseCostToRaleigh += (ReleaseContractPrice/ReleaseContractLength*52.0);
+					realizationBuybackCostToDurham -= (ReleaseContractPrice/ReleaseContractLength*52.0);
+				}
+				
+				realizationReleaseVol += systemStorage.getRaleighReleases();
+				realizationBuybackVol += systemStorage.getDurhamBuybackRequest();
+				
+				
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
+				
+				weekcounter += 1;
+				
+				if (raleigh.weeklyReleaseVolume > 0.0)
+				{
+					systemStorage.setSpillover(week-1);
+					systemStorage.updateStorage(week-1);
+				}
+				
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
+			}
+			
 			if(formulation > 0)
                 // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
 			{
@@ -3186,8 +3203,12 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
-				weekcounter += 1;
+				if (allowReleases == 0)
+				{
+					weekcounter += 1;
+				}
 			}
+			
 			//Update reservoir storage levels
 			systemStorage.setSpillover(week-1);
 			systemStorage.updateStorage(week-1);
@@ -3230,6 +3251,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 			raleigh.weeklyUpdate();
 			cary.weeklyUpdate();
 			updateFallsQuality();
+			
 			if (week == 1)
                 // if on a new year...
 			{

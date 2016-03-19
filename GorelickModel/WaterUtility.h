@@ -42,6 +42,9 @@ class WaterUtility
 	// Transfer trigger, translated into reservoir storage volume
 	double TTrigger;
 	
+	// RAW RELEASE TRIGGER DECISION VARIABLES
+	double RRtrigger;
+	
 	// Storage amount (fraction of full)
 	double storageFraction;
 	
