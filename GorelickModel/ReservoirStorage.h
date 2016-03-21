@@ -23,7 +23,7 @@ public:
 	
 	void calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
 						 double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, double RSCALEFACTOR, double DSCALEFACTOR,
-						 int realization, ofstream &streamFile, int year, int week);
+						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT);
 	double getRaleighReleases();
 	double getDurhamBuybackRequest();
 	

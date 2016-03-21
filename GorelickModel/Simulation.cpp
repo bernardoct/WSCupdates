@@ -2880,13 +2880,21 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 
 	double buybackratePerMG = 3000.0/1000000.0;
 		// currently equal to cost per quantity of treated transfer
-	double ReleaseRequestScaleFactor = 10000.0;
+	double ReleaseRequestScaleFactor = 100.0;
 		// a factor introduced to generate an initial release request
 		// by raleigh based on the difference between current week ROF
 		// and the ROF trigger value.
 	double DbuybackScaleFactor = 10.0;
 		// a similar scale factor to determine the buyback threshold
 		// for durham
+	
+	
+	raleigh.RRtrigger = raleigh.RRtrigger + 0.1 - rank * 0.1;
+	//durham.RRtrigger  = durham.RRtrigger + 0.1 - rank * 0.1;
+		
+	//ReleaseRequestScaleFactor = pow(100.0, rank);
+	//DbuybackScaleFactor		  = 100.0/pow(10.0, rank);
+	
 	
 	/////////////////////////////////////////////////////////////////////////
 	//////////// VARIABLES TO ORGANIZE OUTPUTS //////////////////////////////
@@ -2903,27 +2911,62 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	double realizationTransferCostToRaleigh;
 		// total (entire timeseries) costs of releases, buybacks, and transfers in a given realization
 	
+	/////////////////////////////////////////////////////////////////////////
+	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
+	
+	int numRealizationsTOREAD = 5;
+	
 	ofstream out100;
 	ofstream out101;
-	
 	ofstream outNew;
 	
-	openFile(out100,"output/JLtransfersRaleigh.csv");
-	openFile(out101,"output/JLtransfersDurham.csv");
+	std::string filenameA = "output/JLTTR";
+	std::string filenameB = "output/JLTTD";
+	std::string filenameC = "output/RRfuncOutput";
 	
-	openFile(outNew, "output/calcRawReleasesFunctionData.csv");
+	std::string filenameEND = ".csv";
+		
+	std::string completeFilenameA;
+	std::string completeFilenameB;
+	std::string completeFilenameC;
+		
+	std::stringstream sstmA;
+	std::stringstream sstmB;
+	std::stringstream sstmC;
+		
+	sstmA << filenameA << rank << filenameEND;
+	sstmB << filenameB << rank << filenameEND;
+	sstmC << filenameC << rank << filenameEND;
+		
+	completeFilenameA = sstmA.str();
+	completeFilenameB = sstmB.str();
+	completeFilenameC = sstmC.str();
 	
-	outReal << "Realization Number" << ",";
+	openFile(out100, completeFilenameA);
+	openFile(out101, completeFilenameB);
+	openFile(outNew, completeFilenameC);
+	
+	outReal << "Realization Number" << "," << "Rank" << "," << "Raleigh RR ROF Trigger" << "," << "Durham RR ROF Trigger" << ",";
+	outReal << "Release Scale Factor" << "," << "Buyback Scale Factor" << ",";
 	outReal << "Raleigh Average Weekly Release Volume (MGW)" << "," << "Durham Average Weekly Buyback Volume (MGW)" << ",";
 	outReal << "Total Realization Cost of Releases to Raleigh" << "," << "Total Realization Cost of Releases to Durham" << ",";
 	outReal << "Raleigh Average Weekly Transfer Volume (MGW)" << "," << "Durham Average Weekly Transfer Volume (MGW)" << ",";
 	outReal << "Total Realization Cost of Transfers to Raleigh" << "," << "Total Realization Cost of Transfers to Durham" << endl;
 		// csv column headers
 	
-	int weekcounter;
+	out100 << "Realization" << "," << "Year" << "," << "Week" << "," << "Raleigh Transfer Volume" << "," << "Raleigh ROF" << endl;
+	out101 << "Realization" << "," << "Year" << "," << "Week" << "," << "Durham Transfer Volume"  << "," << "Durham ROF"  << endl;
+		// csv column headers
+		
+	outNew << "Realization" << "," << "Year" << "," << "Week" << ",";
+	outNew << "Falls Lake Storage Ratio" << "," << "Durham Storage Ratio" << "," << "LM Spillage" << ",";
+	outNew << "Release Request" << "," << "Buyback Quantity" << "," << "Falls Lake Actual Storage" << "," << "Durham Actual Storage" << ",";
+	outNew << "Raleigh ROF" << "," << "Durham ROF" << endl;
+		// csv column headers
 	
 	/////////////////////////////////////////////////////////////////////////
-	
+		
+	int weekcounter;
 	
 	bondRate = 0.05;
 	bondLength = 25;
@@ -3116,10 +3159,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				
 				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
 												raleigh.RRtrigger, durham.RRtrigger, raleigh.riskOfFailure, durham.riskOfFailure, ReleaseRequestScaleFactor, DbuybackScaleFactor, 
-												realization, outNew, year, week);
-					// NEED TO INCLUDE as release triggers instead of reservoir levels:
-					//	raleigh.TTriggerN
-					//  durham.TTriggerN
+												realization, outNew, year, week, numRealizationsTOREAD);
 
 				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
@@ -3175,15 +3215,10 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
                     // each utility assigned the costs of the transfers they get
 				
-				if (realization == 1) 
+				if (realization < numRealizationsTOREAD) 
 				{
-					//if (week == 1)
-					//{
-					//	out100<<endl;
-					//	out101<<endl;
-					//}
-					out100<<year<<","<<week<<","<<raleigh.weeklyTransferVolume<<endl;
-					out101<<year<<","<<week<<","<<durham.weeklyTransferVolume<<endl;
+					out100 << realization << "," << year << "," << week << "," << raleigh.weeklyTransferVolume << "," << raleigh.riskOfFailure << endl;
+					out101 << realization << "," << year << "," << week << "," << durham.weeklyTransferVolume  << "," << durham.riskOfFailure  << endl;
 				}
 				
 				durham.payForTransfers(transferCosts);
@@ -3306,7 +3341,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 		
 		///////////////////// WRITE REALIZATION AVERAGES //////////////////////////////////////////////////////////////////
 		
-		outReal << realization << ",";
+		outReal << realization << "," << rank << "," << raleigh.RRtrigger << "," << durham.RRtrigger << "," << ReleaseRequestScaleFactor << "," << DbuybackScaleFactor << ",";
 		outReal << realizationReleaseVol/weekcounter << "," << realizationBuybackVol/weekcounter << ",";
 		outReal << realizationReleaseCostToRaleigh << "," << realizationBuybackCostToDurham << ",";
 		outReal << realizationTransferVolToRaleigh/weekcounter << "," << realizationTransferVolToDurham/weekcounter << ",";

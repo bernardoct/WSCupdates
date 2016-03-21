@@ -1584,7 +1584,7 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
 									   double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, double RSCALEFACTOR, double DSCALEFACTOR,
-									   int realization, ofstream &streamFile, int year, int week)
+									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
 	// of water Durham wants to "buy back" to avoid releasing it.
@@ -1730,17 +1730,18 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		// DOING SO HERE CHANGES R AND D DECISIONS
 		// TO USE JL IN THE CURRENT WEEK
 
-	if (realization == 1)
+	if (realization < numRealizationsTOOUTPUT)
 		// for each week, output all this info to a csv
 	{
-		streamFile << year << "," << week << ",";
-		streamFile << ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) << ",";
+		streamFile << realization << "," << year << "," << week << ",";
+		streamFile << ((fallsLakeSupplyStorage)/(fallsLakeSupplyCapacity)) << ",";
 		streamFile << (durhamStorage/durhamCapacity) << ",";
 		streamFile << durhamSpillage << ",";
 		streamFile << RreleaseRequest << ",";
 		streamFile << DbuybackQuantity << ",";
 		streamFile << fallsLakeSupplyStorage << ",";
-		streamFile << durhamStorage << endl;
+		streamFile << durhamStorage << ",";
+		streamFile << RROFactual << "," << DROFactual << endl;
 	}
 	
 	return;

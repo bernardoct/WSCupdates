@@ -280,7 +280,7 @@ int main (int argc, char *argv[])
 		int rank2 = rank + 256;
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
-		std::string filename3 = "output/variedTransfersNR";
+		std::string filename3 = "output/variedRROF";
 		
 		std::string completeFilename;
 		std::string completeFilename2;
