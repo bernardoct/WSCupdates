@@ -656,6 +656,8 @@ void Simulation::chooseStreamflows()
 		for (int col = 0; col < terminateYear*52; col++)
 		{
 			durhamInflows.synthetic[row][col] 	= michieInflowSYN[x][col]+littleRiverInflowSYN[x][col];
+				// if I want to use all realizations, not just the worst 100,
+				// change x to row in all of these indicies
 			owasaInflows.synthetic[row][col] 	= owasaInflowSYN[x][col];
 			fallsInflows.synthetic[row][col]	= fallsLakeInflowSYN[x][col];
 			wheelerInflows.synthetic[row][col]	= lakeWBInflowSYN[x][col];
@@ -1391,7 +1393,9 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 
 	return;
 }
-void Simulation::createRiskOfFailure(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue)
+
+void Simulation::createRiskOfFailure(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
+									 int discreteintervals)
 {
 	// Risk of failure measures the risk, given a certain week of the year and storage volume, of reservoirs running out of water using historical
 	// streamflows.  This function goes through every combination of storage (discritized at 5% intervals) and week-of-year and runs through 52 weeks of
@@ -2063,6 +2067,7 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 
 	return;
 }
+
 void Simulation::createInfrastructure()
 {
 	int owasaConstruction;
@@ -2225,6 +2230,440 @@ void Simulation::createInfrastructure()
 	return;
 }
 
+void Simulation::createReservoirTargets(int realization, int synthYr, double dDemandValue, double oDemandValue, double rDemandValue, double cDemandValue, 
+										int discreteintervals, ofstream &outFile)
+	// except for variable names, the processes that occur within this function are identical to the createRiskOfFailure function.
+	// the goal here is to determine which current risk of failure corresponds to what current reservoir level.
+	// then, release/buyback quantity can be determined based on the reservoir level necessary to return ROF to less than or equal to its trigger level.
+{
+	outFile << "opened reservoir targets function" << ",";
+	
+	double durhamROFDemand = 0.0;
+	double owasaROFDemand = 0.0;
+	double raleighROFDemand = 0.0;
+	double caryROFDemand = 0.0;
+	double durhamROFInflow = 0.0;
+	double raleighROFInflow = 0.0;
+	double owasaROFInflow = 0.0;
+	double wbROFInflow = 0.0;
+	double claytonROFInflow = 0.0;
+	double crabtreeROFInflow = 0.0;
+	double jordanROFInflow = 0.0;
+	double lillingtonROFInflow = 0.0;
+	double littleRiverRaleighROFInflow = 0.0;
+	double ROFevap = 0.0;
+	double fallsROFevap = 0.0;
+	double wbROFevap = 0.0;
+
+	double dIPs = 0.0;
+	double rIPs = 0.0;
+
+	double dIPex = 0.0;
+	double rIPex = 0.0;
+
+	int dROFstage = 0.0;
+	int rROFstage = 0.0;
+	
+	int counter = 0;
+	int syntheticIndex = 0;
+
+	int thisTimeDIP[discreteintervals];
+	int thisTimeRIP[discreteintervals];
+	
+	int histYear = 80;
+	int yearROF;
+	int monthROF;
+	int weekROF;
+	int numdaysROF;
+	int insurancePriceCounter;
+	
+	for(int x = 0; x < discreteintervals; x++)
+	{
+		durham.ReleaseStorageRisk[x] = 0.0;
+		raleigh.ReleaseStorageRisk[x] = 0.0;
+	}
+	
+	outFile << "inside" << ",";
+
+	double durhamS         = systemStorage.getDurhamStorageVol();
+	double teerS           = systemStorage.getTeerStorageVol();
+	double CCRS            = systemStorage.getCCRStorageVol();
+	double ULS             = systemStorage.getULStorageVol();
+	double STQS            = systemStorage.getSTQStorageVol();
+	double owasaS          = systemStorage.getOWASAStorageVol();
+	double lakeWBS         = systemStorage.getLakeWBStorageVol();
+	double flSS            = systemStorage.getFallsSupplyStorageVol();
+	double flQS            = systemStorage.getFallsQualityStorageVol();
+	double jlSS            = systemStorage.getJordanSupplyStorageVol();
+	double jlQS            = systemStorage.getJordanQualityStorageVol();
+	double caryJordanS     = systemStorage.getCaryJordanStorageVol();
+	double raleighJordanS  = systemStorage.getRaleighJordanStorageVol();
+	double durhamJordanS   = systemStorage.getDurhamJordanStorageVol();
+	double owasaJordanS    = systemStorage.getOWASAJordanStorageVol();
+	double littleRiverRalS = systemStorage.getLittleRiverRalStorageVol();
+	double raleighQS       = systemStorage.getRaleighQuarryStorageVol();
+	
+	int numRiskYears = 50;
+	int startingHistoricalYear = 80 - (numRiskYears - synthYr + 1);
+	int startingSynthYear = synthYr - numRiskYears;
+	
+	if(startingSynthYear < 0)
+	{
+		startingSynthYear = 0;
+	}
+	
+	outFile << "before first loop" << endl;
+	
+	for (int histRealizations = startingHistoricalYear; histRealizations < histYear; histRealizations++)
+		// determines the year of the historical streamflow record to be used in calculations
+        // runs 52 weeks from current week, to find where levels drop below 20% over this year
+        // this is run for 50 years of the immediate past, based on the current year
+	{
+		counter = 0;
+
+		dIPex = 0.0;
+		rIPex = 0.0;
+
+		for(int x = 0; x < discreteintervals; x++)
+		{
+			thisTimeDIP[x] = 0;
+			thisTimeRIP[x] = 0;
+		}
+		
+		riskOfFailureDates.initializeDates(startSimulationYear,1,week,7,0);
+			//each simulation is run independently (52 week intervals, then the slate is cleaned)
+		riskOfFailureStorageIP.updateReservoirStorageROF();
+            // sets initial IP storage to full
+			
+		outFile << "before weeks loop" << endl;
+
+		while (counter < 52)
+		{
+			//Retrieving date information
+			yearROF    = riskOfFailureDates.getYear();
+			monthROF   = riskOfFailureDates.getMonth();
+			weekROF    = riskOfFailureDates.getWeek();
+			numdaysROF = riskOfFailureDates.getDays();
+
+			//Demand calcs
+			//While seasonal trends and future growth are incorporated, no demand uncertainty is used (weekly averages only)
+			durhamROFDemand  = durham.UD.averages[weekROF-1]*numdaysROF*dDemandValue;//Durham demands
+			owasaROFDemand   = owasa.UD.averages[weekROF-1]*numdaysROF*oDemandValue;//OWASA demands
+			raleighROFDemand = raleigh.UD.averages[weekROF-1]*numdaysROF*rDemandValue;//Raleigh Demands
+			caryROFDemand    = raleigh.UD.averages[weekROF-1]*numdaysROF*cDemandValue;//Raleigh Demands
+                // expected demand set for a given week
+
+			riskOfFailureStorageIP.setDemands(durhamROFDemand, owasaROFDemand, raleighROFDemand, caryROFDemand, numdaysROF);
+				//passes demands to storage calcs
+
+
+			// Inflow Calcs /////////
+			
+			durhamROFInflow             = michieInflow[histRealizations+yearROF-startSimulationYear][weekROF-1] + littleRiverInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Durham Inflows
+			raleighROFInflow            = fallsLakeInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Raleigh
+			owasaROFInflow              = owasaInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// OWASA
+			wbROFInflow                 = lakeWBInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Wheeler&Benson
+			claytonROFInflow            = claytonInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Clayton gauge
+			crabtreeROFInflow           = crabtreeInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Crabtree creek
+			jordanROFInflow             = jordanLakeInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+			lillingtonROFInflow         = lillingtonGaugeInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+			littleRiverRaleighROFInflow = littleRiverRaleighInflow[histRealizations+yearROF-startSimulationYear][weekROF-1];
+                // inflow taken from historical record
+
+			// Evap Calcs from historical record /////////////
+			
+			ROFevap      = evaporation[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Durham and OWASA evap
+			fallsROFevap = fallsLakeEvaporation[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Falls Lake evap
+			wbROFevap    = lakeWheelerEvaporation[histRealizations+yearROF-startSimulationYear][weekROF-1];
+				// Wheeler Benson evap
+
+			riskOfFailureStorageIP.setInflow(durhamROFInflow, //passes inflows to storage calcs
+				31.4*owasaROFInflow,
+				28.7*owasaROFInflow,
+				1.2*owasaROFInflow,
+				raleighROFInflow,
+				wbROFInflow,
+				claytonROFInflow,
+				crabtreeROFInflow, jordanROFInflow, lillingtonROFInflow,
+				raleighROFDemand*returnRatio[1][weekROF-1],
+				durhamROFDemand*returnRatio[0][weekROF-1], durhamROFDemand*returnRatio[0][weekROF-1],owasaROFDemand*returnRatio[0][weekROF-1],
+				fallsROFevap,
+				wbROFevap,
+				ROFevap, littleRiverRaleighROFInflow);
+
+			riskOfFailureStorageIP.setSpillover(weekROF-1);
+				//reservoir releases to meet downstream needs and/or reservoir capacity
+			riskOfFailureStorageIP.updateStorage(weekROF-1);
+				//storage calcs
+
+			riskOfFailureDates.increase();
+				//increase week by one
+			counter++;
+			
+			dIPs = riskOfFailureStorageIP.getDurhamStorage();
+				// retrieve overall storage, Durham
+				// treated as being the storage fraction for LM
+			rIPs = riskOfFailureStorageIP.getFallsSupplyStorage();
+				// retrieve falls lake supply pool storage fraction
+                // current week's storage fraction, from 0 to 1, 1 being the reservoir is full
+
+			dIPex += riskOfFailureStorageIP.getExcessD();
+				// retrieve spillage fraction from durham
+			rIPex += riskOfFailureStorageIP.getFallsSpillage();
+				// retrieve spillage fraction from falls lake
+                // if the reservoir was full, what was spilled over as excess
+				
+			outFile << "got storage values" << ",";
+
+			if(dIPs < 0.2)
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					thisTimeDIP[x] = 1;
+				}
+			}
+			else
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					if(dIPs < (0.2 + double(x)/double(discreteintervals) - dIPex))
+					{
+						for(int y = x; y < discreteintervals; y++)
+						{
+							thisTimeDIP[y] = 1;
+						}
+						break;
+					}
+				}
+			}
+
+			if(rIPs < 0.2)
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					thisTimeRIP[x] = 1;
+				}
+			}
+			else
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					if(rIPs<(0.2 + double(x)/double(discreteintervals) - rIPex))
+					{
+						for(int y = x; y < discreteintervals; y++)
+						{
+							thisTimeRIP[y] = 1;
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+		for (int x = 0; x < discreteintervals; x++)
+		{
+			if(thisTimeDIP[x] == 1)
+			{
+				durham.ReleaseStorageRisk[x] += 1.0;
+			}
+			if(thisTimeRIP[x] == 1)
+			{
+				raleigh.ReleaseStorageRisk[x] += 1.0;
+			}
+		}
+	}
+	
+	outFile << "moving to synthetic" << endl;
+	
+	for (int synthRealizations = startingSynthYear; synthRealizations < synthYr; synthRealizations++)
+		// determines the year of the historical streamflow record to be used in calculations
+        // same loop as above but with the synthetic record
+	{
+		counter = 0;
+
+		dIPex = 0.0;
+		rIPex = 0.0;
+		
+		for(int x = 0; x < discreteintervals; x++)
+		{
+			thisTimeDIP[x] = 0;
+			thisTimeRIP[x] = 0;
+		}
+		
+		riskOfFailureDates.initializeDates(synthRealizations,1,week,7,0);
+			//each simulation is run independently (52 week intervals, then the slate is cleaned)
+		riskOfFailureStorageIP.updateReservoirStorageROF();
+		
+		outFile << "synthetic before week loop" << ",";
+
+		while (counter < 52)
+		{
+			//Retrieving date information
+			yearROF = riskOfFailureDates.getYear();
+			monthROF = riskOfFailureDates.getMonth();
+			weekROF = riskOfFailureDates.getWeek();
+			numdaysROF = riskOfFailureDates.getDays();
+
+			//Demand calcs
+			//While seasonal trends and future growth are incorporated, no demand uncertainty is used (weekly averages only)
+			durhamROFDemand = durham.UD.averages[weekROF-1]*numdaysROF*dDemandValue;//Durham demands
+			owasaROFDemand = owasa.UD.averages[weekROF-1]*numdaysROF*oDemandValue;//OWASA demands
+			raleighROFDemand = raleigh.UD.averages[weekROF-1]*numdaysROF*rDemandValue;//Raleigh Demands
+			caryROFDemand = raleigh.UD.averages[weekROF-1]*numdaysROF*cDemandValue;//Raleigh Demands
+
+			riskOfFailureStorageIP.setDemands(durhamROFDemand, owasaROFDemand, raleighROFDemand, caryROFDemand, numdaysROF);//passes demands to storage calcs
+
+			//Inflow Calcs
+			syntheticIndex = (yearROF)*52+weekROF-1;
+			durhamROFInflow = durhamInflows.synthetic[realization][syntheticIndex];//Durham Inflows
+			raleighROFInflow = fallsInflows.synthetic[realization][syntheticIndex];//Raleigh
+			owasaROFInflow = owasaInflows.synthetic[realization][syntheticIndex];//OWASA
+			wbROFInflow = wheelerInflows.synthetic[realization][syntheticIndex];//Wheeler&Benson
+			claytonROFInflow = claytonInflows.synthetic[realization][syntheticIndex];//Clayton gauge
+			crabtreeROFInflow = crabtreeInflows.synthetic[realization][syntheticIndex];// Crabtree creek
+			jordanROFInflow = jordanInflows.synthetic[realization][syntheticIndex];
+			lillingtonROFInflow = lillingtonInflows.synthetic[realization][syntheticIndex];
+			littleRiverRaleighROFInflow = littleRiverRaleighInflows.synthetic[realization][syntheticIndex];
+			//Evap Calcs
+
+			ROFevap = durhamOwasaEvap.synthetic[realization][syntheticIndex];//Durham and OWASA evap
+			fallsROFevap = fallsEvap.synthetic[realization][syntheticIndex];// Falls Lake evap
+			wbROFevap= wheelerEvap.synthetic[realization][syntheticIndex];//Wheeler Benson evap
+
+			riskOfFailureStorageIP.setInflow(durhamROFInflow, //passes inflows to storage calcs
+				31.4*owasaROFInflow,
+				28.7*owasaROFInflow,
+				1.2*owasaROFInflow,
+				raleighROFInflow,
+				wbROFInflow,
+				claytonROFInflow,
+				crabtreeROFInflow, jordanROFInflow, lillingtonROFInflow,
+				raleighROFDemand*returnRatio[1][weekROF-1],
+				durhamROFDemand*returnRatio[0][weekROF-1], durhamROFDemand*returnRatio[0][weekROF-1],owasaROFDemand*returnRatio[0][weekROF-1],
+				fallsROFevap,
+				wbROFevap,
+				ROFevap, littleRiverRaleighROFInflow);
+
+			riskOfFailureStorageIP.setSpillover(weekROF-1);//reservoir releases to meet downstream needs and/or reservoir capacity
+			riskOfFailureStorageIP.updateStorage(weekROF-1);//storage calcs
+
+			riskOfFailureDates.increase();//increase week by one
+			counter++;
+
+			dIPs = riskOfFailureStorageIP.getDurhamStorage();
+				// retrieve overall storage, Durham
+				// treated as being the storage fraction for LM
+			rIPs = riskOfFailureStorageIP.getFallsSupplyStorage();
+				// retrieve falls lake supply pool storage fraction
+                // current week's storage fraction, from 0 to 1, 1 being the reservoir is full
+
+			dIPex += riskOfFailureStorageIP.getExcessD();
+				// retrieve spillage fraction from durham
+			rIPex += riskOfFailureStorageIP.getFallsSpillage();
+				// retrieve spillage fraction from falls lake
+                // if the reservoir was full, what was spilled over as excess
+				
+			outFile << "synthetic after storage info" << ",";
+
+			if(dIPs < 0.2)
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					thisTimeDIP[x] = 1;
+				}
+			}
+			else
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					if(dIPs < (0.2 + double(x)/double(discreteintervals) - dIPex))
+					{
+						for(int y = x; y < discreteintervals; y++)
+						{
+							thisTimeDIP[y] = 1;
+						}
+						break;
+					}
+				}
+			}
+
+			if(rIPs < 0.2)
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					thisTimeRIP[x] = 1;
+				}
+			}
+			else
+			{
+				for(int x = 0; x < discreteintervals; x++)
+				{
+					if(rIPs < (0.2 + double(x)/double(discreteintervals) - rIPex))
+					{
+						for(int y = x; y < discreteintervals; y++)
+						{
+							thisTimeRIP[y] = 1;
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+		for (int x = 0; x < discreteintervals; x++)
+		{
+			if(thisTimeDIP[x] == 1)
+			{
+				durham.ReleaseStorageRisk[x] += 1.0;
+			}
+			if(thisTimeRIP[x] == 1)
+			{
+				raleigh.ReleaseStorageRisk[x] += 1.0;
+			}
+		}
+	}
+	
+	outFile << "synthetic finished" << endl;
+
+	for(int x = 0; x < discreteintervals; x++)
+	{
+		durham.ReleaseStorageRisk[x] = durham.ReleaseStorageRisk[x]/(double(numRiskYears));
+		
+		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger)
+				// if the risk of failure becomes greater than the ROF trigger for releases
+				// at the specific x, meaning current reservoir level
+		{
+			durham.ReleaseRiskVolume[week-1] = (double(discreteintervals) - double(x-1))/double(discreteintervals);
+				// the desired reservoir level that releases need to achieve is this
+			break;
+		}
+	}
+	
+	outFile << "durham risk volume for the week is" << "," << durham.ReleaseRiskVolume[week-1] << endl;
+	
+	for(int x = 0; x < discreteintervals; x++)
+	{
+		raleigh.ReleaseStorageRisk[x] = raleigh.ReleaseStorageRisk[x]/(double(numRiskYears));
+		
+		if (raleigh.ReleaseStorageRisk[x] > raleigh.RRtrigger)
+		{
+			raleigh.ReleaseRiskVolume[week-1] = (double(discreteintervals) - double(x-1))/double(discreteintervals);
+			
+			break;
+		}
+	}
+	
+	outFile << "raleigh risk volume for the week is" << "," << raleigh.ReleaseRiskVolume[week-1] << endl;
+	return;
+}
 
 void Simulation::createInfrastructureRisk(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue)
 {
@@ -2865,6 +3304,9 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	
 	int allowReleases = 1;
 		// logical to decide if releases are allowed or not
+	int numIntervals = 100;
+		// the number of discrete intervals of reservoir volume
+		// that will be tested in the createReservoirTargets function
 	
 	double ReleaseContractLength = 100.0*52;
 		// number of weeks the contract is good
@@ -2872,7 +3314,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 		// total cost of the releases contract in millions, to be paid on an annual basis?
 	
 	double RcriticalStorageLevel = 0.90;
-	double DcriticalStorageLevel = 0.50;
+	double DcriticalStorageLevel = 0.40;
 		// currently arbitrarily set, later should be optimized
 		// previous to March 15, 2016, releases were based on 
 		// R and D reservoir levels alone, now they are based on
@@ -2884,17 +3326,17 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 		// a factor introduced to generate an initial release request
 		// by raleigh based on the difference between current week ROF
 		// and the ROF trigger value.
-	double DbuybackScaleFactor = 10.0;
+	double DbuybackScaleFactor = 2.0;
 		// a similar scale factor to determine the buyback threshold
 		// for durham
 	
 	
 	raleigh.RRtrigger = raleigh.RRtrigger + 0.1 - rank * 0.1;
 	//durham.RRtrigger  = durham.RRtrigger + 0.1 - rank * 0.1;
+		// raw release triggers are for now initially equal to the 
+		// treated transfer ROF triggers, and adjusted based on 
+		// rank to make some comparisons
 		
-	//ReleaseRequestScaleFactor = pow(100.0, rank);
-	//DbuybackScaleFactor		  = 100.0/pow(10.0, rank);
-	
 	
 	/////////////////////////////////////////////////////////////////////////
 	//////////// VARIABLES TO ORGANIZE OUTPUTS //////////////////////////////
@@ -2914,55 +3356,77 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	/////////////////////////////////////////////////////////////////////////
 	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
 	
-	int numRealizationsTOREAD = 5;
+	int numRealizationsTOREAD = 100;
+		// read all realizations in current mode
 	
 	ofstream out100;
 	ofstream out101;
 	ofstream outNew;
+	ofstream outRiskParams;
+	ofstream placechecker;
 	
 	std::string filenameA = "output/JLTTR";
 	std::string filenameB = "output/JLTTD";
 	std::string filenameC = "output/RRfuncOutput";
+	std::string filenameD = "output/weeklyRiskParams";
+	std::string filenameE = "error/progresscounter";
 	
 	std::string filenameEND = ".csv";
 		
 	std::string completeFilenameA;
 	std::string completeFilenameB;
 	std::string completeFilenameC;
+	std::string completeFilenameD;
+	std::string completeFilenameE;
 		
 	std::stringstream sstmA;
 	std::stringstream sstmB;
 	std::stringstream sstmC;
+	std::stringstream sstmD;
+	std::stringstream sstmE;
 		
 	sstmA << filenameA << rank << filenameEND;
 	sstmB << filenameB << rank << filenameEND;
 	sstmC << filenameC << rank << filenameEND;
-		
+	sstmD << filenameD << rank << filenameEND;
+	sstmE << filenameE << rank << filenameEND;
+	
 	completeFilenameA = sstmA.str();
 	completeFilenameB = sstmB.str();
 	completeFilenameC = sstmC.str();
+	completeFilenameD = sstmD.str();
+	completeFilenameE = sstmE.str();
 	
 	openFile(out100, completeFilenameA);
 	openFile(out101, completeFilenameB);
 	openFile(outNew, completeFilenameC);
+	openFile(outRiskParams, completeFilenameD);
+	openFile(placechecker,  completeFilenameE);
 	
-	outReal << "Realization Number" << "," << "Rank" << "," << "Raleigh RR ROF Trigger" << "," << "Durham RR ROF Trigger" << ",";
+	outReal << "Rank" << "," << "Realization" << ",";
 	outReal << "Release Scale Factor" << "," << "Buyback Scale Factor" << ",";
 	outReal << "Raleigh Average Weekly Release Volume (MGW)" << "," << "Durham Average Weekly Buyback Volume (MGW)" << ",";
 	outReal << "Total Realization Cost of Releases to Raleigh" << "," << "Total Realization Cost of Releases to Durham" << ",";
 	outReal << "Raleigh Average Weekly Transfer Volume (MGW)" << "," << "Durham Average Weekly Transfer Volume (MGW)" << ",";
 	outReal << "Total Realization Cost of Transfers to Raleigh" << "," << "Total Realization Cost of Transfers to Durham" << endl;
-		// csv column headers
+		// csv column headers for average statistics and scale factors of each realization
 	
-	out100 << "Realization" << "," << "Year" << "," << "Week" << "," << "Raleigh Transfer Volume" << "," << "Raleigh ROF" << endl;
-	out101 << "Realization" << "," << "Year" << "," << "Week" << "," << "Durham Transfer Volume"  << "," << "Durham ROF"  << endl;
-		// csv column headers
+	out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "RaleighTransferVolume" << endl;
+	out101 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "DurhamTransferVolume"  << endl;
+		// csv column headers of treated transfer output data
 		
-	outNew << "Realization" << "," << "Year" << "," << "Week" << ",";
-	outNew << "Falls Lake Storage Ratio" << "," << "Durham Storage Ratio" << "," << "LM Spillage" << ",";
-	outNew << "Release Request" << "," << "Buyback Quantity" << "," << "Falls Lake Actual Storage" << "," << "Durham Actual Storage" << ",";
-	outNew << "Raleigh ROF" << "," << "Durham ROF" << endl;
-		// csv column headers
+	outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	outNew << "FallsLakeStorageRatio" << "," << "Durham Storage Ratio" << "," << "LM Spillage" << ",";
+	outNew << "Release Request" << "," << "Buyback Quantity" << "," << "BuybackStorageLevel" << "," << "Falls Lake Actual Storage" << "," << "Durham Actual Storage" << ",";
+	outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << endl;
+		// csv column headers for raw release output data and storage levels
+		
+	outRiskParams << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
+	outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
+	outRiskParams << "RaleighRRandTT_ROF" << "," << "RaleighINF_ROF" << ",";
+	outRiskParams << "DurhamRRandTT_ROF"  << "," << "DurhamINF_ROF"  << endl;
+		// csv column headers for csv containing ROF values
 	
 	/////////////////////////////////////////////////////////////////////////
 		
@@ -3082,6 +3546,9 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 		double raleighIntakeCap = raleigh_intake_capacity;
 		zeroes(caryBuild,3);
 		thisYearFalls = 0;
+		
+		placechecker << 1 << endl;
+		
 		while (year-1<(terminateYear))
             // in a single realization, from year to year
 		{
@@ -3098,7 +3565,8 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 			
-			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
+			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
+								numIntervals);
                 // gives the ROF of this given week
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3145,6 +3613,8 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
+			placechecker << 2 << endl;
+							
 			if (formulation > 0 and allowReleases == 1)
 				// allow transfers, apply raw releases 
 				// in a given week, transfers calculated before transfers
@@ -3157,10 +3627,20 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 				
+				placechecker << 3 << endl;
+				
+				createReservoirTargets(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse, 
+									   numIntervals, placechecker);
+				
+				placechecker << 3 << endl;
+				
 				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
-												raleigh.RRtrigger, durham.RRtrigger, raleigh.riskOfFailure, durham.riskOfFailure, ReleaseRequestScaleFactor, DbuybackScaleFactor, 
-												realization, outNew, year, week, numRealizationsTOREAD);
+												raleigh.RRtrigger, durham.RRtrigger, raleigh.riskOfFailure, durham.riskOfFailure, 
+												raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], 
+												realization, outNew, year, week, numRealizationsTOREAD, rank);
 
+				placechecker << 4 << endl;
+												
 				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
@@ -3187,20 +3667,13 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				realizationReleaseVol += systemStorage.getRaleighReleases();
 				realizationBuybackVol += systemStorage.getDurhamBuybackRequest();
 				
-				
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// RECALCULATE STORAGE AND ROF FOR THE WEEK? ///////////////////////////////////
-				
-				weekcounter += 1;
-				
-				if (raleigh.weeklyReleaseVolume > 0.0)
-				{
-					systemStorage.setSpillover(week-1);
-					systemStorage.updateStorage(week-1);
-				}
-				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
+				
+				//Update reservoir storage levels
+				systemStorage.setSpillover(week-1);
+				systemStorage.updateStorage(week-1);
+                // set min releases
 			}
 			
 			if(formulation > 0)
@@ -3217,31 +3690,37 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				
 				if (realization < numRealizationsTOREAD) 
 				{
-					out100 << realization << "," << year << "," << week << "," << raleigh.weeklyTransferVolume << "," << raleigh.riskOfFailure << endl;
-					out101 << realization << "," << year << "," << week << "," << durham.weeklyTransferVolume  << "," << durham.riskOfFailure  << endl;
+					out100 << rank << "," << realization << "," << year << "," << week << "," << raleigh.weeklyTransferVolume << endl;
+					out101 << rank << "," << realization << "," << year << "," << week << "," << durham.weeklyTransferVolume  << endl;
 				}
 				
 				durham.payForTransfers(transferCosts);
 				owasa.payForTransfers(transferCosts);
 				raleigh.payForTransfers(transferCosts);
-				// Use the mitigation fund to calculate water transfer payments (sent to Cary)
+					
 				if((durham.weeklyTransferVolume+owasa.weeklyTransferVolume+raleigh.weeklyTransferVolume)>0.0)
 				{
 					cary.Fund.add((durham.weeklyTransferVolume + owasa.weeklyTransferVolume + raleigh.weeklyTransferVolume)*transferCosts);
+						// Use the mitigation fund to calculate water transfer payments (sent to Cary)
 				}
 				
-				realizationTransferVolToRaleigh += systemStorage.getRaleighTransfers();
-				realizationTransferVolToDurham += systemStorage.getDurhamTransfers();
-				
+				realizationTransferVolToRaleigh  += systemStorage.getRaleighTransfers();
+				realizationTransferVolToDurham   += systemStorage.getDurhamTransfers();
 				realizationTransferCostToRaleigh += transferCosts*systemStorage.getRaleighTransfers();
-				realizationTransferCostToDurham += transferCosts*systemStorage.getDurhamTransfers();
+				realizationTransferCostToDurham  += transferCosts*systemStorage.getDurhamTransfers();
+					// writing statistics for outputting later
 				
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////
-				
-				if (allowReleases == 0)
-				{
-					weekcounter += 1;
-				}
+				weekcounter += 1;
+			}
+			
+			if (realization < numRealizationsTOREAD)
+			{
+				outRiskParams << rank << "," << realization << "," << year << "," << week << ",";
+				outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
+				outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
+				outRiskParams << raleigh.riskOfFailure << "," << raleigh.infRisk << ",";
+				outRiskParams << durham.riskOfFailure  << "," << durham.infRisk  << endl;
+					// write outputs for risk parameters
 			}
 			
 			//Update reservoir storage levels
@@ -3341,7 +3820,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 		
 		///////////////////// WRITE REALIZATION AVERAGES //////////////////////////////////////////////////////////////////
 		
-		outReal << realization << "," << rank << "," << raleigh.RRtrigger << "," << durham.RRtrigger << "," << ReleaseRequestScaleFactor << "," << DbuybackScaleFactor << ",";
+		outReal << rank << "," << realization << "," << ReleaseRequestScaleFactor << "," << DbuybackScaleFactor << ",";
 		outReal << realizationReleaseVol/weekcounter << "," << realizationBuybackVol/weekcounter << ",";
 		outReal << realizationReleaseCostToRaleigh << "," << realizationBuybackCostToDurham << ",";
 		outReal << realizationTransferVolToRaleigh/weekcounter << "," << realizationTransferVolToDurham/weekcounter << ",";
@@ -3356,6 +3835,8 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	out100.close();
 	out101.close();
 	outNew.close();
+	outRiskParams.close();
+	placechecker.close();
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();
@@ -3389,4 +3870,9 @@ Simulation::~Simulation()
 	zap(actualStreamflows);
 	zap(totalFallsFailure);
 }
+
+
+
+
+
 

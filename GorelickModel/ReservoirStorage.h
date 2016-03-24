@@ -22,8 +22,9 @@ public:
 	void setInflow(double durham, double ccr, double ul, double stq, double falls, double wb, double clayton, double crabtree, double jordan, double lillington, double ralRet, double durRet, double durRet2, double owasaRet, double evaporationf, double evaporationwb, double evaporation, double lRR);
 	
 	void calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
-						 double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, double RSCALEFACTOR, double DSCALEFACTOR,
-						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT);
+						 double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, 
+						 double RstorageTarget, double DstorageTarget,
+						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK);
 	double getRaleighReleases();
 	double getDurhamBuybackRequest();
 	
@@ -48,6 +49,10 @@ public:
 	double getRaleighTreatment();
 	double getRaleighIntake();
 	double getFallsQuality();
+	
+	double getFallsSupplyStorage();
+	double getFallsSpillage();
+	
 	void upgradeCaryTreatmentPlant(int counter);
 	void upgradeCaryTreatmentPlant2();
 	void upgradeDurhamCaryConnection();

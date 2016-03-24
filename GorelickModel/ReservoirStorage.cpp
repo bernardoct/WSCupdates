@@ -1419,6 +1419,14 @@ double ReservoirStorage::getRaleighStorage()
 {
 	return (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity);
 }
+double ReservoirStorage::getFallsSupplyStorage()
+{
+	return (fallsLakeSupplyStorage)/(fallsLakeSupplyCapacity);
+}
+double ReservoirStorage::getFallsSpillage()
+{
+	return fallsSpillage/fallsLakeSupplyCapacity;
+}
 double ReservoirStorage::getCaryStorage()
 {
 	return (caryJordanStorage)/(caryJordanCapacity);
@@ -1583,23 +1591,24 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
-									   double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, double RSCALEFACTOR, double DSCALEFACTOR,
-									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT)
+									   double RROFtrigger, double DROFtrigger, double RROFactual, double DROFactual, 
+									   double RstorageTarget, double DstorageTarget,
+									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
 	// of water Durham wants to "buy back" to avoid releasing it.
 {
-	RreleaseRequest = 0.0;
+	RreleaseRequest  = 0.0;
 	DbuybackQuantity = 0.0;
 
 	if (RROFactual > RROFtrigger)
 		// if raleigh is requesting releases or not
 		// AFTER MARCH 15, 2016: now based on ROF triggers
 	{
-		RreleaseRequest = (RROFactual - RROFtrigger) * RSCALEFACTOR;
-			// initial request is based on the current risk level 
-			// relative to the trigger risk level, scaled by some factor
-			// to convert a percentage difference in risk to MGW
+		RreleaseRequest = (RstorageTarget * fallsLakeSupplyCapacity) - fallsLakeSupplyStorage;
+			// initial request is an attempt to draw the reservoir back to the level at which
+			// it is no longer at risk of failure, a storage fraction represented by RstorageTarget
+			// RreleaseRequest is the difference between current and ideal storage levels
 		
 		// RreleaseRequest = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
 			// Raleigh's request is equal to the deficit they wish to cover
@@ -1635,6 +1644,12 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		{
 			RreleaseRequest = fallsLakeSupplyCapacity - fallsLakeSupplyStorage;
 				// if Falls Lake is too full to accept all requested water
+		}
+		
+		if (fallsLakeSupplyStorage + RreleaseRequest > RcriticalStorageLevel*fallsLakeSupplyCapacity)
+		{
+			RreleaseRequest = RcriticalStorageLevel*fallsLakeSupplyCapacity - fallsLakeSupplyStorage;
+				// if Falls Lake is too full to accept all requested water up to critical level
 		}
 		
 		if (durhamStorage - RreleaseRequest < 0.0)
@@ -1675,7 +1690,7 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		
 		if (DROFactual > DROFtrigger)
 		{
-			DbuybackStorageLevel = DcriticalStorageLevel + (DROFactual - DROFtrigger) * DSCALEFACTOR;
+			DbuybackStorageLevel = DstorageTarget;
 				// if Durham has ROF levels above the trigger for transfers,
 				// it will act to buy back releases at a proportional level
 				// to its risk.
@@ -1700,7 +1715,7 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 				// will result in a negative release request volume.
 			{
 				DbuybackQuantity = RreleaseRequest;
-				RreleaseRequest = 0.0;
+				RreleaseRequest  = 0.0;
 			}
 			else 
 			{
@@ -1720,11 +1735,12 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 	}
 	else 
 	{
-		RreleaseRequest = 0.0;
-		DbuybackQuantity = 0.0;
+		RreleaseRequest      = 0.0;
+		DbuybackQuantity     = 0.0;
+		DbuybackStorageLevel = 0.0;
 	}
 	
-	durhamStorage -= RreleaseRequest;
+	durhamStorage          -= RreleaseRequest;
 	fallsLakeSupplyStorage += RreleaseRequest;
 		// ADJUST THE EXISTING STORAGE LEVELS
 		// DOING SO HERE CHANGES R AND D DECISIONS
@@ -1733,15 +1749,10 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 	if (realization < numRealizationsTOOUTPUT)
 		// for each week, output all this info to a csv
 	{
-		streamFile << realization << "," << year << "," << week << ",";
-		streamFile << ((fallsLakeSupplyStorage)/(fallsLakeSupplyCapacity)) << ",";
-		streamFile << (durhamStorage/durhamCapacity) << ",";
-		streamFile << durhamSpillage << ",";
-		streamFile << RreleaseRequest << ",";
-		streamFile << DbuybackQuantity << ",";
-		streamFile << fallsLakeSupplyStorage << ",";
-		streamFile << durhamStorage << ",";
-		streamFile << RROFactual << "," << DROFactual << endl;
+		streamFile << RANK << "," << realization << "," << year << "," << week << ",";
+		streamFile << ((fallsLakeSupplyStorage)/(fallsLakeSupplyCapacity)) << "," << (durhamStorage/durhamCapacity) << "," << durhamSpillage << ",";
+		streamFile << RreleaseRequest << "," << DbuybackQuantity << "," << DbuybackStorageLevel << "," << fallsLakeSupplyStorage << "," << durhamStorage << ",";
+		streamFile << RstorageTarget << "," << DstorageTarget << endl;
 	}
 	
 	return;

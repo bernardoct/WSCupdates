@@ -26,7 +26,12 @@ public:
 	
 	void generateStreamflows();
 	void correlateDemandVariations(double demand_variation_multiplier);
-	void createRiskOfFailure(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
+	
+	void createRiskOfFailure(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand,
+							 int discreteintervals);
+	void createReservoirTargets(int reali, int synthYr, double dDemandValue, double oDemandValue, double rDemandValue, double cDemandValue, 
+								int discreteintervals, ofstream &outFile);
+	
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
 	data_t parameterInput;
 	void createInfrastructure();
