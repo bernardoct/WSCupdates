@@ -43,6 +43,8 @@ WaterUtility::~WaterUtility()
 	zap(storageRisk);
 	zap(riskVolume);
 
+	zap(ReleaseStorageRisk);
+	zap(ReleaseRiskVolume);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
@@ -52,6 +54,7 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	numYears = nyears;
 	numTypes = ntypes;
 	numTiers = ntiers;
+
 	numStages = nstages;
 	numAnnualDecisionPeriods = nannualdecisionperiods;
 	failurePoint = failure;
@@ -64,6 +67,7 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	numRealizations = nrealizations;
 	volumeIncrements = volumeInc;
 	weeklyTransferTriggers = 0.0;
+	
 	if(formulation<2)
 	{
 		infrastructureCount = infCount;
@@ -111,9 +115,11 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	general_2d_allocate(annualInsurance, terminateYear, numRealizations, 0.0);
 	general_1d_allocate(netPresentCostInfrastructure, numRealizations, 0.0);
 
-	general_1d_allocate(storageRisk, 20, 0.0);
+	general_1d_allocate(storageRisk, volumeIncrements, 0.0);
 	general_1d_allocate(riskVolume, 52, 0.0);
 
+	general_1d_allocate(ReleaseStorageRisk, volumeIncrements, 0.0);
+	general_1d_allocate(ReleaseRiskVolume, 52, 0.0);
 
 	usesROF = true;
 

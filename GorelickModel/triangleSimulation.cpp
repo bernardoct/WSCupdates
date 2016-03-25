@@ -13,13 +13,6 @@
     // they don't require a semicolon because they are not statements.
     // each instructs for a header file to be included.
 
-/*  A HEADER FILE:
-        These contain
-
-
-
-*/
-
 #ifdef PARALLEL
 	#include <mpi.h>
 	#include "borgProblemDefinition.h"
@@ -128,6 +121,12 @@ int main (int argc, char *argv[])
 	int startSimulationYear = currentYear - startYear + 1;
 	simulation.setNumYears(terminateYear);
 	simulation.setStartYear(startSimulationYear);
+	
+	simulation.numIntervals = 50;
+		// the number of discrete volume increments
+		// used for insurance payouts and for 
+		// setting the "rating curve" for raleigh
+		// and durham water supply for release determination
 
 	//seed random number generator
 	// NOTE: for model, the seed stays the same. For Borg, the seed comes from command line argument.
@@ -139,21 +138,27 @@ int main (int argc, char *argv[])
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
         // c_num_dec is number of dec vars
+		
 
 	simulation.setNumDecisions(c_num_dec);
 
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
+	
+	
 	simulation.importDataFiles();
 
 	// Set water prices and consumer elasticity,
 
 	//cout << "write data lists" << endl;
+	
 	simulation.writeDataLists();
 
 	// 'Whiten' demand and inflow data, generate joint PDFs,
 	//cout << "precondition data" << endl;
 	// (Here pass in 1's because we don't want to scale the demand yet).
+	
+	
 	simulation.preconditionData(1.0, 1.0, true);
 
 	// Weighted average water prices and consumer surplus losses
@@ -165,6 +170,8 @@ int main (int argc, char *argv[])
 	// 3 - total reduction in water use from a given combination of restrictions and price increases
 
 	//cout << "calc water prices" << endl;
+	
+	
 	simulation.calculateWaterPrices();
 	simulation.calculateWaterSurcharges();
 
@@ -172,6 +179,8 @@ int main (int argc, char *argv[])
 	//Streamflows records have weekly values with a length of 52*(terminateYear)
 	//there are a number of streamflow records generated equal to (numRealizations)
 	//cout << "generate streamflows" << endl;
+	
+	
 	simulation.generateStreamflows();
 	simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
 
@@ -181,6 +190,7 @@ int main (int argc, char *argv[])
 
 	//Function not needed - data is inputted from file
 	//simulation.createRiskOfFailure();
+
 
 	double *c_obj = NULL, *c_constr = NULL;
 	int c_num_obj;

@@ -1605,20 +1605,15 @@ void ReservoirStorage::calcRawReleases(double DreleaseMax, double DreleaseMin, d
 		// if raleigh is requesting releases or not
 		// AFTER MARCH 15, 2016: now based on ROF triggers
 	{
-		RreleaseRequest = (RstorageTarget * fallsLakeSupplyCapacity) - fallsLakeSupplyStorage;
+		RreleaseRequest = (RstorageTarget * (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
 			// initial request is an attempt to draw the reservoir back to the level at which
 			// it is no longer at risk of failure, a storage fraction represented by RstorageTarget
 			// RreleaseRequest is the difference between current and ideal storage levels
-		
-		// RreleaseRequest = RcriticalStorageLevel*(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage);
-			// Raleigh's request is equal to the deficit they wish to cover
-			// this quantity is the level below critical storage level that Raleigh has in the current week.
-			// THIS WAS A PAST DETERMINATE OF THE INITIAL RELEASE REQUEST, NO LONGER USED
 
-		if (fallsLakeSupplyStorage/fallsLakeSupplyCapacity >= RcriticalStorageLevel)	
+		if ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) >= RcriticalStorageLevel)	
 		{
 			RreleaseRequest = 0.0;
-				// if Falls Lake is already filled to a given level, no releases requested
+				// if raleigh already has storage at a given level, no releases requested
 		}
 		
 		if ((fallsLakeSupplyStorage + RreleaseRequest)/fallsLakeSupplyCapacity >= RcriticalStorageLevel)

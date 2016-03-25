@@ -102,7 +102,8 @@ class WaterUtility
 	
 	double weeklyReleaseVolume;
 	double weeklyBuybackVolume;
-	double *ReleaseStorageRisk, *ReleaseRiskVolume;
+	double *ReleaseStorageRisk; 
+	double *ReleaseRiskVolume;
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	void calcWaterPrice(double elasticity_Of_Demand[]);

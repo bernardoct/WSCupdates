@@ -29,8 +29,7 @@ public:
 	
 	void createRiskOfFailure(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand,
 							 int discreteintervals);
-	void createReservoirTargets(int reali, int synthYr, double dDemandValue, double oDemandValue, double rDemandValue, double cDemandValue, 
-								int discreteintervals, ofstream &outFile);
+	int numIntervals;
 	
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
 	data_t parameterInput;
