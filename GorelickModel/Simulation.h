@@ -51,6 +51,8 @@ public:
 	double bondRate;
 	int rank;
 	
+	ofstream createROFout;
+	
 private:
 	
 	//class definitions
