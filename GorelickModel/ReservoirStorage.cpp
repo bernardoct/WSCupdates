@@ -1575,7 +1575,6 @@ void ReservoirStorage::upgradeCaryTreatmentPlant(int counter)
 	}
 	else
 	{
-
 		CaryTreatmentCapacity = 80;
 	}
 }
@@ -1594,7 +1593,7 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ReservoirStorage::calcRawReleases(double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel,  
+void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel,  
 									   double RstorageTarget, double DstorageTarget, double FallsSupplyFraction,
 									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK)
 	// function accepts release max or min constraints, plus critical storage levels,
@@ -1606,6 +1605,13 @@ void ReservoirStorage::calcRawReleases(double DreleaseMin, double RcriticalStora
 		// initially zero
 	DreleaseMax = durhamStorage / 5.0;
 		// releases can only be up to 20% of Durham's current supply storage
+		// or capped at another arbitrary limit of 2000 MGW (DreleaseWeekCap)
+	
+	if (DreleaseMax > DreleaseWeekCap)
+	{
+		DreleaseMax = DreleaseWeekCap;
+			// if this is set to 0, no releases will occur 
+	}
 		
 	if (week < 21 || week > 47)
 		// Spillage rules for Durham Reservoir at Little River
@@ -1766,9 +1772,12 @@ void ReservoirStorage::calcRawReleases(double DreleaseMin, double RcriticalStora
 	{
 		streamFile << RANK << "," << realization << "," << year << "," << week << ",";
 		streamFile << ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) << ",";
+		streamFile << (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage) << "," << (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) << ",";
 		streamFile << (durhamStorage/durhamCapacity) << "," << durhamSpillage << ",";
 		streamFile << RreleaseRequest << "," << DbuybackQuantity << "," << DbuybackStorageLevel << "," << fallsLakeSupplyStorage << "," << durhamStorage << ",";
-		streamFile << RstorageTarget << "," << DstorageTarget << endl;
+		streamFile << RstorageTarget << "," << DstorageTarget << ",";
+		streamFile << DreleaseMax << "," << requestadjusted << ","<< DminEnvSpill << ",";
+		streamFile << fallsLakeQualityStorage << "," << fallsLakeQualityCapacity << "," << fallsLakeSupplyCapacity << "," << durhamCapacity << "," << FallsSupplyFraction << endl;
 	}
 	
 	return;

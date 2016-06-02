@@ -19,8 +19,8 @@ public:
 	void setNumYears(int c_terminateYear);
 	
 	void preconditionData(double unit_demand_multiplier, double future_demand_multiplier, bool firstTime);
-	void realizationLoop(ofstream &outReal, int rank);
-	void calculation (double *c_xreal, double *c_obj, double *c_constr, ofstream &datareturn, int rank);
+	void realizationLoop();
+	void calculation (double *c_xreal, double *c_obj, double *c_constr);
 	void calculateWaterPrices();
 	void calculateWaterSurcharges();
 	
@@ -33,7 +33,7 @@ public:
 	
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
 	data_t parameterInput;
-	void createInfrastructure();
+	void createInfrastructure(int realization);
 	void triggerInfrastructure(int realization);
 	void updateFallsQuality();
 	void setStartYear(int SSY);
@@ -52,6 +52,13 @@ public:
 	int rank;
 	
 	ofstream createROFout;
+	double availableJLallocation;
+	int allowReleases;
+	
+	double LMreleaseCap;
+	double buybackratePerMG;
+	double ReleaseContractPrice;
+	double FallsSupplyAllocationFraction;
 	
 private:
 	
@@ -144,6 +151,7 @@ private:
 	
 	ofstream out1;
 	ofstream out3;
+	ofstream InfraBuilt;
 	
 };
 #endif

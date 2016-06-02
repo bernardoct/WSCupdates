@@ -1050,34 +1050,55 @@ int WaterUtility::buildInfrastructure(int infIndex)
 {
 	int indexValue = 0;
 	if(infMatrix[infIndex][3] == infMatrix[infIndex][5])
+		// the third column is initally 0 (constrution has not started)
+		// if the third column number reaches the same value as the fifth column
+		// that represents the construction time needed to complete the option,
+		// then the project is complete and it's capacity can be added to the system.
 	{
 		indexValue = 1;
+			// indicates this project has been built
 		infMatrix[infIndex][3] += 1.0;
+			// raises the index so this if statement wont trigger again
  	}
 	else if(infMatrix[infIndex][3] > 0.0)
 	{
 		infMatrix[infIndex][3] += 1.0;
+			// keep building the project if it isn't finished
 	}
  return indexValue;
 }
+
 int WaterUtility::startNewInfrastructure(int year)
+	// triggered if risk is high enough
 {
 	double rankValue = 0.0;
 	int indexValue = 999;
 	for(int x = 0; x<infrastructureCount;x++)
 	{
 		if( infMatrix[x][1] < 1.0 && year >= int(infMatrix[x][2]) )
+			// the first column is either 0 or 1, 0 being this option has 
+			// not been triggered yet.  the second column is the realization year
+			// after which permitting has completed and this project is 
+			// eligible to be constructed.
 		{
 			if(infMatrix[x][0]>rankValue && infMatrix[x][0] < 1.0)
+				// by cycling through all infrastructure options (x)
+				// the model is looking for the greatest rankValue 
+				// or the 0th column which holds a 0-to-1 value from
+				// the parameter input file.  the eligible infrastructure
+				// option with the greatest ranking value will be found 
+				// and selected to be built 
 			{
 				indexValue = x;
 				rankValue = infMatrix[x][0];
+					// indicates which option is picked
 			}
 		}
 	}
 	if(indexValue<infrastructureCount)
 	{
 		infMatrix[indexValue][1] = 1.0;
+			// mark the chosen option as triggered
 	}
 	return indexValue;
 }

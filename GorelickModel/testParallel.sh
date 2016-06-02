@@ -1,4 +1,4 @@
-#PBS -l nodes=2:ppn=2
+#PBS -l nodes=2:ppn=8
 #PBS -l walltime=48:00:00
 #PBS -j oe
 #PBS -o output/testParallel.out

@@ -692,6 +692,7 @@ void Simulation::calculateWaterPrices()
 	owasa.calcWaterPrice(elasticity_Of_Demand);
 }
 void Simulation::calculateWaterSurcharges()
+	// this doesnt do anything 
 {
 	durham.calcSurchargePrice(elasticity_Of_Demand, 0);
 	owasa.calcSurchargePrice(elasticity_Of_Demand, 0);
@@ -721,7 +722,7 @@ void Simulation::generateStreamflows()
 	return;
 }
 
-void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, ofstream &datareturn, int rank)
+void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 {
 	// Decision variable
 	if (borgToggle ==3)
@@ -797,7 +798,11 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 
 	calculateWaterPrices();
 	calculateWaterSurcharges();
+		// unnecessary now
+		
 	chooseStreamflows();
+		// right now, picks 100 worst years
+		
 	durham.insurancePremium = 1.2;
 	cary.insurancePremium = 1.2;
 	raleigh.insurancePremium = 1.2;
@@ -812,6 +817,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 			if(i == 0 && j < 4 && owasa.individualReductions[i][j] > 1) owasa.individualReductions[i][j] = 1;
 		}
 	}
+		// nothing?
 
 	//Water use restrictions:  Durham and Raleigh have 4 stages, OWASA has three
 	// 			Two decision variables per utility:  storage levels (Durham and Raleigh) or risk of failure (OWASA) which causes stage 1 restrictions
@@ -1026,45 +1032,78 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	{
 		durham.TTriggerN = xreal[4];
 		durham.TTriggerI = xreal[4];
+			// TTtriggerI variables arent used 
+			
 		owasa.TTriggerN = xreal[5];
 		owasa.TTriggerI = xreal[5];
 		raleigh.TTriggerI = xreal[6];
 		raleigh.TTriggerN = xreal[6];
 		
-		durham.RRtrigger  = xreal[4];
-		raleigh.RRtrigger = xreal[6];
+		durham.RRtrigger  = xreal[58];
+		raleigh.RRtrigger = xreal[57];
 			// raw release triggers
 			// for now, same as treated transfer triggers
 			// should be their own variables later
 
-		if((xreal[7]+xreal[8]+xreal[9]+xreal[10])>1.0)
+		if((xreal[7]+xreal[8]+xreal[9]+xreal[10]) > availableJLallocation)
+			// JL allocations for all 4 utilities
+			// May 2016: based on allocations to Chatham County
+			// these must be limited to 69% of JL available
+			
+			// SHOULD ALL OF THESE IF STATEMENTS BE REDONE AND UN-NESTED???
+			
 		{
-			raleigh.jordanLakeAlloc = 1.0 - xreal[7] - xreal[9] - xreal[10];
+			raleigh.jordanLakeAlloc = availableJLallocation - xreal[7] - xreal[9] - xreal[10];
+				// based on Durham, OWASA, Cary allocations.
+				// if JL is overallocated, Raleigh allocation is cut
 
 			if(raleigh.jordanLakeAlloc < 0.0)
 			{
 				raleigh.jordanLakeAlloc = 0.0;
-				owasa.jordanLakeAlloc = 1.0 - xreal[9] - xreal[10];
+				owasa.jordanLakeAlloc = availableJLallocation - xreal[9] - xreal[10];
+					// OWASA allocation is the next limited factor
+					// based on Durham and Cary allocations
+					// if by reducing Raleigh's allocation the total
+					// allocation is still above the available quantity to allocate.
+					
 				if(owasa.jordanLakeAlloc < 0.05)
 				{
 					owasa.jordanLakeAlloc = 0.05;
-					durham.jordanLakeAlloc = 1.0 - xreal[10] - 0.05;
-					if(durham.jordanLakeAlloc < 0.1)
+						// OWASA allocation has to be at least 5% though
+						
+					durham.jordanLakeAlloc = availableJLallocation - xreal[10] - 0.05;
+						// if Raleigh allocation goes to 0 and OWASA's is minimized,
+						// durham's allocation is next to be curtailed
+						
+					if(durham.jordanLakeAlloc < 0.10)
 					{
-						cary.jordanLakeAlloc = 0.85;
 						durham.jordanLakeAlloc = 0.10;
+							// but, Durham has to have at least a 10% stake in JL,
+							// so if the allocations can't be set properly,
+							// and Raleigh, OWASA, and Durham allocations are
+							// minimized, the final allocations are
+							// Cary = availableJLallocation - durham - raleigh - owasa
+							
+						//cary.jordanLakeAlloc = availableJLallocation - durham.jordanLakeAlloc - owasa.jordanLakeAlloc - raleigh.jordanLakeAlloc;
+						cary.jordanLakeAlloc = 0.85;
+							// in this scenario, D allocation is 10%, OWASA is 5%, R is 0%
 					}
 					else
 					{
 						cary.jordanLakeAlloc = xreal[10];
+							// if, after adjusting D, R and OWASA allocations,
+							// everything is kosher, then Cary allocation 
+							// doesnt need to be adjusted
 					}
 				}
 				else
 				{
 					durham.jordanLakeAlloc = xreal[9];
 					cary.jordanLakeAlloc = xreal[10];
+						// if everything is under the limit
+						// after R and OWASA are adjusted,
+						// D and Cary allocations are as inputted.
 				}
-
 			}
 			else
 			{
@@ -1075,13 +1114,16 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 		}
 		else
 		{
-			durham.jordanLakeAlloc = xreal[7];
+			owasa.jordanLakeAlloc = xreal[7];
 			raleigh.jordanLakeAlloc = xreal[8];
-			owasa.jordanLakeAlloc = xreal[9];
+			durham.jordanLakeAlloc = xreal[9];
 			cary.jordanLakeAlloc = xreal[10];
+				// should xreal inputs for owasa and durham be switched?
+				// May 2016: durham, originally xreal[7] is changed to xreal[9]
+				// to match the other parts of the loop, and 
+				// OWASA is changed from xreal[9] to xreal[7] for the same reason
 		}
 	}
-
 
 	//Mitigation variables
 	//Annual payment - size of the annual contribution to a contingency fund, as a percentage of expected total annual volumetric revenue
@@ -1090,7 +1132,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	raleigh.annualPayment = xreal[13];
 	cary.annualPayment = xreal[14];
 
-	//Insurance purchases - what stage of restrictions should be covered by insurance from 1 (all) to 5 (none)
+	// what ROF should trigger insurance, and how much is paid in triggered weeks (% of AVR)
 	durham.insuranceUse = xreal[15];
 	owasa.insuranceUse = xreal[16];
 	raleigh.insuranceUse = xreal[17];
@@ -1130,6 +1172,10 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 		
 	owasa.infMatrix[1][0] = xreal[28];////Cane Creek expansion
 	owasa.infMatrix[1][2] = 17;
+		// MAY 2016: changed so that this will never be built
+		// (on consult of OWASA, model is saying that after 100 years
+		//  it is ok to build, which means it will never happen)
+		// was originally 17 permitting years 
 	owasa.infMatrix[1][4] = 127.0;
 	owasa.infMatrix[1][5] = 3 + rand() % 3;
 	owasa.infMatrix[2][0] = xreal[29];////Quarry reservoir expansion (shallow)
@@ -1176,11 +1222,19 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	raleigh.infMatrix[2][5] = 3 + rand() % 3;
 	raleigh.infMatrix[3][0] = xreal[39];////Reallocate Falls Lake
 	raleigh.infMatrix[3][2] = 12;
+		// May 2016: changed to 100 years, so it can't be done as a 
+		// experiment to see what happens if durham expands while raleigh
+		// doesnt.
+		// originally 12 years permitting time
+		// put back down at 12 years for some new results 
 	raleigh.infMatrix[3][4] = 68.2;
 	raleigh.infMatrix[3][5] = 3 + rand() % 3;
 	if(formulation == 2)
 	{
 	/////All utilities have the potential to trigger the Western Wake Treatment plant
+			// BY WESTERN WAKE, WE ARE REFERRING TO
+			// NEW WTP ON THE WESTERN SIDE OF JORDAN LAKE????
+		
 		///OWASA infrastructure
 		owasa.infMatrix[4][0] = xreal[40];////Western Wake Treatment plant
 		owasa.infMatrix[4][2] = 12;
@@ -1238,6 +1292,24 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	owasa.infBuffer = xreal[54];
 	raleigh.infBuffer = xreal[55];
 	cary.infBuffer = xreal[56];
+		// adjusts daily demands by a factor
+		// to approximate future demands
+		
+	// NEW PARAMETERS --------------------------------------------------------------------------
+	// May 2016 --------------------------------------------------------------------------------
+	
+	LMreleaseCap = xreal[59];
+		// maximum weekly release volume from Durham to Falls Lake (MG per week)
+		// set to 0 when no releases should occur
+	buybackratePerMG = xreal[60];
+		// average cost of a MG of water in buybacks (should be $3,500 per MG, in millions of dollars, so $0.0035 MM)
+		// can set to 0 when releases arent happening, but wont get used anyway 
+	ReleaseContractPrice = xreal[61];
+		// total cost in $MM of a release contract
+		// set to $0 when no releases are occuring
+	FallsSupplyAllocationFraction = xreal[62];
+		// fraction of Durham releases that are added to
+		// the Falls Lake water supply pool 
 
 	//Drought surcharges - 2 variables for each utility, one for residential customers and one for commercial/industrial/irrigation customers
 	if (formulation<6)
@@ -1265,6 +1337,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 			}
 		}
 	}
+		// nothing 
 
 	//Takes water use distributions calculated in calc_Water_Price functions and applies drought surcharge to calculate
 	//the average revenue recieved from the sale of 1 MG of water, the consumer surplus lost from water use reductions/cost increases,
@@ -1277,6 +1350,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 		cary.calcSurchargePrice(elasticity_Of_Demand, 1);
 		raleigh.calcSurchargePrice(elasticity_Of_Demand, 1);
 	}
+		// nothing 
 
 
 	// Initialize variables back to 0 to start the next simulation
@@ -1292,13 +1366,15 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr, o
 	owasa.setCapacity(3558.0);
 	raleigh.setCapacity(14700.0+2789.66);
 	cary.setCapacity(cary.jordanLakeAlloc*14924.0);
+		// should I switch this away from hardcoded numbers?
+		// what are these referencing?
 
 	//Actual reservoir simulation loop
 
 	// to this point, only assigned decision variables to their model variables,
 	// now we are actually running the model.
 
-	realizationLoop(datareturn, rank);
+	realizationLoop();
         // reservoir simulation done here
 
 	//Writing objective variables
@@ -2180,7 +2256,7 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 	return;
 }
 
-void Simulation::createInfrastructure()
+void Simulation::createInfrastructure(int realization)
 {
 	int owasaConstruction;
 	int durhamConstruction;
@@ -2188,8 +2264,12 @@ void Simulation::createInfrastructure()
 	for(int x = 0; x<owasa.infrastructureCount; x++)
 	{
 		owasaConstruction = owasa.buildInfrastructure(x);
+			// for infrastructure option x, check buildInfrastructure option
+			// to see if this option has been built or not, if it has, enter the if statement below
 		if(owasaConstruction == 1)
 		{
+			InfraBuilt << rank << "," << realization << "," << year << ",";
+			
 			switch(x)
 			{
 				case 0:
@@ -2197,37 +2277,57 @@ void Simulation::createInfrastructure()
 					riskOfFailureStorageROF.buildULexp();
 					riskOfFailureStorageIP.buildULexp();
 					owasa.addCapacity(2550.0);
+					
+					InfraBuilt << "OWASA" << "," << "University Lake Expansion" << endl;
+					
 					break;
 				case 1:
 					systemStorage.buildCCexp();
 					riskOfFailureStorageROF.buildCCexp();
 					riskOfFailureStorageIP.buildCCexp();
 					owasa.addCapacity(3000.0);
+					
+					InfraBuilt << "OWASA" << "," << "CCR Expansion" << endl;
+					
 					break;
 				case 2:
 					systemStorage.buildSQlow();
 					riskOfFailureStorageROF.buildSQlow();
 					riskOfFailureStorageIP.buildSQlow();
 					owasa.addCapacity(1500.0);
+					
+					InfraBuilt << "OWASA" << "," << "Stone Quarry Expansion (Small)" << endl;
+					
 					break;
 				case 3:
 					systemStorage.buildSQhigh();
 					riskOfFailureStorageROF.buildSQhigh();
 					riskOfFailureStorageIP.buildSQhigh();
 					owasa.addCapacity(2200.0);
+					
+					InfraBuilt << "OWASA" << "," << "Stone Quarry Expansion (Large)" << endl;
+					
 					break;
 				case 4:
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "OWASA" << "," << "Western JL WTP (Small)" << endl;
+					
 					break;
 				case 5:
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "OWASA" << "," << "Western JL WTP (Large)" << endl;
+					
 					break;
+				default:
+					InfraBuilt << "OWASA" << "," << "NO REMAINING PROJECTS" << endl;
 			}
 		}
 	}
@@ -2241,6 +2341,8 @@ void Simulation::createInfrastructure()
 
 		if(durhamConstruction == 1)
 		{
+			InfraBuilt << rank << "," << realization << "," << year << ",";
+			
 			constructionToggle2 = x;
 			switch(x)
 			{
@@ -2248,42 +2350,66 @@ void Simulation::createInfrastructure()
 					systemStorage.buildTeerQuarry();
 					riskOfFailureStorageROF.buildTeerQuarry();
 					riskOfFailureStorageIP.buildTeerQuarry();
+					
+					InfraBuilt << "Durham" << "," << "Teer Quarry" << endl;
+					
 					break;
 				case 1:
 					systemStorage.buildReclaimedLow();
 					riskOfFailureStorageROF.buildReclaimedLow();
 					riskOfFailureStorageIP.buildReclaimedLow();
 					durhamReclaimedInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Durham" << "," << "Reclaimed Water (Small)" << endl;
+					
 					break;
 				case 2:
 					systemStorage.buildReclaimedHigh();
 					riskOfFailureStorageROF.buildReclaimedHigh();
 					riskOfFailureStorageIP.buildReclaimedHigh();
 					durhamReclaimedInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Durham" << "," << "Reclaimed Water (Large)" << endl;
+					
 					break;
 				case 3:
 					systemStorage.buildMichieLow();
 					riskOfFailureStorageROF.buildMichieLow();
 					riskOfFailureStorageIP.buildMichieLow();
 					durham.setCapacity(8849.0);
+					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small)" << endl;
+					
+					break;
 				case 4:
 					systemStorage.buildMichieHigh();
 					riskOfFailureStorageROF.buildMichieHigh();
 					riskOfFailureStorageIP.buildMichieHigh();
 					durham.setCapacity(14049.0);
+					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large)" << endl;
+					
 					break;
 				case 5:
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Durham" << "," << "Western JL WTP (Small)" << endl;
+					
 					break;
 				case 6:
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Durham" << "," << "Western JL WTP (Large)" << endl;
+					
 					break;
+				default:
+					InfraBuilt << "Durham" << "," << "NO REMAINING PROJECTS" << endl;
 			}
 		}
 	}
@@ -2293,6 +2419,8 @@ void Simulation::createInfrastructure()
 		raleighConstruction = raleigh.buildInfrastructure(x);
 		if(raleighConstruction == 1)
 		{
+			InfraBuilt << rank << "," << realization << "," << year << ",";
+			
 			constructionToggle = x;
 			switch(x)
 			{
@@ -2302,17 +2430,26 @@ void Simulation::createInfrastructure()
 					riskOfFailureStorageIP.buildLittleRiverRal();
 					raleigh.addCapacity(3700.0);
 					littleRiverRalInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Raleigh" << "," << "LRR Raleigh" << endl;
+					
 					break;
 				case 1:
 					systemStorage.buildRalQuarry();
 					riskOfFailureStorageROF.buildRalQuarry();
 					riskOfFailureStorageIP.buildRalQuarry();
+					
+					InfraBuilt << "Raleigh" << "," << "Raleigh Quarry" << endl;
+					
 					break;
 				case 2:
 					systemStorage.buildNeuseIntake();
 					riskOfFailureStorageROF.buildNeuseIntake();
 					riskOfFailureStorageIP.buildNeuseIntake();
 					ralIntakeInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Raleigh" << "," << "Neuse River Intake" << endl;
+					
 					break;
 				case 3:
 					systemStorage.reallocateFallsLake(fallsLakeReallocation);
@@ -2320,19 +2457,30 @@ void Simulation::createInfrastructure()
 					riskOfFailureStorageIP.reallocateFallsLake(fallsLakeReallocation);
 					raleigh.addCapacity(fallsLakeReallocation);
 					raleigh.addInsStorage(fallsLakeReallocation);
+					
+					InfraBuilt << "Raleigh" << "," << "Reallocate Falls Lake" << endl;
+					
 					break;
 				case 4:
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Raleigh" << "," << "Western JL WTP (Small)" << endl;
+					
 					break;
 				case 5:
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					wwWTPInsuranceTrigger = 1.0;
+					
+					InfraBuilt << "Raleigh" << "," << "Western JL WTP (Large)" << endl;
+					
 					break;
+				default:
+					InfraBuilt << "Raleigh" << "," << "NO REMAINING PROJECTS" << endl;
 			}
 		}
 	}
@@ -2932,7 +3080,7 @@ void Simulation::triggerInfrastructure(int realization)
 return;
 }
 
-void Simulation::realizationLoop(ofstream &outReal, int rank)
+void Simulation::realizationLoop()
 {
 	double durhamActualInflow, owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow;
 	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
@@ -2970,20 +3118,27 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
 	
-	double LMreleaseCap = durham_res_supply_capacity / 5.0;
+	//double LMreleaseCap = 2000.0;
 		// assume that the max release allowed is 20% of total Durham storage 
-		// THIS WILL ADJUST WEEKLY
-		// May 2016: now defined within calcRawReleases, so this isn't really necessary
-		// but it is called a few places and then overwritten so i will not replace it now
+		// but that this is an additional, firm ceiling constraint
+		// now included above, read in the parameter input file
 	double LMreleaseMin = 0.0;
 		// no minimum contractual release
-	double FallsSupplyAllocationFraction = 0.423;
+	//double FallsSupplyAllocationFraction = 0.423;
+	double FLSPreleaseFrac;
+		// fraction of FL conservation pool dedicated to
+		// water supply storage (the rest is the WQ pool)
+		// now in parameter input file
+	double NearFailureLimit = 0.2;
+		// if FL storage is below this, any releases 
+		// will go 100% into the water supply pool 
 	
 	/////////////////////////////////////////////////////////////////////////
 	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
 	
-	int allowReleases = 1;
+	// int allowReleases = 1;
 		// logical to decide if releases are allowed or not
+		// specified in trianglesimulation 
 		
 	// numIntervals = 20;
 		// the number of discrete intervals of reservoir volume
@@ -2992,84 +3147,51 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	
 	double ReleaseContractLength = 100.0*52;
 		// number of weeks the contract is good
-	double ReleaseContractPrice = 30000000.0/1000000.0;
+	//double ReleaseContractPrice = 30000000.0/1000000.0;
 		// total cost of the releases contract in millions, to be paid on an annual basis?
+		// now included in parameter input file
 	
-	double RcriticalStorageLevel = 0.95;
+	double RcriticalStorageLevel = 1.00;
 	double DcriticalStorageLevel = 0.25;
 		// currently arbitrarily set, later should be optimized
 		// previous to March 15, 2016, releases were based on 
 		// R and D reservoir levels alone, now they are based on
 		// the same ROF values as treated transfers
 
-	double buybackratePerMG = 3000.0/1000000.0;
+	//double buybackratePerMG = 3500.0/1000000.0;
 		// currently equal to cost per quantity of treated transfer
+		// MAY 2016: RAISED TO 3500
+		// now included in parameter input file
 	
-	//raleigh.RRtrigger = raleigh.RRtrigger + 0.01 - rank * 0.01;
-	//durham.RRtrigger  = durham.RRtrigger  + 0.01 - rank * 0.01;
-		// raw release triggers are for now initially equal to the 
-		// treated transfer ROF triggers, and adjusted based on 
-		// rank to make some comparisons
-		// April 2016: these need to be much lower than past results,
-		// lower ROF triggers for TT to 0.03 (3%) and vary RR triggers
-		// around that at intervals of 0.01
+	// MAY 2016 CHANGES - INCREASED TO 16 RANKS -----------------------------------
 	
-	durham.RRtrigger = 0.02;
+	rank = solutionNumber;
+		// solutionNumber is assigned as rank in triangleSimulation.cpp
+	
+	// ALL OF THIS COMMENTED CHUNK IS NOW DEALT WITH IN THE PARAMETER INPUT FILE 
+	/* durham.RRtrigger  = 0.02;
+	durham.TTriggerN  = 0.02;
 		// keep this firm at a very low level to preserve durham risk
 	
-	if (rank == 0)
+	if (rank < 8)
 	{
-		raleigh.RRtrigger = 0.02;
+		raleigh.RRtrigger = 0.02 + rank * 0.02;
+			// vary this at 2% increasing by rank
 	}
-	if (rank == 1)
+	else
 	{
-		raleigh.RRtrigger = 0.05;
+		raleigh.RRtrigger = 0.02 + (rank-8) * 0.02;
+			// vary this at 2% increasing by rank
 	}
-	if (rank == 2)
-	{
-		raleigh.RRtrigger = 0.10;
-	}
-	if (rank == 3)
-	{
-		raleigh.RRtrigger = 0.20;
-	}
+		// for now, I am running 16 ranks and I want 
+		// 2 matching sets of 8 runs
+		// because half will be done without releases and half with them.
+		
+	raleigh.TTriggerN = 0.02;
+		// hold this low across all ranks */
 	
-	if (rank == 0)
-	{
-		raleigh.TTriggerN = 0.02;
-		durham.TTriggerN  = 0.02;
-	}
-	if (rank == 1)
-	{
-		raleigh.TTriggerN = 0.02;
-		durham.TTriggerN  = 0.02;
-	}
-	if (rank == 2)
-	{
-		raleigh.TTriggerN = 0.02;
-		durham.TTriggerN  = 0.02;
-	}
-	if (rank == 3)
-	{
-		raleigh.TTriggerN = 0.02;
-		durham.TTriggerN  = 0.02;
-	}
-	
-	/////////////////////////////////////////////////////////////////////////
-	//////////// VARIABLES TO ORGANIZE OUTPUTS //////////////////////////////
-	
-	double realizationReleaseVol;
-	double realizationBuybackVol;
-	double realizationTransferVolToRaleigh;
-	double realizationTransferVolToDurham;
-		// averaged annual release, buyback, or transfer quantities in a given realization
-	
-	double realizationReleaseCostToRaleigh;
-	double realizationBuybackCostToDurham;
-	double realizationTransferCostToDurham;
-	double realizationTransferCostToRaleigh;
-		// total (entire timeseries) costs of releases, buybacks, and transfers in a given realization
-	
+	// ----------------------------------------------------------------------------
+
 	/////////////////////////////////////////////////////////////////////////
 	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
 	
@@ -3082,78 +3204,80 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	ofstream outRiskParams;
 	ofstream placechecker;
 	
-	std::string filenameA = "output/JLTTR";
-	std::string filenameB = "output/JLTTD";
+	std::string filenameA = "output/JLTreatedTransfers";
+	//std::string filenameB = "output/JLTTD";
 	std::string filenameC = "output/RRfuncOutput";
 	std::string filenameD = "output/weeklyRiskParams";
 	std::string filenameE = "error/progresscounter";
+	std::string filenameG = "output/InfraBuilt";
+		// G is declared in the header file 
 	
 	std::string filenameEND = ".csv";
 		
 	std::string completeFilenameA;
-	std::string completeFilenameB;
+	//std::string completeFilenameB;
 	std::string completeFilenameC;
 	std::string completeFilenameD;
 	std::string completeFilenameE;
 	//std::string completeFilenameF;
+	std::string completeFilenameG;
 		
 	std::stringstream sstmA;
-	std::stringstream sstmB;
+	//std::stringstream sstmB;
 	std::stringstream sstmC;
 	std::stringstream sstmD;
 	std::stringstream sstmE;
 	//std::stringstream sstmF;
+	std::stringstream sstmG;
 		
 	sstmA << filenameA << rank << filenameEND;
-	sstmB << filenameB << rank << filenameEND;
+	//sstmB << filenameB << rank << filenameEND;
 	sstmC << filenameC << rank << filenameEND;
 	sstmD << filenameD << rank << filenameEND;
 	sstmE << filenameE << rank << filenameEND;
 	//sstmF << filenameF << rank << filenameEND;
+	sstmG << filenameG << rank << filenameEND;
 	
 	completeFilenameA = sstmA.str();
-	completeFilenameB = sstmB.str();
+	//completeFilenameB = sstmB.str();
 	completeFilenameC = sstmC.str();
 	completeFilenameD = sstmD.str();
 	completeFilenameE = sstmE.str();
 	//completeFilenameF = sstmF.str();
+	completeFilenameG = sstmG.str();
 	
 	openFile(out100, completeFilenameA);
-	openFile(out101, completeFilenameB);
+	//openFile(out101, completeFilenameB);
 	openFile(outNew, completeFilenameC);
 	openFile(outRiskParams, completeFilenameD);
 	openFile(placechecker,  completeFilenameE);
 	//openFile(createROFout,  completeFilenameF);
+	openFile(InfraBuilt, completeFilenameG);
 	
-	outReal << "Rank" << "," << "Realization" << ",";
-	outReal << "Raleigh Average Weekly Release Volume (MGW)" << "," << "Durham Average Weekly Buyback Volume (MGW)" << ",";
-	outReal << "Total Realization Cost of Releases to Raleigh" << "," << "Total Realization Cost of Releases to Durham" << ",";
-	outReal << "Raleigh Average Weekly Transfer Volume (MGW)" << "," << "Durham Average Weekly Transfer Volume (MGW)" << ",";
-	outReal << "Total Realization Cost of Transfers to Raleigh" << "," << "Total Realization Cost of Transfers to Durham" << endl;
-		// csv column headers for average statistics and scale factors of each realization
-	
-	out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "RaleighTransferVolume" << endl;
-	out101 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "DurhamTransferVolume"  << endl;
+	out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
+	out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
 		// csv column headers of treated transfer output data
 		
 	outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	outNew << "RaleighStorageRatio" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
-	outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "RaleighActualStorage" << "," << "DurhamActualStorage" << ",";
-	outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << endl;
+	outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+	outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+	outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
+	outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+	outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
 		// csv column headers for raw release output data and storage levels
 		
-	outRiskParams << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	outRiskParams << "Rank" << "," << "Realization" << ",";
 	outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
 	outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
-	outRiskParams << "RaleighRRandTT_ROF" << "," << "RaleighINF_ROF" << ",";
-	outRiskParams << "DurhamRRandTT_ROF"  << "," << "DurhamINF_ROF"  << endl;
+	outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
 		// csv column headers for csv containing ROF values
 		
-	//createROFout << "Year" << "," << "Month" << "," << "Week" << ",";
-	//createROFout << "Ddem" << "," << "Rdem" << ",";
-	//createROFout << "Dstorage" << "," << "Rstorage" << ",";
-	//createROFout << "Dexcess" << "," << "Rexcess" << endl;
+	InfraBuilt << "Rank" << "," << "Realization" << "," << "Year" << ",";
+	InfraBuilt << "Utility" << "," << "Project" << endl;
+		// column headers for infrastructure builds 
 	
+	////////////// OTHER PARAMS /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 		
 	int weekcounter;
@@ -3169,21 +3293,13 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 	//systemStorage.openResFiles();
 	//openFile(out1,"raleighDemand.csv");
 	//openFile(out3,"riskOfFailureFile.csv");
+	
+	///////////// RUN THE LOOP //////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+	
 	for (int realization = 0; realization < numRealizations; realization++)
 	{
 		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
-		
-		realizationReleaseVol = 0.0;
-		realizationBuybackVol = 0.0;
-		realizationTransferVolToRaleigh = 0.0;
-		realizationTransferVolToDurham = 0.0;
-			// reset averaged annual release, buyback, or transfer quantities in a given realization
-	
-		realizationReleaseCostToRaleigh = 0.0;
-		realizationBuybackCostToDurham = 0.0;
-		realizationTransferCostToDurham = 0.0;
-		realizationTransferCostToRaleigh = 0.0;
-			// reset total (entire timeseries) costs of releases, buybacks, and transfers in a given realization
 		
 		weekcounter = 0;
 		
@@ -3344,65 +3460,69 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
 			placechecker << 2 << endl;
-							
-			if (formulation > 0 and allowReleases == 1)
-				// allow transfers, apply raw releases 
-				// in a given week, transfers calculated before transfers
-				// however, ROF is not updated.  this should work out as long as
-				// release quantities are not capped at a low level
-				// (think: first week of a month of triggered ROF will see large
-				// transfers and releases, but the releases in first week will lead to
-				// no transfers in following weeks)
-			{
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
-				
-				placechecker << 3 << endl;
-				
-				systemStorage.calcRawReleases(LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
-											  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FallsSupplyAllocationFraction, 
-											  realization, outNew, year, week, numRealizationsTOREAD, rank);
-
-				placechecker << 4 << endl;
-												
-				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
-				
-				if (durham.weeklyBuybackVolume > 0.0)
-				{
-					durham.payForBuybacks(buybackratePerMG);
-					raleigh.acceptBuybackPayment(buybackratePerMG);
-					
-					realizationReleaseCostToRaleigh -= buybackratePerMG*systemStorage.getDurhamBuybackRequest();
-					realizationBuybackCostToDurham += buybackratePerMG*systemStorage.getDurhamBuybackRequest();
-				}
-				
-				if (week == 1)
-				{
-					raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
-					durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
-						// annual payment
-					
-					realizationReleaseCostToRaleigh += (ReleaseContractPrice/ReleaseContractLength*52.0);
-					realizationBuybackCostToDurham -= (ReleaseContractPrice/ReleaseContractLength*52.0);
-				}
-				
-				realizationReleaseVol += systemStorage.getRaleighReleases();
-				realizationBuybackVol += systemStorage.getDurhamBuybackRequest();
-				
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
-				
-				//Update reservoir storage levels
-				systemStorage.setSpillover(week-1);
-				systemStorage.updateStorage(week-1);
-                // set min releases
-			}
 			
 			if(formulation > 0)
                 // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
 			{
+				if (allowReleases == 1)
+					// allow transfers, apply raw releases 
+					// in a given week, transfers calculated before transfers
+					// however, ROF is not updated.  this should work out as long as
+					// release quantities are not capped at a low level
+					// (think: first week of a month of triggered ROF will see large
+					// transfers and releases, but the releases in first week will lead to
+					// no transfers in following weeks)
+				{
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////
+					/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
+					
+					placechecker << 3 << endl;
+					
+					if (systemStorage.getRaleighStorage() < NearFailureLimit)
+					{
+						FLSPreleaseFrac = 1.0;
+							// if Raleigh's total storage is below 30%
+							// any request releases can be completely used to
+							// augment water supply, rather than be split between
+							// water supply and water quality FL pools
+					}
+					else
+					{
+						FLSPreleaseFrac = FallsSupplyAllocationFraction;
+					}
+					
+					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
+												  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, 
+												  realization, outNew, year, week, numRealizationsTOREAD, rank);
+
+					placechecker << 4 << endl;
+													
+					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
+					
+					if (durham.weeklyBuybackVolume > 0.0)
+					{
+						durham.payForBuybacks(buybackratePerMG);
+						raleigh.acceptBuybackPayment(buybackratePerMG);
+					}
+					
+					if (week == 1)
+					{
+						raleigh.payForReleases(ReleaseContractPrice, ReleaseContractLength);
+						durham.acceptReleasePayment(ReleaseContractPrice, ReleaseContractLength);
+							// annual payment
+					}
+					
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////
+					/////////////////////////// APPLY TREATED TRANSFERS NEXT ////////////////////////////////////////////////
+					
+					//Update reservoir storage levels
+					systemStorage.setSpillover(week-1);
+					systemStorage.updateStorage(week-1);
+					// set min releases
+				}
+				
 				//Transfer requests are granted based on the limitations of infrastructure
 				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand);
                     // who gets transfers based on want and availability
@@ -3414,8 +3534,9 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 				
 				if (realization < numRealizationsTOREAD) 
 				{
-					out100 << rank << "," << realization << "," << year << "," << week << "," << raleigh.weeklyTransferVolume << endl;
-					out101 << rank << "," << realization << "," << year << "," << week << "," << durham.weeklyTransferVolume  << endl;
+					out100 << rank << "," << realization << "," << year << "," << week << ",";
+					out100 << raleigh.weeklyTransferVolume << "," << durham.weeklyTransferVolume << ",";
+					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << endl;
 				}
 				
 				durham.payForTransfers(transferCosts);
@@ -3428,23 +3549,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 						// Use the mitigation fund to calculate water transfer payments (sent to Cary)
 				}
 				
-				realizationTransferVolToRaleigh  += systemStorage.getRaleighTransfers();
-				realizationTransferVolToDurham   += systemStorage.getDurhamTransfers();
-				realizationTransferCostToRaleigh += transferCosts*systemStorage.getRaleighTransfers();
-				realizationTransferCostToDurham  += transferCosts*systemStorage.getDurhamTransfers();
-					// writing statistics for outputting later
-				
 				weekcounter += 1;
-			}
-			
-			if (realization < numRealizationsTOREAD)
-			{
-				outRiskParams << rank << "," << realization << "," << year << "," << week << ",";
-				outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
-				outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
-				outRiskParams << raleigh.riskOfFailure << "," << raleigh.infRisk << ",";
-				outRiskParams << durham.riskOfFailure  << "," << durham.infRisk  << endl;
-					// write outputs for risk parameters
 			}
 			
 			//Update reservoir storage levels
@@ -3493,7 +3598,7 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 			if (week == 1)
                 // if on a new year...
 			{
-				createInfrastructure();
+				createInfrastructure(realization);
 				createInfrastructureRisk(realization, year-1, durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
 				triggerInfrastructure(realization);
                     // check on infra
@@ -3541,27 +3646,24 @@ void Simulation::realizationLoop(ofstream &outReal, int rank)
 
 		} // End weekly loop
 		
-		
-		///////////////////// WRITE REALIZATION AVERAGES //////////////////////////////////////////////////////////////////
-		
-		outReal << rank << "," << realization << ",";
-		outReal << realizationReleaseVol/weekcounter << "," << realizationBuybackVol/weekcounter << ",";
-		outReal << realizationReleaseCostToRaleigh << "," << realizationBuybackCostToDurham << ",";
-		outReal << realizationTransferVolToRaleigh/weekcounter << "," << realizationTransferVolToDurham/weekcounter << ",";
-		outReal << realizationTransferCostToRaleigh << "," << realizationTransferCostToDurham << endl;
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// Saving the average annual cost from each 15-year realization
+		if (realization < numRealizationsTOREAD)
+		{
+			outRiskParams << rank << "," << realization << ",";
+			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
+			outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
+			outRiskParams << raleigh.jordanLakeAlloc << "," << durham.jordanLakeAlloc << "," << availableJLallocation << endl;
+				// write outputs for risk and other triggers that don't change over the course of simulation
+		}
 
 	} //end realization loop
 	
 	out100.close();
-	out101.close();
+	//out101.close();
 	outNew.close();
 	outRiskParams.close();
 	placechecker.close();
 	//createROFout.close();
+	InfraBuilt.close();
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();

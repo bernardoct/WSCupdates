@@ -116,30 +116,46 @@ int main (int argc, char *argv[])
 	int endYear = 2060;
 	int currentYear = 2015;
 
-
 	int terminateYear = endYear-startYear + 1;
 	int startSimulationYear = currentYear - startYear + 1;
 	simulation.setNumYears(terminateYear);
 	simulation.setStartYear(startSimulationYear);
 	
-	simulation.numIntervals = 50;
+	simulation.numIntervals = 20;
 		// the number of discrete volume increments
 		// used for insurance payouts and for 
-		// setting the "rating curve" for raleigh
+		// setting the "GUIDE curve" for raleigh
 		// and durham water supply for release determination
-
+	simulation.availableJLallocation = 1.00;
+		// the fraction of Jordan Lake water supply pool
+		// that can be divided among Cary, OWASA, Durham, and Raleigh.
+		// may be less than 1 (100%) because of allocation
+		// to Chatham County communities.
+	if (simulation.formulation > 0)
+		// in any formulation where treated transfers occur 
+	{
+		simulation.allowReleases = 0;
+			// a logical to determine whether releases will occur
+			// SET TO 0 SO RELEASES NEVER OCCUR 
+	}
+	else 
+	{
+		simulation.allowReleases = 0;
+	}
+	
 	//seed random number generator
 	// NOTE: for model, the seed stays the same. For Borg, the seed comes from command line argument.
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 57;
+	int c_num_dec = 63;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
         // c_num_dec is number of dec vars
+		// MAY 2016: ADD NEW VARIABLES TO THIS 
+		// NOW 63 VARIABLES 
 		
-
 	simulation.setNumDecisions(c_num_dec);
 
 	// Import historical demand and inflow datasets
@@ -173,7 +189,9 @@ int main (int argc, char *argv[])
 	
 	
 	simulation.calculateWaterPrices();
+	
 	simulation.calculateWaterSurcharges();
+		// not used 
 
 	//Generates synthetic streamflows using the autocorrelated bootstrap technique.
 	//Streamflows records have weekly values with a length of 52*(terminateYear)
@@ -290,31 +308,24 @@ int main (int argc, char *argv[])
 		int rank2 = rank + 256;
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
-		std::string filename3 = "output/variedRROF";
 		
 		std::string completeFilename;
-		std::string completeFilename2;
 		
 		std::stringstream sstm;
-		std::stringstream sstm2;
 		
 		sstm<< filename1<<rank <<filename2;
-		sstm2 << filename3 << rank << filename2;
 		
 		completeFilename = sstm.str();
-		completeFilename2 = sstm2.str();
 		
 		ofstream out1;
-		ofstream datareturn;
 		
 		openFile(out1, completeFilename);
-		openFile(datareturn, completeFilename2);
 		
 		//for (int i = 0; i < 2; i++)
 		//{
 			simulation.solutionNumber = rank;
             //simulation.solutionNumber = 1;
-			simulation.calculation(c_xreal, c_obj, c_constr, datareturn, rank);
+			simulation.calculation(c_xreal, c_obj, c_constr);
 			for (int x = 0; x< c_num_dec; x++)
 			{
 				out1<<simulation.parameterInput[simulation.solutionNumber][x]<<",";
@@ -327,7 +338,6 @@ int main (int argc, char *argv[])
 		//}
 		MPI_Finalize();
 		out1.close();
-		datareturn.close();
 	}
 
 	zap(c_obj);
