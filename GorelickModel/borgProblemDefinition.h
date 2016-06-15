@@ -1,7 +1,7 @@
 #ifndef borgProblemDefinition_h
 #define borgProblemDefinition_h
 
-#include "Borg-1.6/borgms.h"
+#include "cborg/borgms.h"
 
 void setProblemDefinition(BORG_Problem &problem, int formulation)
 {

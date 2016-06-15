@@ -20,7 +20,7 @@ public:
 	
 	void preconditionData(double unit_demand_multiplier, double future_demand_multiplier, bool firstTime);
 	void realizationLoop();
-	void calculation (double *c_xreal, double *c_obj, double *c_constr);
+	double calculation (double *c_xreal, double *c_obj, double *c_constr);
 	void calculateWaterPrices();
 	void calculateWaterSurcharges();
 	
@@ -38,6 +38,7 @@ public:
 	void updateFallsQuality();
 	void setStartYear(int SSY);
 	void chooseStreamflows();
+	void fixRDMFactors(int rdm_i);
 	
 	WaterUtility durham, owasa, cary, raleigh;
 	TimeSeriesData durhamInflows, owasaInflows, fallsInflows, wheelerInflows, crabtreeInflows, claytonInflows, jordanInflows, lillingtonInflows, littleRiverRaleighInflows;
@@ -45,6 +46,14 @@ public:
 	
 	int formulation;
 	int borgToggle;
+	bool printDetailedOutput;
+	
+	data_t RDMInput;
+	static const int num_rdm_factors = 30;
+	string directoryName;
+	double rdm_factors[30];
+	int rdmNumber;
+
 	int solutionNumber;
 	int bondLength;
 	int numRecords;
@@ -59,6 +68,15 @@ public:
 	double buybackratePerMG;
 	double ReleaseContractPrice;
 	double FallsSupplyAllocationFraction;
+
+	double falls_lake_supply_capacity;
+	double falls_lake_wq_capacity;
+	double jordan_lake_supply_capacity;
+	double jordan_lake_wq_capacity;
+	double cary_treatment_capacity;
+	double durham_cary_capacity;
+	double durham_owasa_capacity;
+	double raleigh_cary_capacity;
 	
 private:
 	

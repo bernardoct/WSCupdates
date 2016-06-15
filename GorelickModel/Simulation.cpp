@@ -1,5 +1,7 @@
 #include "global.h"
 #include "Simulation.h"
+#include <time.h>
+#include <string>
 
 using namespace std;
 
@@ -284,16 +286,6 @@ void Simulation::importDataFiles()
 	readFile(lillingtonGaugeInflow, directoryName + "updatedLillingtonInflow.csv", 81, 52);
 	readFile(littleRiverRaleighInflow, directoryName + "updatedLittleRiverRaleighInflow.csv", 81, 52);
 
-	readFile(michieInflowSYN, directoryName + "updatedMichieInflowSYN.csv", numRecords, 70*52);
-	readFile(littleRiverInflowSYN, directoryName + "updatedLittleRiverInflowSYN.csv", numRecords, 70*52);
-	readFile(owasaInflowSYN, directoryName + "updatedOWASAInflowSYN.csv", numRecords, 70*52);
-	readFile(fallsLakeInflowSYN, directoryName + "updatedFallsLakeInflowSYN.csv", numRecords, 70*52);
-	readFile(lakeWBInflowSYN, directoryName + "updatedLakeWBInflowSYN.csv", numRecords, 70*52);
-	readFile(claytonInflowSYN, directoryName + "claytonGageInflowSYN.csv", numRecords, 70*52);
-	readFile(crabtreeInflowSYN, directoryName + "crabtreeCreekInflowSYN.csv", numRecords, 70*52);
-	readFile(jordanLakeInflowSYN, directoryName + "updatedJordanLakeInflowSYN.csv", numRecords, 70*52);
-	readFile(lillingtonGaugeInflowSYN, directoryName + "updatedLillingtonInflowSYN.csv", numRecords, 70*52);
-	readFile(littleRiverRaleighInflowSYN, directoryName + "updatedLittleRiverRaleighInflowSYN.csv", numRecords, 70*52);
 
 	readFile(streamflowIndex, directoryName + "streamflowSample.csv", 100, 1);
 
@@ -521,29 +513,6 @@ void Simulation::preconditionData(double unit_demand_multiplier, double future_d
 		jordanInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
 		lillingtonInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
 		littleRiverRaleighInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
-		for (int row = 0; row<numRealizations;row++)
-		{
-			int weekCounter = 0;
-			for (int col = 0; col < terminateYear*52; col++)
-			{
-				durhamInflows.simulatedData[row][col] 	= (log(michieInflowSYN[row][col]+littleRiverInflowSYN[row][col]) - durhamInflows.averages[weekCounter])/durhamInflows.standardDeviations[weekCounter];
-				owasaInflows.simulatedData[row][col] 	= (log(owasaInflowSYN[row][col]) - owasaInflows.averages[weekCounter])/owasaInflows.standardDeviations[weekCounter];
-				fallsInflows.simulatedData[row][col]	= (log(fallsLakeInflowSYN[row][col]) - fallsInflows.averages[weekCounter])/fallsInflows.standardDeviations[weekCounter];
-				wheelerInflows.simulatedData[row][col]	= (log(lakeWBInflowSYN[row][col])-wheelerInflows.averages[weekCounter])/wheelerInflows.standardDeviations[weekCounter];
-				claytonInflows.simulatedData[row][col]	= (log(claytonInflowSYN[row][col])-claytonInflows.averages[weekCounter])/claytonInflows.standardDeviations[weekCounter];
-				crabtreeInflows.simulatedData[row][col]	= (log(crabtreeInflowSYN[row][col])-crabtreeInflows.averages[weekCounter])/crabtreeInflows.standardDeviations[weekCounter];
-				jordanInflows.simulatedData[row][col]	= (log(jordanLakeInflowSYN[row][col])-jordanInflows.averages[weekCounter])/jordanInflows.standardDeviations[weekCounter];
-				lillingtonInflows.simulatedData[row][col] = (log(lillingtonGaugeInflowSYN[row][col])-lillingtonInflows.averages[weekCounter])/lillingtonInflows.standardDeviations[weekCounter];
-				littleRiverRaleighInflows.simulatedData[row][col] = (log(littleRiverRaleighInflowSYN[row][col])-littleRiverRaleighInflows.averages[weekCounter])/littleRiverRaleighInflows.standardDeviations[weekCounter];
-				weekCounter = weekCounter + 1;
-				if(weekCounter == 52)
-				{
-					weekCounter = 0;
-				}
-
-			}
-
-		}
 	}
 
 	// Creating joint probability density functions between the whitened demand and inflow data for each utility
@@ -658,7 +627,8 @@ void Simulation::chooseStreamflows()
 			//}
 
 		//}
-		x = streamflowIndex[row][0] - 1;
+		//x = streamflowIndex[row][0] - 1;
+		x = row;
 		for (int col = 0; col < terminateYear*52; col++)
 		{
 			durhamInflows.synthetic[row][col] 	= michieInflowSYN[x][col]+littleRiverInflowSYN[x][col];
@@ -722,13 +692,163 @@ void Simulation::generateStreamflows()
 	return;
 }
 
-void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
+// MORDM EXTENSION - READ THE RIGHT SYNTHETIC STREAMFLOWS FILE BASED ON RDM FACTORS
+void Simulation::fixRDMFactors(int rdm_i)
 {
+	for (int r = 0; r < num_rdm_factors; r++)
+	{
+		rdm_factors[r] = RDMInput[rdm_i][r];
+	}
+
+	string hydrology_number;	
+	stringstream ss;
+
+	cout << "Setting up SOW info." << endl;
+	// cout << "Reading Hydrologies" << endl;
+	ss << rdm_factors[0];
+	hydrology_number = ss.str();
+	
+	//MORDM EXTENSION -  int combination = RDMInput[i] + ...
+	readFile(michieInflowSYN, directoryName + "updatedMichieInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(littleRiverInflowSYN, directoryName + "updatedLittleRiverInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(owasaInflowSYN, directoryName + "updatedOWASAInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(fallsLakeInflowSYN, directoryName + "updatedFallsLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(lakeWBInflowSYN, directoryName + "updatedLakeWBInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(claytonInflowSYN, directoryName + "claytonGageInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(crabtreeInflowSYN, directoryName + "crabtreeCreekInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(jordanLakeInflowSYN, directoryName + "updatedJordanLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(lillingtonGaugeInflowSYN, directoryName + "updatedLillingtonInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(littleRiverRaleighInflowSYN, directoryName + "updatedLittleRiverRaleighInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+
+
+	for (int row = 0; row<numRealizations;row++)
+	{
+		int weekCounter = 0;
+		for (int col = 0; col < terminateYear*52; col++)
+		{
+			durhamInflows.simulatedData[row][col] 	= (log(michieInflowSYN[row][col]+littleRiverInflowSYN[row][col]) - durhamInflows.averages[weekCounter])/durhamInflows.standardDeviations[weekCounter];
+			owasaInflows.simulatedData[row][col] 	= (log(owasaInflowSYN[row][col]) - owasaInflows.averages[weekCounter])/owasaInflows.standardDeviations[weekCounter];
+			fallsInflows.simulatedData[row][col]	= (log(fallsLakeInflowSYN[row][col]) - fallsInflows.averages[weekCounter])/fallsInflows.standardDeviations[weekCounter];
+			wheelerInflows.simulatedData[row][col]	= (log(lakeWBInflowSYN[row][col])-wheelerInflows.averages[weekCounter])/wheelerInflows.standardDeviations[weekCounter];
+			claytonInflows.simulatedData[row][col]	= (log(claytonInflowSYN[row][col])-claytonInflows.averages[weekCounter])/claytonInflows.standardDeviations[weekCounter];
+			crabtreeInflows.simulatedData[row][col]	= (log(crabtreeInflowSYN[row][col])-crabtreeInflows.averages[weekCounter])/crabtreeInflows.standardDeviations[weekCounter];
+			jordanInflows.simulatedData[row][col]	= (log(jordanLakeInflowSYN[row][col])-jordanInflows.averages[weekCounter])/jordanInflows.standardDeviations[weekCounter];
+			lillingtonInflows.simulatedData[row][col] = (log(lillingtonGaugeInflowSYN[row][col])-lillingtonInflows.averages[weekCounter])/lillingtonInflows.standardDeviations[weekCounter];
+			littleRiverRaleighInflows.simulatedData[row][col] = (log(littleRiverRaleighInflowSYN[row][col])-littleRiverRaleighInflows.averages[weekCounter])/littleRiverRaleighInflows.standardDeviations[weekCounter];
+			weekCounter = weekCounter + 1;
+			if(weekCounter == 52)
+			{
+				weekCounter = 0;
+			}
+		}
+	}
+
+
+	// cout << "Future demand multiplier" << endl;
+	//this section allows for use of historic record of variable length
+	for (int x = 0; x<numFutureYears; x++)
+	{
+		// MORDM EXTENSION - REPLACE future_demand_multiplier WITH THE RIGHT MULTIPLIERS FROM RDMInput
+		// Scaling a linear projection -- multiply the slope and subtract off changes to the y-intercept
+		cary.futureDemand[x] = caryFutureD[0][x]*rdm_factors[1] - caryFutureD[0][0]*(rdm_factors[1]-1);
+		raleigh.futureDemand[x] = raleighFutureD[0][x]*rdm_factors[2] - raleighFutureD[0][0]*(rdm_factors[2]-1);
+		durham.futureDemand[x] = durhamFutureD[0][x]*rdm_factors[3] - durhamFutureD[0][0]*(rdm_factors[3]-1);
+		owasa.futureDemand[x] = owasaFutureD[0][x]*rdm_factors[4] - owasaFutureD[0][0]*(rdm_factors[4]-1);
+	}
+
+
+	// cout << "Applying demand restriction multiplier" << endl;
+	// Consumer reductions factor (0/1 is irrigation/non, and 0-4 is the restriction stage
+	// MORDM EXTENSION - ADD CONSERVATION POTENTIAL FACTORS HERE
+	
+	durham.individualReductions[0][0] = 1;
+	durham.individualReductions[0][1] = .85 * rdm_factors[5];
+	durham.individualReductions[0][2] = .7 * rdm_factors[5];
+	durham.individualReductions[0][3] = .6 * rdm_factors[5];
+	durham.individualReductions[0][4] = .45 * rdm_factors[5];
+	// ASK IF THESE NON-IRRIGATION REDUCTIONS ARE BEING USED
+	durham.individualReductions[1][0] = 1;
+	durham.individualReductions[1][1] = .93 * rdm_factors[5];
+	durham.individualReductions[1][2] = .88 * rdm_factors[5];
+	durham.individualReductions[1][3] = .83 * rdm_factors[5];
+	durham.individualReductions[1][4] = .7 * rdm_factors[5];
+
+	owasa.individualReductions[0][0] = 1;
+	owasa.individualReductions[0][1] = .9 * rdm_factors[6];
+	owasa.individualReductions[0][2] = .85 * rdm_factors[6];
+	owasa.individualReductions[0][3] = .8 * rdm_factors[6];
+
+	raleigh.individualReductions[0][0] = 1;
+	raleigh.individualReductions[0][1] = .952 * rdm_factors[7];
+	raleigh.individualReductions[0][2] = .91 * rdm_factors[7];
+	raleigh.individualReductions[0][3] = .724 * rdm_factors[7];
+	raleigh.individualReductions[0][4] = .634 * rdm_factors[7];
+
+	//Cary reductions by stage
+	cary.individualReductions[0][0] = 1;
+	cary.individualReductions[0][1] = .87 * rdm_factors[8];
+	cary.individualReductions[0][2] = .68 * rdm_factors[8];
+	cary.individualReductions[0][3] = .62 * rdm_factors[8];
+	cary.individualReductions[0][4] = .54 * rdm_factors[8];
+	cary.individualReductions[1][0] = 1;
+	cary.individualReductions[1][1] = .94 * rdm_factors[8];
+	cary.individualReductions[1][2] = .9 * rdm_factors[8];
+	cary.individualReductions[1][3] = .83 * rdm_factors[8];
+	cary.individualReductions[1][4] = .71 * rdm_factors[8];
+	
+	// cout << "Capacities multiplier" << endl;
+	//MORDM EXTENSION - add allocation, and capacities multipliers	
+	falls_lake_supply_capacity = 14700.0*rdm_factors[9];
+	falls_lake_wq_capacity = (14700.0 - falls_lake_supply_capacity) + 20000.0;
+	jordan_lake_supply_capacity = 14924.0*rdm_factors[10];
+	jordan_lake_wq_capacity = (14924.0 - jordan_lake_supply_capacity) + 30825.0;
+	cary_treatment_capacity = 40.0*rdm_factors[11];
+	durham_cary_capacity = 10.0*rdm_factors[12];
+	durham_owasa_capacity = 7.0*rdm_factors[12];
+	raleigh_cary_capacity = 10.8*rdm_factors[12];
+
+	// cout << "Financial info" << endl;
+	//MORDM EXTENSION - add bond rate and length
+	bondRate = rdm_factors[13];
+	bondLength = rdm_factors[14];
+
+	// cout << "Setting permiting times" << endl;
+	//MORDM EXTENSION - permiting periods
+	owasa.infMatrix[0][2] = rdm_factors[15];//17;
+		// permitting period, cant be built until 17th year
+	owasa.infMatrix[1][2] = rdm_factors[16];
+	
+	owasa.infMatrix[2][2] = rdm_factors[17];
+	owasa.infMatrix[3][2] = rdm_factors[18];
+	durham.infMatrix[0][2] = rdm_factors[19];
+	durham.infMatrix[1][2] = rdm_factors[20];
+	durham.infMatrix[2][2] = rdm_factors[21];
+	durham.infMatrix[3][2] = rdm_factors[22];
+	durham.infMatrix[4][2] = rdm_factors[23];
+	raleigh.infMatrix[0][2] = rdm_factors[24];
+	raleigh.infMatrix[1][2] = rdm_factors[25];
+	raleigh.infMatrix[2][2] = rdm_factors[26];
+	raleigh.infMatrix[3][2] = rdm_factors[27];
+
+	// for these last 6, the 12s and 27s must be the same.
+	owasa.infMatrix[4][2] = rdm_factors[28];
+	owasa.infMatrix[5][2] = rdm_factors[29];
+	durham.infMatrix[5][2] = rdm_factors[28];
+	durham.infMatrix[6][2] = rdm_factors[29];
+	raleigh.infMatrix[4][2] = rdm_factors[28];
+	raleigh.infMatrix[5][2] = rdm_factors[29];
+}
+
+double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
+{
+
+	time_t start = time(0);
 	// Decision variable
 	if (borgToggle ==3)
         // doesnt happen if using the MOEA
         // MAKE SURE IM USING 3 WHEN LOOKING AT not the MOEA
 	{
+		cout << "Setting up deccision vars" << endl;
 		for (int i = 0; i < num_dec; i++)
 		{
 			xreal[i] = parameterInput[solutionNumber][i];
@@ -796,13 +916,16 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		}
 	}
 
+	cout << "calculating water prices and surcharges." << endl;
 	calculateWaterPrices();
 	calculateWaterSurcharges();
 		// unnecessary now
 		
+	cout << "Choosing streamflows." << endl;
 	chooseStreamflows();
 		// right now, picks 100 worst years
 		
+	cout << "Setting up triggers, restrictions, and other data." << endl;
 	durham.insurancePremium = 1.2;
 	cary.insurancePremium = 1.2;
 	raleigh.insurancePremium = 1.2;
@@ -1158,8 +1281,6 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// between 0 and 1 (higher = build first)
 		// once built, this number is changed to 1
 		
-	owasa.infMatrix[0][2] = 17;
-		// permitting period, cant be built until 17th year
 		
 	owasa.infMatrix[0][4] = 107.0;
 		// total cost, $MM
@@ -1171,57 +1292,49 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	// index = 3 means counter of years of construction
 		
 	owasa.infMatrix[1][0] = xreal[28];////Cane Creek expansion
-	owasa.infMatrix[1][2] = 17;
 		// MAY 2016: changed so that this will never be built
 		// (on consult of OWASA, model is saying that after 100 years
 		//  it is ok to build, which means it will never happen)
 		// was originally 17 permitting years 
+
+	// MORDM EXTENTION - REPLACE x in infMatrix[n][2] BY THE PERMITING VALUES. 15 TOTAL BECAUSE THE ONES FOR SHARED INFRACTRUCTURE (LINES 1262, 1271, 1280 AND SAME PLUS 3) MUST BE THE SAME 
 	owasa.infMatrix[1][4] = 127.0;
 	owasa.infMatrix[1][5] = 3 + rand() % 3;
 	owasa.infMatrix[2][0] = xreal[29];////Quarry reservoir expansion (shallow)
-	owasa.infMatrix[2][2] = 23;
 	owasa.infMatrix[2][4] = 1.4;
 	owasa.infMatrix[2][5] = 3 + rand() % 3;
 	owasa.infMatrix[3][0] = xreal[30];////Quarry reservoir expansion (deep)
-	owasa.infMatrix[3][2] = 23;
 	owasa.infMatrix[3][4] = 1.4;
 	owasa.infMatrix[3][5] = 3 + rand() % 3;
 	///Durham infrastructure
 	durham.infMatrix[0][0] = xreal[31];////Teer quarry expansion
-	durham.infMatrix[0][2] = 7;
 	durham.infMatrix[0][4] = 22.6;
 	durham.infMatrix[0][5] = 3 + rand() % 3;
 	durham.infMatrix[1][0] = xreal[32];////Reclaimed water (low)
-	durham.infMatrix[1][2] = 7;
 	durham.infMatrix[1][4] = 27.5;
 	durham.infMatrix[1][5] = 3 + rand() % 3;
 	durham.infMatrix[2][0] = xreal[33];////Reclaimed water (high)
-	durham.infMatrix[2][2] = 17;
 	durham.infMatrix[2][4] = 104.4;
 	durham.infMatrix[2][5] = 3 + rand() % 3;
 	durham.infMatrix[3][0] = xreal[34];////Lake Michie expansion (low)
-	durham.infMatrix[3][2] = 17;
 	durham.infMatrix[3][4] = 158.3;
 	durham.infMatrix[3][5] = 3 + rand() % 3;
 	durham.infMatrix[4][0] = xreal[35];////Lake Michie expansion (high)
-	durham.infMatrix[4][2] = 17;
 	durham.infMatrix[4][4] = 203.3;
 	durham.infMatrix[4][5] = 3 + rand() % 3;
 	///Raleigh infrastructure
 	raleigh.infMatrix[0][0] = xreal[37];////Little River Reservoir
-	raleigh.infMatrix[0][2] = 17;
 	raleigh.infMatrix[0][4] = 263.0;
 	raleigh.infMatrix[0][5] = 3 + rand() % 3;
 	raleigh.infMatrix[1][0] = xreal[37];////Richland Creek Quarry
-	raleigh.infMatrix[1][2] = 17;
 	raleigh.infMatrix[1][4] = 265.0;
 	raleigh.infMatrix[1][5] = 3 + rand() % 3;
 	raleigh.infMatrix[2][0] = xreal[38];////Neuse River Intake
-	raleigh.infMatrix[2][2] = 17;
 	raleigh.infMatrix[2][4] = 225.5;
 	raleigh.infMatrix[2][5] = 3 + rand() % 3;
 	raleigh.infMatrix[3][0] = xreal[39];////Reallocate Falls Lake
-	raleigh.infMatrix[3][2] = 12;
+
+
 		// May 2016: changed to 100 years, so it can't be done as a 
 		// experiment to see what happens if durham expands while raleigh
 		// doesnt.
@@ -1237,29 +1350,23 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		
 		///OWASA infrastructure
 		owasa.infMatrix[4][0] = xreal[40];////Western Wake Treatment plant
-		owasa.infMatrix[4][2] = 12;
 		owasa.infMatrix[4][4] = 243.3*xreal[49];
 		owasa.infMatrix[4][5] = 3 + rand() % 3;
 		owasa.infMatrix[5][0] = xreal[41];////Western Wake Treatment plant
-		owasa.infMatrix[5][2] = 27;
 		owasa.infMatrix[5][4] = 316.8*xreal[49];
 		owasa.infMatrix[5][5] = 3 + rand() % 3;
 		///Durham infrastructure
 		durham.infMatrix[5][0] = xreal[42];/////Western Wake Treatment plant
-		durham.infMatrix[5][2] = 12;
 		durham.infMatrix[5][4] = 243.3*xreal[50];
 		durham.infMatrix[5][5] = 3 + rand() % 3;
 		durham.infMatrix[6][0] = xreal[43];////Western Wake Treatment plant
-		durham.infMatrix[6][2] = 27;
 		durham.infMatrix[6][4] = 316.8*xreal[50];
 		durham.infMatrix[6][5] = 3 + rand() % 3;
 		///Raleigh infrastructure
 		raleigh.infMatrix[4][0] = xreal[44];//Western Wake Treatment plant
-		raleigh.infMatrix[4][2] = 12;
 		raleigh.infMatrix[4][4] = 243.3*xreal[51];
 		raleigh.infMatrix[4][5] = 3 + rand() % 3;
 		raleigh.infMatrix[5][0] = xreal[45];////Western Wake Treatment plant
-		raleigh.infMatrix[5][2] = 27;
 		raleigh.infMatrix[5][4] = 316.8*xreal[51];
 		raleigh.infMatrix[5][5] = 3 + rand() % 3;
 	}
@@ -1374,6 +1481,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	// to this point, only assigned decision variables to their model variables,
 	// now we are actually running the model.
 
+	// cout << "Beginning realization loop." << endl;
 	realizationLoop();
         // reservoir simulation done here
 
@@ -1473,7 +1581,7 @@ void Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		}
 	}*/
 
-	return;
+	return difftime( time(0), start);
 }
 
 void Simulation::createRiskOfFailure(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
@@ -2266,6 +2374,7 @@ void Simulation::createInfrastructure(int realization)
 		owasaConstruction = owasa.buildInfrastructure(x);
 			// for infrastructure option x, check buildInfrastructure option
 			// to see if this option has been built or not, if it has, enter the if statement below
+
 		if(owasaConstruction == 1)
 		{
 			InfraBuilt << rank << "," << realization << "," << year << ",";
@@ -3092,14 +3201,6 @@ void Simulation::realizationLoop()
 	double stone_quarry_supply_capacity = 200.0;
 	double university_lake_supply_capacity = 449.0;
 	double lake_wheeler_benson_supply_capacity = 2789.66;
-	double falls_lake_supply_capacity = 14700.0;
-	double falls_lake_wq_capacity = 34700.0 - falls_lake_supply_capacity;
-	double jordan_lake_supply_capacity = 14924.0;
-	double jordan_lake_wq_capacity = (14924.0 - jordan_lake_supply_capacity) + 30825.0;
-	double cary_treatment_capacity = 56.0;
-	double durham_cary_capacity = 10.0;
-	double durham_owasa_capacity = 7.0;
-	double raleigh_cary_capacity = 10.8;
 	double raleigh_durham_capacity = 10.0;
 	double teer_quarry_supply_capacity = 1315.0;
 	double teer_quarry_intake_capacity = 0.0;
@@ -3195,95 +3296,98 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
 	
-	int numRealizationsTOREAD = 100;
+	int numRealizationsTOREAD = 1000;
 		// read all realizations in current mode
 	
+
 	ofstream out100;
 	ofstream out101;
 	ofstream outNew;
 	ofstream outRiskParams;
-	ofstream placechecker;
+	ofstream InfraBuilt;
 	
-	std::string filenameA = "output/JLTreatedTransfers";
-	//std::string filenameB = "output/JLTTD";
-	std::string filenameC = "output/RRfuncOutput";
-	std::string filenameD = "output/weeklyRiskParams";
-	std::string filenameE = "error/progresscounter";
-	std::string filenameG = "output/InfraBuilt";
-		// G is declared in the header file 
-	
-	std::string filenameEND = ".csv";
-		
-	std::string completeFilenameA;
-	//std::string completeFilenameB;
-	std::string completeFilenameC;
-	std::string completeFilenameD;
-	std::string completeFilenameE;
-	//std::string completeFilenameF;
 	std::string completeFilenameG;
-		
-	std::stringstream sstmA;
-	//std::stringstream sstmB;
-	std::stringstream sstmC;
-	std::stringstream sstmD;
-	std::stringstream sstmE;
-	//std::stringstream sstmF;
-	std::stringstream sstmG;
-		
-	sstmA << filenameA << rank << filenameEND;
-	//sstmB << filenameB << rank << filenameEND;
-	sstmC << filenameC << rank << filenameEND;
-	sstmD << filenameD << rank << filenameEND;
-	sstmE << filenameE << rank << filenameEND;
-	//sstmF << filenameF << rank << filenameEND;
 	sstmG << filenameG << rank << filenameEND;
-	
-	completeFilenameA = sstmA.str();
-	//completeFilenameB = sstmB.str();
-	completeFilenameC = sstmC.str();
-	completeFilenameD = sstmD.str();
-	completeFilenameE = sstmE.str();
-	//completeFilenameF = sstmF.str();
 	completeFilenameG = sstmG.str();
-	
-	openFile(out100, completeFilenameA);
-	//openFile(out101, completeFilenameB);
-	openFile(outNew, completeFilenameC);
-	openFile(outRiskParams, completeFilenameD);
-	openFile(placechecker,  completeFilenameE);
-	//openFile(createROFout,  completeFilenameF);
+
+	std::string filenameEND = ".csv";
+	std::string filenameG = "output/InfraBuilt";
 	openFile(InfraBuilt, completeFilenameG);
-	
-	out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
-	out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
-		// csv column headers of treated transfer output data
-		
-	outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
-	outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
-	outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
-	outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
-	outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
-		// csv column headers for raw release output data and storage levels
-		
-	outRiskParams << "Rank" << "," << "Realization" << ",";
-	outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
-	outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
-	outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
-		// csv column headers for csv containing ROF values
 		
 	InfraBuilt << "Rank" << "," << "Realization" << "," << "Year" << ",";
 	InfraBuilt << "Utility" << "," << "Project" << endl;
+
+	if (printDetailedOutput)
+	{
+		
+		std::string filenameA = "output/JLTreatedTransfers";
+		//std::string filenameB = "output/JLTTD";
+		std::string filenameC = "output/RRfuncOutput";
+		std::string filenameD = "output/weeklyRiskParams";
+		std::string filenameE = "error/progresscounter";
+			// G is declared in the header file 
+		
+			
+		std::string completeFilenameA;
+		//std::string completeFilenameB;
+		std::string completeFilenameC;
+		std::string completeFilenameD;
+		std::string completeFilenameE;
+		//std::string completeFilenameF;
+			
+		std::stringstream sstmA;
+		//std::stringstream sstmB;
+		std::stringstream sstmC;
+		std::stringstream sstmD;
+		std::stringstream sstmE;
+		//std::stringstream sstmF;
+		std::stringstream sstmG;
+			
+		sstmA << filenameA << rank << filenameEND;
+		//sstmB << filenameB << rank << filenameEND;
+		sstmC << filenameC << rank << filenameEND;
+		sstmD << filenameD << rank << filenameEND;
+		sstmE << filenameE << rank << filenameEND;
+		//sstmF << filenameF << rank << filenameEND;
+		
+		completeFilenameA = sstmA.str();
+		//completeFilenameB = sstmB.str();
+		completeFilenameC = sstmC.str();
+		completeFilenameD = sstmD.str();
+		completeFilenameE = sstmE.str();
+		//completeFilenameF = sstmF.str();
+		
+		openFile(out100, completeFilenameA);
+		//openFile(out101, completeFilenameB);
+		openFile(outNew, completeFilenameC);
+		openFile(outRiskParams, completeFilenameD);
+		//openFile(createROFout,  completeFilenameF);
+		
+		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
+		out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
+			// csv column headers of treated transfer output data
+			
+		outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+		outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+		outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
+		outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+		outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
+			// csv column headers for raw release output data and storage levels
+			
+		outRiskParams << "Rank" << "," << "Realization" << ",";
+		outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
+		outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
+		outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
+			// csv column headers for csv containing ROF values
+	}
 		// column headers for infrastructure builds 
 	
 	////////////// OTHER PARAMS /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 		
 	int weekcounter;
-	
-	bondRate = 0.05;
-	bondLength = 25;
 	fallsFailurePoint = 0.2;
 	zeroes(totalFallsFailure, terminateYear);
 	maxFallsFailure = 0.0;
@@ -3299,6 +3403,9 @@ void Simulation::realizationLoop()
 	
 	for (int realization = 0; realization < numRealizations; realization++)
 	{
+
+
+
 		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
 		
 		weekcounter = 0;
@@ -3389,7 +3496,6 @@ void Simulation::realizationLoop()
 		zeroes(caryBuild,3);
 		thisYearFalls = 0;
 		
-		placechecker << 1 << endl;
 		
 		while (year-1<(terminateYear))
             // in a single realization, from year to year
@@ -3407,13 +3513,11 @@ void Simulation::realizationLoop()
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 			
-			placechecker << "am i here" << endl;
 			
 			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
 								numIntervals);
                 // gives the ROF of this given week
 				
-			placechecker << "but not here" << endl;
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3459,7 +3563,6 @@ void Simulation::realizationLoop()
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
-			placechecker << 2 << endl;
 			
 			if(formulation > 0)
                 // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
@@ -3476,7 +3579,6 @@ void Simulation::realizationLoop()
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
 					/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 					
-					placechecker << 3 << endl;
 					
 					if (systemStorage.getRaleighStorage() < NearFailureLimit)
 					{
@@ -3493,9 +3595,8 @@ void Simulation::realizationLoop()
 					
 					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
 												  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, 
-												  realization, outNew, year, week, numRealizationsTOREAD, rank);
+												  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput);
 
-					placechecker << 4 << endl;
 													
 					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
@@ -3532,7 +3633,7 @@ void Simulation::realizationLoop()
 				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
                     // each utility assigned the costs of the transfers they get
 				
-				if (realization < numRealizationsTOREAD) 
+				if (realization < numRealizationsTOREAD && printDetailedOutput) 
 				{
 					out100 << rank << "," << realization << "," << year << "," << week << ",";
 					out100 << raleigh.weeklyTransferVolume << "," << durham.weeklyTransferVolume << ",";
@@ -3646,7 +3747,7 @@ void Simulation::realizationLoop()
 
 		} // End weekly loop
 		
-		if (realization < numRealizationsTOREAD)
+		if (realization < numRealizationsTOREAD && printDetailedOutput)
 		{
 			outRiskParams << rank << "," << realization << ",";
 			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
@@ -3657,12 +3758,14 @@ void Simulation::realizationLoop()
 
 	} //end realization loop
 	
-	out100.close();
-	//out101.close();
-	outNew.close();
-	outRiskParams.close();
-	placechecker.close();
-	//createROFout.close();
+	if (printDetailedOutput)
+	{
+		out100.close();
+		//out101.close();
+		outNew.close();
+		outRiskParams.close();
+		//createROFout.close();
+	}
 	InfraBuilt.close();
 
 	durham.calculateObjectives();

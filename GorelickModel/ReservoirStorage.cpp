@@ -1595,7 +1595,7 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel,  
 									   double RstorageTarget, double DstorageTarget, double FallsSupplyFraction,
-									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK)
+									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
 	// of water Durham wants to "buy back" to avoid releasing it.
@@ -1767,7 +1767,7 @@ void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMi
 		// at a division equal to their relative allocations 
 		// within falls lake conservation pool
 	
-	if (realization < numRealizationsTOOUTPUT)
+	if (realization < numRealizationsTOOUTPUT && printOutput)
 		// for each week, output all this info to a csv
 	{
 		streamFile << RANK << "," << realization << "," << year << "," << week << ",";

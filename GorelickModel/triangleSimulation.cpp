@@ -16,10 +16,11 @@
 #ifdef PARALLEL
 	#include <mpi.h>
 	#include "borgProblemDefinition.h"
-	#include "Borg-1.6/borgms.h"
+	#include "cborg/borgms.h"
 #endif
 
 using namespace std;
+
     // tells C++ that we are using the standard namespace, so
     // instead of typing "std::cerr" we just type "cerr"
 
@@ -35,6 +36,10 @@ void usage(int argc, char* argv[])
 	cerr << "-b <BORG Interface toggle> \t BORG interface options or write output to file.  REQUIRED." <<endl;
         // which mode are we running?
 	cerr << "-s <seed> \t Seed. (optional)." << endl;
+	cerr << "-a <alternative> \t alternative to be evaluated (optional)." << endl;
+	cerr << "-f <deeply uncertain factors vector> \t number of the first deeply uncertain factor vector to be used for reevaluations (optional)." << endl;
+	cerr << "-e <deeply uncertain factors vector> \t number of the last deeply uncertain factor vector to be used for reevaluations (optional)." << endl;
+	cerr << "-p <comprehensive output> \t print entire output (infrestructure built, etc) (optional)." << endl;
 	cerr << "-h Help (this screen)." << endl;
 
 	exit(-1);
@@ -74,8 +79,13 @@ int main (int argc, char *argv[])
 	//int seed = (int)time(NULL);
 	int seed = 1;
 	int numRealizations;
+	int duFactorsFrom = 0;
+	int duFactorsTo = 1;
+	int alternative = 0;
+	int interval = 0;
+	simulation.printDetailedOutput = false;
 
-	while ((opt = getopt(argc, argv, "r:t:c:b:s:h")) != -1)
+	while ((opt = getopt(argc, argv, "r:t:c:b:s:a:f:e:p:i:h")) != -1)
 	{
 		switch (opt)
 		{
@@ -94,6 +104,21 @@ int main (int argc, char *argv[])
 			case 's':
 				seed = atoi(optarg);
 				break;
+			case 'a':
+				alternative = atoi(optarg);
+				break;
+			case 'f':
+				duFactorsFrom = atoi(optarg);
+				break;
+			case 'e':
+				duFactorsTo = atoi(optarg);
+				break;
+			case 'p':
+				simulation.printDetailedOutput = true;
+				break;
+			case 'i':
+				interval = atoi(optarg);
+				break;
 			case 'h':
 				usage(argc, argv);
 				break;
@@ -108,6 +133,8 @@ int main (int argc, char *argv[])
 		cerr << "Error! Number of realizations not given." << endl;
 		exit(-1);
 	}
+
+
 
 	//set defaults
 	simulation.setNumRealizations(numRealizations);
@@ -155,7 +182,7 @@ int main (int argc, char *argv[])
         // c_num_dec is number of dec vars
 		// MAY 2016: ADD NEW VARIABLES TO THIS 
 		// NOW 63 VARIABLES 
-		
+	
 	simulation.setNumDecisions(c_num_dec);
 
 	// Import historical demand and inflow datasets
@@ -200,7 +227,6 @@ int main (int argc, char *argv[])
 	
 	
 	simulation.generateStreamflows();
-	simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
 
 	//Reservoir risk of failure uses historical streamflow records to determine the probability that reservoir storage will drop below
 	//20% of storage capacity within a period of 52 weeks for a given storage level, week of the year, and average consumer demand
@@ -291,13 +317,20 @@ int main (int argc, char *argv[])
             // this can look at them separately
 		general_1d_allocate(c_obj, c_num_obj);
 		simulation.initializeFormulation(c_num_obj, 0);
+		simulation.directoryName = "./inputfiles/";
 
 		// cout << "running simulations" << endl;
 
 		// Read a certain number of parameter sets from a file
-		int numSolutions = 10000;
+		int numSolutions = 32;
+		int numDeepFactorCombs = 4;
+		std::stringstream rdmstm;
+		rdmstm << "RDMSamples.csv";// << duFactorsFrom << "_" << duFactorsTo << ".csv";
+		std::string rdmfilename = rdmstm.str();
             // make sure it is num of rows in the following file
-		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);
+		readFile(simulation.parameterInput, "./parameterInputFile2.csv", numSolutions, c_num_dec);
+		// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  ADDED BY BERNARDO
+		readFile(simulation.RDMInput, rdmfilename, numDeepFactorCombs, simulation.num_rdm_factors);
 
 		// Set up the output stream for objective values
 		MPI_Init(NULL,NULL);
@@ -309,23 +342,31 @@ int main (int argc, char *argv[])
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
 		
+		simulation.directoryName = "./inputfiles/";
 		std::string completeFilename;
 		
 		std::stringstream sstm;
 		
-		sstm<< filename1<<rank <<filename2;
+		sstm<< filename1 << (rank + interval) << "_" << duFactorsFrom << "_" << duFactorsTo << filename2;
 		
 		completeFilename = sstm.str();
 		
 		ofstream out1;
 		
 		openFile(out1, completeFilename);
+		double calculation_time;
 		
-		//for (int i = 0; i < 2; i++)
-		//{
-			simulation.solutionNumber = rank;
+		// RDM LOOP
+		for (int i = duFactorsFrom; i <= duFactorsTo; i++)
+		{
+			simulation.fixRDMFactors(i);
+			simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
+
+			simulation.solutionNumber = rank + interval;
             //simulation.solutionNumber = 1;
-			simulation.calculation(c_xreal, c_obj, c_constr);
+            cout << "Calculating rank " << rank << " RDM number " << i << endl;
+			calculation_time = simulation.calculation(c_xreal, c_obj, c_constr);
+            cout << "Rank " << rank << " RDM number " << i << " took " << calculation_time << " seconds." << endl;
 			for (int x = 0; x< c_num_dec; x++)
 			{
 				out1<<simulation.parameterInput[simulation.solutionNumber][x]<<",";
@@ -335,7 +376,7 @@ int main (int argc, char *argv[])
 				out1 << c_obj[x] << ",";
 			}
 			out1 << endl;
-		//}
+		}
 		MPI_Finalize();
 		out1.close();
 	}
