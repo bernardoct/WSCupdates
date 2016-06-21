@@ -36,10 +36,6 @@ void usage(int argc, char* argv[])
 	cerr << "-b <BORG Interface toggle> \t BORG interface options or write output to file.  REQUIRED." <<endl;
         // which mode are we running?
 	cerr << "-s <seed> \t Seed. (optional)." << endl;
-	cerr << "-a <alternative> \t alternative to be evaluated (optional)." << endl;
-	cerr << "-f <deeply uncertain factors vector> \t number of the first deeply uncertain factor vector to be used for reevaluations (optional)." << endl;
-	cerr << "-e <deeply uncertain factors vector> \t number of the last deeply uncertain factor vector to be used for reevaluations (optional)." << endl;
-	cerr << "-p <comprehensive output> \t print entire output (infrestructure built, etc) (optional)." << endl;
 	cerr << "-h Help (this screen)." << endl;
 
 	exit(-1);
@@ -79,13 +75,8 @@ int main (int argc, char *argv[])
 	//int seed = (int)time(NULL);
 	int seed = 1;
 	int numRealizations;
-	int duFactorsFrom = 0;
-	int duFactorsTo = 1;
-	int alternative = 0;
-	int interval = 0;
-	simulation.printDetailedOutput = false;
 
-	while ((opt = getopt(argc, argv, "r:t:c:b:s:a:f:e:p:i:h")) != -1)
+	while ((opt = getopt(argc, argv, "r:t:c:b:s:h")) != -1)
 	{
 		switch (opt)
 		{
@@ -103,21 +94,6 @@ int main (int argc, char *argv[])
 				break;
 			case 's':
 				seed = atoi(optarg);
-				break;
-			case 'a':
-				alternative = atoi(optarg);
-				break;
-			case 'f':
-				duFactorsFrom = atoi(optarg);
-				break;
-			case 'e':
-				duFactorsTo = atoi(optarg);
-				break;
-			case 'p':
-				simulation.printDetailedOutput = true;
-				break;
-			case 'i':
-				interval = atoi(optarg);
 				break;
 			case 'h':
 				usage(argc, argv);
@@ -323,14 +299,10 @@ int main (int argc, char *argv[])
 
 		// Read a certain number of parameter sets from a file
 		int numSolutions = 32;
-		int numDeepFactorCombs = 4;
-		std::stringstream rdmstm;
-		rdmstm << "RDMSamples.csv";// << duFactorsFrom << "_" << duFactorsTo << ".csv";
-		std::string rdmfilename = rdmstm.str();
             // make sure it is num of rows in the following file
-		readFile(simulation.parameterInput, "./parameterInputFile2.csv", numSolutions, c_num_dec);
+		readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1.set", numSolutions, c_num_dec);
 		// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  ADDED BY BERNARDO
-		readFile(simulation.RDMInput, rdmfilename, numDeepFactorCombs, simulation.num_rdm_factors);
+		readFile(simulation.RDMInput, "./lhs_samples_final.csv", numRealizations, simulation.num_rdm_factors);
 
 		// Set up the output stream for objective values
 		MPI_Init(NULL,NULL);
@@ -347,7 +319,7 @@ int main (int argc, char *argv[])
 		
 		std::stringstream sstm;
 		
-		sstm<< filename1 << (rank + interval) << "_" << duFactorsFrom << "_" << duFactorsTo << filename2;
+		sstm<< filename1<<rank <<filename2;
 		
 		completeFilename = sstm.str();
 		
@@ -357,12 +329,12 @@ int main (int argc, char *argv[])
 		double calculation_time;
 		
 		// RDM LOOP
-		for (int i = duFactorsFrom; i <= duFactorsTo; i++)
+		for (int i = 0; i < numRealizations; i++)
 		{
 			simulation.fixRDMFactors(i);
 			simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
 
-			simulation.solutionNumber = rank + interval;
+			simulation.solutionNumber = rank;
             //simulation.solutionNumber = 1;
             cout << "Calculating rank " << rank << " RDM number " << i << endl;
 			calculation_time = simulation.calculation(c_xreal, c_obj, c_constr);

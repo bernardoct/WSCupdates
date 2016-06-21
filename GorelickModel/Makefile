@@ -8,7 +8,7 @@ CFLAGS=-O3 -Wall
 
 # List of sources and objects (include all .cpp files)
 SOURCES=$(wildcard *.cpp)
-SOURCESC = Borg-1.6/borgms.c Borg-1.6/mt19937ar.c
+SOURCESC = cborg/borgms.c cborg/mt19937ar.c
 OBJECTS=$(SOURCES:.cpp=.o)
 OBJECTS+=$(SOURCESC:.c=.o)
 
@@ -18,7 +18,7 @@ LIBS=-lm
 all: $(SOURCES) $(TARGET)
 
 parallel: CC=mpiCC
-parallel: INCL_DIR=./Borg-1.6/
+parallel: INCL_DIR=./cborg/
 parallel: CFLAGS += -DPARALLEL
 parallel: all
 

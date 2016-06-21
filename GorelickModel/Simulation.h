@@ -78,6 +78,8 @@ public:
 	double durham_owasa_capacity;
 	double raleigh_cary_capacity;
 	
+	int numRealizations;
+	
 private:
 	
 	//class definitions
@@ -147,7 +149,6 @@ private:
 	double elasticity_Of_Demand[5];
 	int terminateYear;
 	double transferCosts;
-	int numRealizations;
 	int numFutureYears;
 	int startSimulationYear;
 	int volumeIncrements, costRiskLevel;
