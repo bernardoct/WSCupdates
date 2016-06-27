@@ -9,6 +9,7 @@
 #include "global.h"
 #include "Simulation.h"
 #include "moeaframework.h"
+#include <time.h>
     // these are "directives" read by the C++ preprocessor.
     // they don't require a semicolon because they are not statements.
     // each instructs for a header file to be included.
@@ -75,13 +76,19 @@ int main (int argc, char *argv[])
 	//int seed = (int)time(NULL);
 	int seed = 1;
 	int numRealizations;
+	int nDeeplyUncertainSets;
+	int offset;
+	int fromRDM;
 
-	while ((opt = getopt(argc, argv, "r:t:c:b:s:h")) != -1)
+	while ((opt = getopt(argc, argv, "r:u:t:c:b:s:o:h")) != -1)
 	{
 		switch (opt)
 		{
 			case 'r':
 				numRealizations = atoi(optarg);
+				break;
+			case 'u':
+				nDeeplyUncertainSets = atoi(optarg);
 				break;
 			case 't':
 				simulation.numRecords = atoi(optarg);
@@ -94,6 +101,9 @@ int main (int argc, char *argv[])
 				break;
 			case 's':
 				seed = atoi(optarg);
+				break;
+			case 'o':
+				offset = atoi(optarg);
 				break;
 			case 'h':
 				usage(argc, argv);
@@ -289,6 +299,9 @@ int main (int argc, char *argv[])
         // optimized outputs, not actually optimizing here
 	{
 		int c_num_obj = 29;
+		int nRDM = 1000;
+		// Read a certain number of parameter sets from a file
+		int numSolutions = 779;
             // 6 OBJ VALUES are combined from each utility,
             // this can look at them separately
 		general_1d_allocate(c_obj, c_num_obj);
@@ -297,12 +310,10 @@ int main (int argc, char *argv[])
 
 		// cout << "running simulations" << endl;
 
-		// Read a certain number of parameter sets from a file
-		int numSolutions = 32;
             // make sure it is num of rows in the following file
-		readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1.set", numSolutions, c_num_dec);
+		readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", 444, c_num_dec);
 		// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  ADDED BY BERNARDO
-		readFile(simulation.RDMInput, "./lhs_samples_final.csv", numRealizations, simulation.num_rdm_factors);
+		readFile(simulation.RDMInput, "./lhs_samples_final.csv", 1000, simulation.num_rdm_factors);
 
 		// Set up the output stream for objective values
 		MPI_Init(NULL,NULL);
@@ -310,16 +321,27 @@ int main (int argc, char *argv[])
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             // gives a value to rank, based on the number of processors being used
             // each processor doing the same thing, but each has diff rank
-		int rank2 = rank + 256;
+		int rank2 = rank + offset;
+
+		int rdmNumber = rank2 / 444;
+		int solutionNumber  = rank2 % 444;
+		
+		cout << rdmNumber << " " << solutionNumber << endl;
+		
+		//int solutionNumber = rank2;
+		simulation.solutionNumber = solutionNumber;
+
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
 		
 		simulation.directoryName = "./inputfiles/";
+//		simulation.nDeeplyUncertainSets = 4;
+
 		std::string completeFilename;
 		
 		std::stringstream sstm;
 		
-		sstm<< filename1<<rank <<filename2;
+		sstm<< filename1 << solutionNumber << "_" << rdmNumber << filename2;
 		
 		completeFilename = sstm.str();
 		
@@ -327,18 +349,23 @@ int main (int argc, char *argv[])
 		
 		openFile(out1, completeFilename);
 		double calculation_time;
+
+
+		simulation.solutionNumber = solutionNumber;
 		
 		// RDM LOOP
-		for (int i = 0; i < numRealizations; i++)
-		{
-			simulation.fixRDMFactors(i);
+		//for (int i = 0; i < nDeeplyUncertainSets; i++)
+		//{
+ 		        cout << "Setting up solution number " << solutionNumber << " RDM number " << rdmNumber << " rank number " << rank2 << endl;
+			time_t start = time(0);
+			simulation.fixRDMFactors(rdmNumber);
 			simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
+			cout << "Solution " << solutionNumber << " rdmNumber " << rdmNumber << " took " << difftime( time(0), start) << " seconds to set up data." << endl;
 
-			simulation.solutionNumber = rank;
-            //simulation.solutionNumber = 1;
-            cout << "Calculating rank " << rank << " RDM number " << i << endl;
+ 	               //simulation.solutionNumber = 1;
+                       // cout << "Calculating solution number " << solutionNumber << " RDM number " << rdmNumber << endl;
 			calculation_time = simulation.calculation(c_xreal, c_obj, c_constr);
-            cout << "Rank " << rank << " RDM number " << i << " took " << calculation_time << " seconds." << endl;
+                        cout << "Solution number " << solutionNumber << " RDM number " << rdmNumber << " took " << calculation_time << " seconds." << endl;
 			for (int x = 0; x< c_num_dec; x++)
 			{
 				out1<<simulation.parameterInput[simulation.solutionNumber][x]<<",";
@@ -348,7 +375,7 @@ int main (int argc, char *argv[])
 				out1 << c_obj[x] << ",";
 			}
 			out1 << endl;
-		}
+		//}
 		MPI_Finalize();
 		out1.close();
 	}

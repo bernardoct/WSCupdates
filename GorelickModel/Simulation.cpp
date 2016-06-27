@@ -2,6 +2,7 @@
 #include "Simulation.h"
 #include <time.h>
 #include <string>
+#include <unistd.h>
 
 using namespace std;
 
@@ -695,32 +696,38 @@ void Simulation::generateStreamflows()
 // MORDM EXTENSION - READ THE RIGHT SYNTHETIC STREAMFLOWS FILE BASED ON RDM FACTORS
 void Simulation::fixRDMFactors(int rdm_i)
 {
+	rdmNumber = rdm_i;
+	// cout << "Setting up solution " << solutionNumber << " RDM " << rdmNumber << endl;
 
 	for (int r = 0; r < num_rdm_factors; r++)
 	{
 		rdm_factors[r] = RDMInput[rdm_i][r];
-		cout << "RDM factors " << rdm_i << " " << r << " " << rdm_factors[r] << endl;
+		// cout << "RDM factors " << rdm_i << " " << r << " " << rdm_factors[r] << endl;
 	}
 
-	string hydrology_number;	
-	stringstream ss;
+	// usleep(rdm_i * 10000);
 
-	cout << "Setting up SOW info." << endl;
+	string hydrology_number;	
+	stringstream hn;
+
+	string hydrology_folder = "./synthetic-inflows/inflow-synthetic/";
+
+	// cout << "Setting up SOW info." << endl;
 	// cout << "Reading Hydrologies" << endl;
-	ss << (int)rdm_factors[0];
-	hydrology_number = ss.str();
+	hn << (int)rdm_factors[0];
+	hydrology_number = hn.str();
 	
 	//MORDM EXTENSION -  int combination = RDMInput[i] + ...
-	readFile(michieInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedMichieInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(littleRiverInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedLittleRiverInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(owasaInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedOWASAInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(fallsLakeInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedFallsLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(lakeWBInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedLakeWBInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(claytonInflowSYN, "./synthetic-inflows/inflow-synthetic/claytonGageInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(crabtreeInflowSYN, "./synthetic-inflows/inflow-synthetic/crabtreeCreekInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(jordanLakeInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedJordanLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(lillingtonGaugeInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedLillingtonInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(littleRiverRaleighInflowSYN, "./synthetic-inflows/inflow-synthetic/updatedLittleRiverRaleighInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(michieInflowSYN, hydrology_folder + "updatedMichieInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(littleRiverInflowSYN, hydrology_folder + "updatedLittleRiverInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(owasaInflowSYN, hydrology_folder + "updatedOWASAInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(fallsLakeInflowSYN, hydrology_folder + "updatedFallsLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(lakeWBInflowSYN, hydrology_folder + "updatedLakeWBInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(claytonInflowSYN, hydrology_folder + "claytonGageInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(crabtreeInflowSYN, hydrology_folder + "crabtreeCreekInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(jordanLakeInflowSYN, hydrology_folder + "updatedJordanLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(lillingtonGaugeInflowSYN, hydrology_folder + "updatedLillingtonInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	readFile(littleRiverRaleighInflowSYN, hydrology_folder + "updatedLittleRiverRaleighInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
 
 
 	for (int row = 0; row<numRealizations;row++)
@@ -850,11 +857,13 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
         // doesnt happen if using the MOEA
         // MAKE SURE IM USING 3 WHEN LOOKING AT not the MOEA
 	{
-		cout << "Setting up deccision vars" << endl;
+		cout << "Setting up deccision vars sol. " << solutionNumber << endl;
 		for (int i = 0; i < num_dec; i++)
 		{
+			cout << "Dec var " << solutionNumber << " ";
+			cout << i << " " << xreal[i] << endl;
 			xreal[i] = parameterInput[solutionNumber][i];
-			cout << "Dec var " << solutionNumber << " "  << i << " " << xreal[i] << endl;
+
                 // solutionNumber is defined in triangleSimulation.cpp
 		}
 		//xreal[0] = 0.02;
@@ -919,16 +928,16 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		}
 	}
 
-	cout << "calculating water prices and surcharges." << endl;
+	// cout << "calculating water prices and surcharges sol " << solutionNumber << endl;
 	calculateWaterPrices();
 	calculateWaterSurcharges();
 		// unnecessary now
 		
-	cout << "Choosing streamflows." << endl;
+	cout << "Choosing streamflows sol " << solutionNumber << endl;
 	chooseStreamflows();
 		// right now, picks 100 worst years
 		
-	cout << "Setting up triggers, restrictions, and other data." << endl;
+	// cout << "Setting up triggers, restrictions, and other data." << endl;
 	durham.insurancePremium = 1.2;
 	cary.insurancePremium = 1.2;
 	raleigh.insurancePremium = 1.2;
@@ -1484,7 +1493,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	// to this point, only assigned decision variables to their model variables,
 	// now we are actually running the model.
 
-	cout << "Beginning realization loop." << endl;
+	cout << "Beginning realization loop sol " << solutionNumber << endl;
 	realizationLoop();
         // reservoir simulation done here
 
@@ -2379,7 +2388,7 @@ void Simulation::createInfrastructure(int realization)
 			// to see if this option has been built or not, if it has, enter the if statement below
 		if(owasaConstruction == 1)
 		{
-			InfraBuilt << rank << "," << realization << "," << year << ",";
+			InfraBuilt << solutionNumber << "," << rdmNumber << "," << realization << "," << year << ",";
 			
 			switch(x)
 			{
@@ -2452,7 +2461,7 @@ void Simulation::createInfrastructure(int realization)
 
 		if(durhamConstruction == 1)
 		{
-			InfraBuilt << rank << "," << realization << "," << year << ",";
+			InfraBuilt << solutionNumber << "," << rdmNumber << "," << realization << "," << year << ",";
 			
 			constructionToggle2 = x;
 			switch(x)
@@ -2530,7 +2539,7 @@ void Simulation::createInfrastructure(int realization)
 		raleighConstruction = raleigh.buildInfrastructure(x);
 		if(raleighConstruction == 1)
 		{
-			InfraBuilt << rank << "," << realization << "," << year << ",";
+			InfraBuilt << solutionNumber << "," << rdmNumber << "," << realization << "," << year << ",";
 			
 			constructionToggle = x;
 			switch(x)
@@ -3339,7 +3348,7 @@ void Simulation::realizationLoop()
 	sstmD << filenameD << rank << filenameEND;
 	sstmE << filenameE << rank << filenameEND;
 	//sstmF << filenameF << rank << filenameEND;
-	sstmG << filenameG << rank << filenameEND;
+	sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
 	
 	completeFilenameA = sstmA.str();
 	//completeFilenameB = sstmB.str();
@@ -3349,35 +3358,37 @@ void Simulation::realizationLoop()
 	//completeFilenameF = sstmF.str();
 	completeFilenameG = sstmG.str();
 	
-	openFile(out100, completeFilenameA);
-	//openFile(out101, completeFilenameB);
-	openFile(outNew, completeFilenameC);
-	openFile(outRiskParams, completeFilenameD);
-	openFile(placechecker,  completeFilenameE);
+	// openFile(out100, completeFilenameA);
+	// //openFile(out101, completeFilenameB);
+	// openFile(outNew, completeFilenameC);
+	// openFile(outRiskParams, completeFilenameD);
+	// openFile(placechecker,  completeFilenameE);
 	//openFile(createROFout,  completeFilenameF);
-	openFile(InfraBuilt, completeFilenameG);
+	// if (rdmNumber == 0)	
+	// {
+		openFile(InfraBuilt, completeFilenameG);
+		InfraBuilt << "Solution no" << "," << "RDM no" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
+	// }
 	
-	out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
-	out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
-		// csv column headers of treated transfer output data
+	// out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	// out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
+	// out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
+	// 	// csv column headers of treated transfer output data
 		
-	outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
-	outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
-	outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
-	outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
-	outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
-		// csv column headers for raw release output data and storage levels
+	// outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+	// outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+	// outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+	// outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
+	// outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+	// outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
+	// 	// csv column headers for raw release output data and storage levels
 		
-	outRiskParams << "Rank" << "," << "Realization" << ",";
-	outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
-	outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
-	outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
+	// outRiskParams << "Rank" << "," << "Realization" << ",";
+	// outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
+	// outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
+	// outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
 		// csv column headers for csv containing ROF values
 		
-	InfraBuilt << "Rank" << "," << "Realization" << "," << "Year" << ",";
-	InfraBuilt << "Utility" << "," << "Project" << endl;
 		// column headers for infrastructure builds 
 	
 	////////////// OTHER PARAMS /////////////////////////////////////////////
@@ -3492,7 +3503,7 @@ void Simulation::realizationLoop()
 		zeroes(caryBuild,3);
 		thisYearFalls = 0;
 		
-		placechecker << 1 << endl;
+		// placechecker << 1 << endl;
 		
 		while (year-1<(terminateYear))
             // in a single realization, from year to year
@@ -3510,13 +3521,13 @@ void Simulation::realizationLoop()
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 			
-			placechecker << "am i here" << endl;
+			// placechecker << "am i here" << endl;
 			
 			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
 								numIntervals);
                 // gives the ROF of this given week
 				
-			placechecker << "but not here" << endl;
+			// placechecker << "but not here" << endl;
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3562,7 +3573,7 @@ void Simulation::realizationLoop()
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 
-			placechecker << 2 << endl;
+			// placechecker << 2 << endl;
 			
 			if(formulation > 0)
                 // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
@@ -3579,7 +3590,7 @@ void Simulation::realizationLoop()
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
 					/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 					
-					placechecker << 3 << endl;
+					// placechecker << 3 << endl;
 					
 					if (systemStorage.getRaleighStorage() < NearFailureLimit)
 					{
@@ -3598,7 +3609,7 @@ void Simulation::realizationLoop()
 												  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, 
 												  realization, outNew, year, week, numRealizationsTOREAD, rank);
 
-					placechecker << 4 << endl;
+					// placechecker << 4 << endl;
 													
 					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
@@ -3760,13 +3771,14 @@ void Simulation::realizationLoop()
 
 	} //end realization loop
 	
-	out100.close();
+	// out100.close();
 	//out101.close();
-	outNew.close();
-	outRiskParams.close();
-	placechecker.close();
+	// outNew.close();
+	// outRiskParams.close();
+	// placechecker.close();
 	//createROFout.close();
-	InfraBuilt.close();
+	// if (rdmNumber == nDeeplyUncertainSets - 1) 
+		InfraBuilt.close();
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();
