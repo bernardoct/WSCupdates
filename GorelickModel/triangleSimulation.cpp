@@ -141,7 +141,7 @@ int main (int argc, char *argv[])
 		// used for insurance payouts and for 
 		// setting the "GUIDE curve" for raleigh
 		// and durham water supply for release determination
-	simulation.availableJLallocation = 1.00;
+	simulation.availableJLallocation = 0.69;
 		// the fraction of Jordan Lake water supply pool
 		// that can be divided among Cary, OWASA, Durham, and Raleigh.
 		// may be less than 1 (100%) because of allocation
@@ -149,7 +149,7 @@ int main (int argc, char *argv[])
 	if (simulation.formulation > 0)
 		// in any formulation where treated transfers occur 
 	{
-		simulation.allowReleases = 0;
+		simulation.allowReleases = 1;
 			// a logical to determine whether releases will occur
 			// SET TO 0 SO RELEASES NEVER OCCUR 
 	}
@@ -176,6 +176,13 @@ int main (int argc, char *argv[])
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
 	
+	simulation.directoryName = "./inputfiles/";
+	simulation.historicFlowPath = "./historicflows/";
+	simulation.syntheticFlowPath = "./syntheticflows/";
+	simulation.evaporationPath = "./evapfiles/";
+	simulation.oldstochPath = "./oldstochfiles/";
+	simulation.demanddataPath = "./demandfiles/";
+		// set some subfolder input paths 
 	
 	simulation.importDataFiles();
 
@@ -315,14 +322,13 @@ int main (int argc, char *argv[])
 
 		// cout << "running simulations" << endl;
 		
-		simulation.use_RDM_ext = true;
+		simulation.use_RDM_ext = false;
 			// determines how to read synthetic flows
-
+			// if true, read from folder extension bernardo uses 
 		//readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", numSolutions, c_num_dec);
 			// use this one for Bernardo's input file 
 		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);
 			// these are david's input parameters 
-		
 		readFile(simulation.RDMInput, "./inputfiles/lhs_samples_final.csv", nRDM, simulation.num_rdm_factors);
 			// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  
 			// ADDED BY BERNARDO
@@ -339,8 +345,8 @@ int main (int argc, char *argv[])
 			// when not running RDM, offset = 0
 
 		//int rdmNumber = rank2 / numSolutions;
-		int rdmNumber = 1;
-			// set to 1 when not running with RDM loop
+		int rdmNumber = 0;
+			// set to 0 when not running with RDM loop
 		//int solutionNumber = rank2 % numSolutions;
 		int solutionNumber = rank2;
 			// the solution is equal to the rank
@@ -352,14 +358,6 @@ int main (int argc, char *argv[])
 		simulation.solutionNumber = rank;
 			// set this to rank when running without uncertain factors
 			// set as solutionNumber otherwise
-		
-		simulation.directoryName = "./inputfiles/";
-		simulation.historicFlowPath = "./historicflows/";
-		simulation.syntheticFlowPath = "./syntheticflows/";
-		simulation.evaporationPath = "./evapfiles/";
-		simulation.oldstochPath = "./oldstochfiles/";
-		simulation.demanddataPath = "./demandfiles/";
-			// set some subfolder input paths 
 		
 		//simulation.nDeeplyUncertainSets = 4;
 

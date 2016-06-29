@@ -708,7 +708,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 	// cout << "Setting up SOW info." << endl;
 	// cout << "Reading Hydrologies" << endl;
 	
-	if (use_RDM_ext == true) 
+	if (use_RDM_ext)
 	{
 		//MORDM EXTENSION -  int combination = RDMInput[i] + ...
 		
@@ -735,16 +735,16 @@ void Simulation::fixRDMFactors(int rdm_i)
 	}
 	else
 	{
-		readFile(michieInflowSYN, syntheticFlowPath + "updatedMichieInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(littleRiverInflowSYN, syntheticFlowPath + "updatedLittleRiverInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(owasaInflowSYN, syntheticFlowPath + "updatedOWASAInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(fallsLakeInflowSYN, syntheticFlowPath + "updatedFallsLakeInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(lakeWBInflowSYN, syntheticFlowPath + "updatedLakeWBInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(claytonInflowSYN, syntheticFlowPath + "claytonGageInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(crabtreeInflowSYN, syntheticFlowPath + "crabtreeCreekInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(jordanLakeInflowSYN, syntheticFlowPath + "updatedJordanLakeInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(lillingtonGaugeInflowSYN, syntheticFlowPath + "updatedLillingtonInflowSYN" + ".csv", numRecords, 70*52);
-		readFile(littleRiverRaleighInflowSYN, syntheticFlowPath + "updatedLittleRiverRaleighInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(michieInflowSYN, directoryName + syntheticFlowPath + "updatedMichieInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(littleRiverInflowSYN, directoryName + syntheticFlowPath + "updatedLittleRiverInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(owasaInflowSYN, directoryName + syntheticFlowPath + "updatedOWASAInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(fallsLakeInflowSYN, directoryName + syntheticFlowPath + "updatedFallsLakeInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(lakeWBInflowSYN, directoryName + syntheticFlowPath + "updatedLakeWBInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(claytonInflowSYN, directoryName + syntheticFlowPath + "claytonGageInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(crabtreeInflowSYN, directoryName + syntheticFlowPath + "crabtreeCreekInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(jordanLakeInflowSYN, directoryName + syntheticFlowPath + "updatedJordanLakeInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(lillingtonGaugeInflowSYN, directoryName + syntheticFlowPath + "updatedLillingtonInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(littleRiverRaleighInflowSYN, directoryName + syntheticFlowPath + "updatedLittleRiverRaleighInflowSYN" + ".csv", numRecords, 70*52);
 	}
 	
 	for (int row = 0; row<numRealizations;row++)
@@ -3324,7 +3324,7 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
 	
-	int numRealizationsTOREAD = 1000;
+	int numRealizationsTOREAD = 100;
 		// read all realizations in current mode
 	
 	ofstream out100;
