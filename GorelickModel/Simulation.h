@@ -53,6 +53,7 @@ public:
 	string directoryName;
 	double rdm_factors[30];
 	int rdmNumber;
+	int nDeeplyUncertainSets;
 
 	int solutionNumber;
 	int bondLength;
