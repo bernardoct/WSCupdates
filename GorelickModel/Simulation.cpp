@@ -269,110 +269,109 @@ void Simulation::importDataFiles()
 	//openFile(out3, "reservoirOutput.csv");
 	//systemStorage.openResFiles();
 	// Read in all input files
-	string directoryName = "./inputfiles/";
+	// string directoryName = "./inputfiles/";
 
 	// Weekly inflow data
 	// 81 Years: 1930 - 2010
 	// 82 Years: 1926 - 2007
 	// 83 Years: 1928 - 2010
 	// 83 Years: 1929 - 2011 (little river raleigh)
-	readFile(michieInflow, directoryName + "updatedMichieInflow.csv", 81, 52);
-	readFile(littleRiverInflow, directoryName + "updatedLittleRiverInflow.csv", 81, 52);
-	readFile(owasaInflow, directoryName + "updatedOWASAInflow.csv", 81, 52);
-	readFile(fallsLakeInflow, directoryName + "updatedFallsLakeInflow.csv", 81, 52);
-	readFile(lakeWBInflow, directoryName + "updatedLakeWBInflow.csv", 81, 52);
-	readFile(claytonInflow, directoryName + "claytonGageInflow.csv", 81, 52);
-	readFile(crabtreeInflow, directoryName + "crabtreeCreekInflow.csv", 81, 52);
-	readFile(jordanLakeInflow, directoryName + "updatedJordanLakeInflow.csv", 81, 52);
-	readFile(lillingtonGaugeInflow, directoryName + "updatedLillingtonInflow.csv", 81, 52);
-	readFile(littleRiverRaleighInflow, directoryName + "updatedLittleRiverRaleighInflow.csv", 81, 52);
+	readFile(michieInflow, directoryName + historicFlowPath + "updatedMichieInflow.csv", 81, 52);
+	readFile(littleRiverInflow, directoryName + historicFlowPath + "updatedLittleRiverInflow.csv", 81, 52);
+	readFile(owasaInflow, directoryName + historicFlowPath + "updatedOWASAInflow.csv", 81, 52);
+	readFile(fallsLakeInflow, directoryName + historicFlowPath + "updatedFallsLakeInflow.csv", 81, 52);
+	readFile(lakeWBInflow, directoryName + historicFlowPath + "updatedLakeWBInflow.csv", 81, 52);
+	readFile(claytonInflow, directoryName + historicFlowPath + "claytonGageInflow.csv", 81, 52);
+	readFile(crabtreeInflow, directoryName + historicFlowPath + "crabtreeCreekInflow.csv", 81, 52);
+	readFile(jordanLakeInflow, directoryName + historicFlowPath + "updatedJordanLakeInflow.csv", 81, 52);
+	readFile(lillingtonGaugeInflow, directoryName + historicFlowPath + "updatedLillingtonInflow.csv", 81, 52);
+	readFile(littleRiverRaleighInflow, directoryName + historicFlowPath + "updatedLittleRiverRaleighInflow.csv", 81, 52);
 
-
-	readFile(streamflowIndex, directoryName + "streamflowSample.csv", 100, 1);
+	readFile(streamflowIndex, directoryName + historicFlowPath + "streamflowSample.csv", 100, 1);
 
 
 	// Evaporation data (MG/acre)
 	// 82 years (1926 - 2007)
 	// 83 years (1928 - 2010)
-	readFile(evaporation, directoryName + "updatedEvap.csv", 81, 52); // for Durham and OWASA
-	readFile(fallsLakeEvaporation, directoryName + "fallsLakeEvap.csv", 81, 52);
-	readFile(lakeWheelerEvaporation, directoryName + "lakeWheelerBensonEvap.csv", 81, 52);
+	readFile(evaporation, directoryName + evaporationPath + "updatedEvap.csv", 81, 52); // for Durham and OWASA
+	readFile(fallsLakeEvaporation, directoryName + evaporationPath + "fallsLakeEvap.csv", 81, 52);
+	readFile(lakeWheelerEvaporation, directoryName + evaporationPath + "lakeWheelerBensonEvap.csv", 81, 52);
 
 	// U files from Cholesky Factorization - combine with standardized inflows
 	// To make stochastic inflows for weeks 27-52 (1) and weeks 1-26 (2).
 	// Each file is an upper triangular matrix, 52x52
-	//readFile(durhamInflows.stoch1, directoryName + "updatedDurhamStoch1.csv", 52, 52);
-	//readFile(durhamInflows.stoch2, directoryName + "updatedDurhamStoch2.csv", 52, 52);
-	//readFile(owasaInflows.stoch1, directoryName + "updatedOwasaStoch1.csv",  52, 52);
-	//readFile(owasaInflows.stoch2, directoryName + "updatedOwasaStoch2.csv",  52, 52);
-	//readFile(fallsInflows.stoch1, directoryName + "updatedFallsStoch1.csv", 52, 52);
-	//readFile(fallsInflows.stoch2, directoryName + "updatedFallsStoch2.csv", 52, 52);
-	//readFile(wheelerInflows.stoch1, directoryName + "updatedWheelerStoch1.csv", 52, 52);
-	//readFile(wheelerInflows.stoch2, directoryName + "updatedWheelerStoch2.csv", 52, 52);
-	//readFile(crabtreeInflows.stoch1, directoryName + "updatedCrabtreeStoch1.csv", 52, 52);
-	//readFile(crabtreeInflows.stoch2, directoryName + "updatedCrabtreeStoch2.csv", 52, 52);
-	//readFile(claytonInflows.stoch1, directoryName + "updatedClaytonStoch1.csv", 52, 52);
-	//readFile(claytonInflows.stoch2, directoryName + "updatedClaytonStoch2.csv", 52, 52);
-	//readFile(jordanInflows.stoch1, directoryName + "updatedJordanStoch1.csv", 52, 52);
-	//readFile(jordanInflows.stoch2, directoryName + "updatedJordanStoch2.csv", 52, 52);
-	//readFile(lillingtonInflows.stoch1, directoryName + "updatedLillingtonStoch1.csv", 52, 52);
-	//readFile(lillingtonInflows.stoch2, directoryName + "updatedLillingtonStoch2.csv", 52, 52);
-	//readFile(littleRiverRaleighInflows.stoch1, directoryName + "updatedLittleRiverRaleighStoch1.csv", 52, 52);
-	//readFile(littleRiverRaleighInflows.stoch2, directoryName + "updatedLittleRiverRaleighStoch2.csv", 52, 52);
+	//readFile(durhamInflows.stoch1, directoryName + oldstochPath + "updatedDurhamStoch1.csv", 52, 52);
+	//readFile(durhamInflows.stoch2, directoryName + oldstochPath + "updatedDurhamStoch2.csv", 52, 52);
+	//readFile(owasaInflows.stoch1, directoryName + oldstochPath + "updatedOwasaStoch1.csv",  52, 52);
+	//readFile(owasaInflows.stoch2, directoryName + oldstochPath + "updatedOwasaStoch2.csv",  52, 52);
+	//readFile(fallsInflows.stoch1, directoryName + oldstochPath + "updatedFallsStoch1.csv", 52, 52);
+	//readFile(fallsInflows.stoch2, directoryName + oldstochPath + "updatedFallsStoch2.csv", 52, 52);
+	//readFile(wheelerInflows.stoch1, directoryName + oldstochPath + "updatedWheelerStoch1.csv", 52, 52);
+	//readFile(wheelerInflows.stoch2, directoryName + oldstochPath + "updatedWheelerStoch2.csv", 52, 52);
+	//readFile(crabtreeInflows.stoch1, directoryName + oldstochPath + "updatedCrabtreeStoch1.csv", 52, 52);
+	//readFile(crabtreeInflows.stoch2, directoryName + oldstochPath + "updatedCrabtreeStoch2.csv", 52, 52);
+	//readFile(claytonInflows.stoch1, directoryName + oldstochPath + "updatedClaytonStoch1.csv", 52, 52);
+	//readFile(claytonInflows.stoch2, directoryName + oldstochPath + "updatedClaytonStoch2.csv", 52, 52);
+	//readFile(jordanInflows.stoch1, directoryName + oldstochPath + "updatedJordanStoch1.csv", 52, 52);
+	//readFile(jordanInflows.stoch2, directoryName + oldstochPath + "updatedJordanStoch2.csv", 52, 52);
+	//readFile(lillingtonInflows.stoch1, directoryName + oldstochPath + "updatedLillingtonStoch1.csv", 52, 52);
+	//readFile(lillingtonInflows.stoch2, directoryName + oldstochPath + "updatedLillingtonStoch2.csv", 52, 52);
+	//readFile(littleRiverRaleighInflows.stoch1, directoryName + oldstochPath + "updatedLittleRiverRaleighStoch1.csv", 52, 52);
+	//readFile(littleRiverRaleighInflows.stoch2, directoryName + oldstochPath + "updatedLittleRiverRaleighStoch2.csv", 52, 52);
 
 	// U file from Cholesky Factorization - combine with standardized evaporation
 	// to make stochastic inflows for weeks 1 - 26 (2) and weeks 27 - 52 (1)
 	// Upper triangular matrix, 52x52
-	readFile(durhamOwasaEvap.stoch1, directoryName + "updatedEvapStoch1.csv", 52, 52);
-	readFile(durhamOwasaEvap.stoch2, directoryName + "updatedEvapStoch2.csv", 52, 52);
-	readFile(fallsEvap.stoch1, directoryName + "updatedfallsEvapStoch1.csv", 52, 52);
-	readFile(fallsEvap.stoch2, directoryName + "updatedfallsEvapStoch2.csv", 52, 52);
-	readFile(wheelerEvap.stoch1, directoryName + "updatedwheelerEvapStoch1.csv", 52, 52);
-	readFile(wheelerEvap.stoch2, directoryName + "updatedwheelerEvapStoch2.csv", 52, 52);
+	readFile(durhamOwasaEvap.stoch1, directoryName + evaporationPath + "updatedEvapStoch1.csv", 52, 52);
+	readFile(durhamOwasaEvap.stoch2, directoryName + evaporationPath + "updatedEvapStoch2.csv", 52, 52);
+	readFile(fallsEvap.stoch1, directoryName + evaporationPath + "updatedfallsEvapStoch1.csv", 52, 52);
+	readFile(fallsEvap.stoch2, directoryName + evaporationPath + "updatedfallsEvapStoch2.csv", 52, 52);
+	readFile(wheelerEvap.stoch1, directoryName + evaporationPath + "updatedwheelerEvapStoch1.csv", 52, 52);
+	readFile(wheelerEvap.stoch2, directoryName + evaporationPath + "updatedwheelerEvapStoch2.csv", 52, 52);
 
 	// 18 years (1990-2007) of weekly demand data (18 x 52)
 	// Raleigh does not have enough data, so use Cary's instead
-	readFile(durham.UnitDemand, directoryName + "updatedDurhamUnitDemand.csv", 52, 18);
-	readFile(owasa.UnitDemand, directoryName + "updatedOWASAUnitDemand.csv", 52, 18);
-	readFile(cary.UnitDemand, directoryName + "updatedCaryUnitDemand.csv", 52, 18);
-	readFile(raleigh.UnitDemand, directoryName + "updatedRaleighUnitDemand.csv", 52, 1);
+	readFile(durham.UnitDemand, directoryName + demanddataPath + "updatedDurhamUnitDemand.csv", 52, 18);
+	readFile(owasa.UnitDemand, directoryName + demanddataPath + "updatedOWASAUnitDemand.csv", 52, 18);
+	readFile(cary.UnitDemand, directoryName + demanddataPath + "updatedCaryUnitDemand.csv", 52, 18);
+	readFile(raleigh.UnitDemand, directoryName + demanddataPath + "updatedRaleighUnitDemand.csv", 52, 1);
 
 	// Usage data (format varies depending on the utility)
-	readFile(owasa.useFractions, directoryName + "updatedOWASARateFractions.csv", 12, 9);
+	readFile(owasa.useFractions, directoryName + demanddataPath + "updatedOWASARateFractions.csv", 12, 9);
 	// Fraction of total use divided between 8 tiers (plus sewer charge as fractions of total water use
 	// in the 9th column owasaRateFractions[months][rate tier] - 12x9
 
-	readFile(owasa.useFractions_Restrictions, directoryName + "updatedOWASARestRateFractions.csv", 12, 9);
+	readFile(owasa.useFractions_Restrictions, directoryName + demanddataPath + "updatedOWASARestRateFractions.csv", 12, 9);
 	// Fraction of total use divided between 8 tiers (plus sewer charge as fractions of total water use
 	// in the 9th column - when restrictions are occuring
 
-	readFile(durham.usePatterns, directoryName + "updatedDurhamUsePatterns.csv", 468, 6);
+	readFile(durham.usePatterns, directoryName + demanddataPath + "updatedDurhamUsePatterns.csv", 468, 6);
 	// 3 years (2008-2010) of monthly durham tiered use data
 	// 13 total types: indoor, outdoor * (res., comm., indus., instit., multi fam., irr.) & hydrant
 	// 12 monthly values for each list type, repeated for three years
 
-	readFile(raleigh.useFractions, directoryName + "raleighRateFractions.csv", 12, 24);
+	readFile(raleigh.useFractions, directoryName + demanddataPath + "raleighRateFractions.csv", 12, 24);
 	// Fraction of total use divided between 24 tiers (plus sewer charge as fractions of total water use
 	// in the 25th column - when restrictions are occuring
 
-	readFile(cary.usePatterns, directoryName + "caryUseFractions.csv", 12, 10);
+	readFile(cary.usePatterns, directoryName + demanddataPath + "caryUseFractions.csv", 12, 10);
 	//Fraction of total use divided between 9 tiers (plus sewer charge as a fraction of total water use in column 10)
 
 	// 51 years (2010 - 2060) of average daily water use projections
-	readFile(caryFutureD, directoryName + "caryFutureDemand.csv", 1, 51);
-	readFile(raleighFutureD, directoryName + "raleighFutureDemand.csv", 1, 51);
-	readFile(durhamFutureD, directoryName + "durhamFutureDemand.csv", 1, 51);
-	readFile(owasaFutureD, directoryName + "owasaFutureDemand.csv", 1, 51);
+	readFile(caryFutureD, directoryName + demanddataPath + "caryFutureDemand.csv", 1, 51);
+	readFile(raleighFutureD, directoryName + demanddataPath + "raleighFutureDemand.csv", 1, 51);
+	readFile(durhamFutureD, directoryName + demanddataPath + "durhamFutureDemand.csv", 1, 51);
+	readFile(owasaFutureD, directoryName + demanddataPath + "owasaFutureDemand.csv", 1, 51);
 
 	// 51 years (2010-2060) of projections of the water use breakdown into 5
 	// use types (residential, commercial, industrial, irrigation, and institutional)
-	readFile(caryFutureB, directoryName + "caryFutureBreakdown.csv", 5, 51);
-	readFile(raleighFutureB, directoryName + "raleighFutureBreakdown.csv", 5, 51);
-	readFile(durhamFutureB, directoryName + "durhamFutureBreakdown.csv", 5, 51);
-	readFile(owasaFutureB, directoryName + "owasaFutureBreakdown.csv", 5, 51);
+	readFile(caryFutureB, directoryName + demanddataPath + "caryFutureBreakdown.csv", 5, 51);
+	readFile(raleighFutureB, directoryName + demanddataPath + "raleighFutureBreakdown.csv", 5, 51);
+	readFile(durhamFutureB, directoryName + demanddataPath + "durhamFutureBreakdown.csv", 5, 51);
+	readFile(owasaFutureB, directoryName + demanddataPath + "owasaFutureBreakdown.csv", 5, 51);
 
 	// Percent of water use returned by Durham (row 0) and Raleigh (row 1) as wastewater
-	readFile(returnRatio, directoryName + "returnRatio.csv", 2, 52);
+	readFile(returnRatio, directoryName + demanddataPath + "returnRatio.csv", 2, 52);
 
 
 }
@@ -706,30 +705,48 @@ void Simulation::fixRDMFactors(int rdm_i)
 	}
 
 	// usleep(rdm_i * 10000);
-
-	string hydrology_number;	
-	stringstream hn;
-
-	string hydrology_folder = "./synthetic-inflows/inflow-synthetic/";
-
 	// cout << "Setting up SOW info." << endl;
 	// cout << "Reading Hydrologies" << endl;
-	hn << (int)rdm_factors[0];
-	hydrology_number = hn.str();
 	
-	//MORDM EXTENSION -  int combination = RDMInput[i] + ...
-	readFile(michieInflowSYN, hydrology_folder + "updatedMichieInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(littleRiverInflowSYN, hydrology_folder + "updatedLittleRiverInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(owasaInflowSYN, hydrology_folder + "updatedOWASAInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(fallsLakeInflowSYN, hydrology_folder + "updatedFallsLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(lakeWBInflowSYN, hydrology_folder + "updatedLakeWBInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(claytonInflowSYN, hydrology_folder + "claytonGageInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(crabtreeInflowSYN, hydrology_folder + "crabtreeCreekInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(jordanLakeInflowSYN, hydrology_folder + "updatedJordanLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(lillingtonGaugeInflowSYN, hydrology_folder + "updatedLillingtonInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-	readFile(littleRiverRaleighInflowSYN, hydrology_folder + "updatedLittleRiverRaleighInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
-
-
+	if (use_RDM_ext == true) 
+	{
+		//MORDM EXTENSION -  int combination = RDMInput[i] + ...
+		
+		string hydrology_folder = "./synthetic-inflows/inflow-synthetic/";
+			// set where the synthetic inflow files are
+		
+		string hydrology_number;	
+		stringstream hn;
+		hn << (int)rdm_factors[0];
+		hydrology_number = hn.str();
+			// reads the first element of the row of RDM factors used 
+			// if david is just using one row, this isnt needed (hence the if statement)
+		
+		readFile(michieInflowSYN, hydrology_folder + "updatedMichieInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(littleRiverInflowSYN, hydrology_folder + "updatedLittleRiverInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(owasaInflowSYN, hydrology_folder + "updatedOWASAInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(fallsLakeInflowSYN, hydrology_folder + "updatedFallsLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(lakeWBInflowSYN, hydrology_folder + "updatedLakeWBInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(claytonInflowSYN, hydrology_folder + "claytonGageInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(crabtreeInflowSYN, hydrology_folder + "crabtreeCreekInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(jordanLakeInflowSYN, hydrology_folder + "updatedJordanLakeInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(lillingtonGaugeInflowSYN, hydrology_folder + "updatedLillingtonInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+		readFile(littleRiverRaleighInflowSYN, hydrology_folder + "updatedLittleRiverRaleighInflowSYN" + hydrology_number + ".csv", numRecords, 70*52);
+	}
+	else
+	{
+		readFile(michieInflowSYN, syntheticFlowPath + "updatedMichieInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(littleRiverInflowSYN, syntheticFlowPath + "updatedLittleRiverInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(owasaInflowSYN, syntheticFlowPath + "updatedOWASAInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(fallsLakeInflowSYN, syntheticFlowPath + "updatedFallsLakeInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(lakeWBInflowSYN, syntheticFlowPath + "updatedLakeWBInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(claytonInflowSYN, syntheticFlowPath + "claytonGageInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(crabtreeInflowSYN, syntheticFlowPath + "crabtreeCreekInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(jordanLakeInflowSYN, syntheticFlowPath + "updatedJordanLakeInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(lillingtonGaugeInflowSYN, syntheticFlowPath + "updatedLillingtonInflowSYN" + ".csv", numRecords, 70*52);
+		readFile(littleRiverRaleighInflowSYN, syntheticFlowPath + "updatedLittleRiverRaleighInflowSYN" + ".csv", numRecords, 70*52);
+	}
+	
 	for (int row = 0; row<numRealizations;row++)
 	{
 		int weekCounter = 0;

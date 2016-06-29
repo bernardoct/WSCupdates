@@ -5,4 +5,4 @@
 
 cd $PBS_O_WORKDIR
 
-time mpirun ./triangleSimulation -r 100 -t 1000 -s 1 -c 2 -b 3
+time mpirun ./triangleSimulation -r 100 -t 1000 -s 1 -c 2 -b 3 -o 0

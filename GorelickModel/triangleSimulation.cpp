@@ -104,6 +104,8 @@ int main (int argc, char *argv[])
 				break;
 			case 'o':
 				offset = atoi(optarg);
+					// must be set to 0 when running the model 
+					// add -o 0 to the testParallel.sh file 
 				break;
 			case 'h':
 				usage(argc, argv);
@@ -299,21 +301,33 @@ int main (int argc, char *argv[])
         // optimized outputs, not actually optimizing here
 	{
 		int c_num_obj = 29;
-		int nRDM = 1000;
-		// Read a certain number of parameter sets from a file
-		int numSolutions = 779;
-            // 6 OBJ VALUES are combined from each utility,
-            // this can look at them separately
+		int nRDM = 1;
+			// Read a certain number of RDM parameter sets 
+			// when running in simulation mode without uncertain factors
+			// set this to 1, other wise bernardo was using 1000
+		int numSolutions = 10000;
+			// when pulling parameter inputs from the paramterinputfile.csv, make sure this
+			// is equal to the number of rows in the file
+			// THIS WAS SET TO 444 FOR BERNARDO TO RUN ON BW
 		general_1d_allocate(c_obj, c_num_obj);
 		simulation.initializeFormulation(c_num_obj, 0);
 		simulation.directoryName = "./inputfiles/";
 
 		// cout << "running simulations" << endl;
+		
+		simulation.use_RDM_ext = true;
+			// determines how to read synthetic flows
 
-            // make sure it is num of rows in the following file
-		readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", 444, c_num_dec);
-		// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  ADDED BY BERNARDO
-		readFile(simulation.RDMInput, "./lhs_samples_final.csv", 1000, simulation.num_rdm_factors);
+		//readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", numSolutions, c_num_dec);
+			// use this one for Bernardo's input file 
+		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);
+			// these are david's input parameters 
+		
+		readFile(simulation.RDMInput, "./inputfiles/lhs_samples_final.csv", nRDM, simulation.num_rdm_factors);
+			// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  
+			// ADDED BY BERNARDO
+			// num_rdm_factors is set to 30 in the Simulation header file
+			// the first value of the first line of this file will determine 
 
 		// Set up the output stream for objective values
 		MPI_Init(NULL,NULL);
@@ -322,53 +336,69 @@ int main (int argc, char *argv[])
             // gives a value to rank, based on the number of processors being used
             // each processor doing the same thing, but each has diff rank
 		int rank2 = rank + offset;
+			// when not running RDM, offset = 0
 
-		int rdmNumber = rank2 / 444;
-		int solutionNumber  = rank2 % 444;
+		//int rdmNumber = rank2 / numSolutions;
+		int rdmNumber = 1;
+			// set to 1 when not running with RDM loop
+		//int solutionNumber = rank2 % numSolutions;
+		int solutionNumber = rank2;
+			// the solution is equal to the rank
+			// without the RDM loop 
 		
 		cout << rdmNumber << " " << solutionNumber << endl;
 		
 		//int solutionNumber = rank2;
-		simulation.solutionNumber = solutionNumber;
+		simulation.solutionNumber = rank;
+			// set this to rank when running without uncertain factors
+			// set as solutionNumber otherwise
+		
+		simulation.directoryName = "./inputfiles/";
+		simulation.historicFlowPath = "./historicflows/";
+		simulation.syntheticFlowPath = "./syntheticflows/";
+		simulation.evaporationPath = "./evapfiles/";
+		simulation.oldstochPath = "./oldstochfiles/";
+		simulation.demanddataPath = "./demandfiles/";
+			// set some subfolder input paths 
+		
+		//simulation.nDeeplyUncertainSets = 4;
 
 		std::string filename1 = "output/simulationOutput";
 		std::string filename2 = ".csv";
-		
-		simulation.directoryName = "./inputfiles/";
-//		simulation.nDeeplyUncertainSets = 4;
-
 		std::string completeFilename;
-		
 		std::stringstream sstm;
-		
-		sstm<< filename1 << solutionNumber << "_" << rdmNumber << filename2;
-		
+		sstm << filename1 << solutionNumber << "_" << rdmNumber << filename2;
 		completeFilename = sstm.str();
 		
 		ofstream out1;
-		
 		openFile(out1, completeFilename);
+			// prepare the output file that 
+			// contains input params and objective values 
+		
 		double calculation_time;
-
-
-		simulation.solutionNumber = solutionNumber;
 		
 		// RDM LOOP
 		//for (int i = 0; i < nDeeplyUncertainSets; i++)
 		//{
- 		        cout << "Setting up solution number " << solutionNumber << " RDM number " << rdmNumber << " rank number " << rank2 << endl;
+ 		    cout << "Setting up solution number " << solutionNumber << " RDM number " << rdmNumber << " rank number " << rank2 << endl;
 			time_t start = time(0);
+			
 			simulation.fixRDMFactors(rdmNumber);
-			simulation.correlateDemandVariations(1.0); // 1.0 reflects no scaling
+			simulation.correlateDemandVariations(1.0); 
+				// 1.0 reflects no scaling
+			
 			cout << "Solution " << solutionNumber << " rdmNumber " << rdmNumber << " took " << difftime( time(0), start) << " seconds to set up data." << endl;
 
- 	               //simulation.solutionNumber = 1;
-                       // cout << "Calculating solution number " << solutionNumber << " RDM number " << rdmNumber << endl;
+ 	        simulation.solutionNumber = rank;
+            // cout << "Calculating solution number " << solutionNumber << " RDM number " << rdmNumber << endl;
+			
 			calculation_time = simulation.calculation(c_xreal, c_obj, c_constr);
-                        cout << "Solution number " << solutionNumber << " RDM number " << rdmNumber << " took " << calculation_time << " seconds." << endl;
+			
+            cout << "Solution number " << solutionNumber << " RDM number " << rdmNumber << " took " << calculation_time << " seconds." << endl;
+			
 			for (int x = 0; x< c_num_dec; x++)
 			{
-				out1<<simulation.parameterInput[simulation.solutionNumber][x]<<",";
+				out1 << simulation.parameterInput[simulation.solutionNumber][x] << ",";
 			}
 			for (int x = 0; x < c_num_obj; x++)
 			{
@@ -376,6 +406,7 @@ int main (int argc, char *argv[])
 			}
 			out1 << endl;
 		//}
+		
 		MPI_Finalize();
 		out1.close();
 	}

@@ -50,7 +50,16 @@ public:
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
+	
 	string directoryName;
+	string historicFlowPath;
+	string syntheticFlowPath;
+	string evaporationPath;
+	string oldstochPath;
+	string demanddataPath;
+	
+	bool use_RDM_ext;
+	
 	double rdm_factors[30];
 	int rdmNumber;
 	int nDeeplyUncertainSets;
