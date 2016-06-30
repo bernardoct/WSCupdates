@@ -3207,7 +3207,7 @@ void Simulation::realizationLoop()
 	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
 	double littleRiverRaleighActualInflow;
 	int season = 1, syntheticIndex = 0; // week 1 is non-irrigation season (season = 1)
-	double raleighBaselineMultiplier = 40434.0*.32*(falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity);
+	double raleighBaselineMultiplier = 40434.0*.32*(falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity));
 	double durham_res_supply_capacity = 6349.0;
 	double cane_creek_supply_capacity = 2909.0;
 	double stone_quarry_supply_capacity = 200.0;
@@ -3310,15 +3310,10 @@ void Simulation::realizationLoop()
 	
 	if (printDetailedOutput)
 	{
-		ofstream out100;
-		ofstream outNew;
-		ofstream outRiskParams;
-		
 		std::string filenameA = "output/JLTreatedTransfers";
 		std::string filenameC = "output/RRfuncOutput";
 		std::string filenameD = "output/weeklyRiskParams";
-		std::string filenameG = "output/InfraBuilt";
-			// G is declared in the header file 
+		std::string filenameG = "output/InfraBuilt"; 
 		
 		std::string filenameEND = ".csv";
 			
@@ -3346,6 +3341,7 @@ void Simulation::realizationLoop()
 		openFile(outNew, completeFilenameC);
 		openFile(outRiskParams, completeFilenameD);
 		openFile(InfraBuilt, completeFilenameG);
+			// all these are defined in the header file 
 		
 		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
 			// column headers for infrastructure builds 

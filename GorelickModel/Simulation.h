@@ -59,6 +59,10 @@ public:
 	string oldstochPath;
 	string demanddataPath;
 	
+	ofstream out100;
+	ofstream outNew;
+	ofstream outRiskParams;
+	
 	bool use_RDM_ext;
 	bool indepReleaseAlloc;
 	
