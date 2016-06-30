@@ -1216,9 +1216,8 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	}
 	////Inflows are divided between the water storage supply and water quality supply proportionatly (14.7BG supply storage, 20 BG quality storage)
 	////Durham reservoir releases and wastewater returns are added to Falls Lake inflows
-	fallsSupplyInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(14.7/34.7);
-		// includes raw release request
-	fallsQualityInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(20/34.7);
+	fallsSupplyInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(fallsLakeSupplyCapacity/(fallsLakeQualityCapacity + fallsLakeSupplyCapacity));
+	fallsQualityInflow = (fallsInflow + durhamSpillage - fallsArea*evapF + durhamReturn - teerDiversion)*(fallsLakeQualityCapacity/(fallsLakeQualityCapacity + fallsLakeSupplyCapacity));
 
 	////Environmental Releases come from the water quality storage portion of Falls Lake
 	fallsLakeQualityStorage += fallsQualityInflow - fallsSpillage;
@@ -1530,6 +1529,10 @@ double ReservoirStorage::getFallsSupplyStorageVol()
 double ReservoirStorage::getFallsQualityStorageVol()
 {
 	return fallsLakeQualityStorage;
+}
+double ReservoirStorage::getFallsSupplyAllocFrac()
+{
+	return fallsLakeSupplyCapacity/(fallsLakeQualityCapacity + fallsLakeSupplyCapacity);
 }
 double ReservoirStorage::getJordanSupplyStorageVol()
 {

@@ -327,6 +327,10 @@ int main (int argc, char *argv[])
 			// if true, read from folder extension bernardo uses 
 		simulation.printDetailedOutput = true;
 			// determines whether to write all the output csvs that I want 
+		simulation.indepReleaseAlloc = false;
+			// this determines whether release allocation into FL conservation pool
+			// is based on the input parameter file or based on the current week's
+			// supply pool to water quality pool ratio 
 		simulation.numRealizationsTOREAD = numRealizations;
 			// read all realizations in current mode
 			// sets the number of realizations for which data

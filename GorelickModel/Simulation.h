@@ -60,6 +60,7 @@ public:
 	string demanddataPath;
 	
 	bool use_RDM_ext;
+	bool indepReleaseAlloc;
 	
 	double rdm_factors[30];
 	int rdmNumber;
@@ -79,6 +80,7 @@ public:
 	double buybackratePerMG;
 	double ReleaseContractPrice;
 	double FallsSupplyAllocationFraction;
+	double FLSPfrac;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;

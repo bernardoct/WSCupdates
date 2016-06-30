@@ -832,6 +832,12 @@ void Simulation::fixRDMFactors(int rdm_i)
 	durham_cary_capacity = 10.0*rdm_factors[12];
 	durham_owasa_capacity = 7.0*rdm_factors[12];
 	raleigh_cary_capacity = 10.8*rdm_factors[12];
+	
+	// FALLS LAKE CONSERVATION POOL ALLOCATIONS
+	// store the fraction of falls lake conservation pool used for WQ and for supply
+	
+	FLSPfrac = falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity);
+		// fraction of FL conservation pool used for raleigh water supply 
 
 	// cout << "Financial info" << endl;
 	//MORDM EXTENSION - add bond rate and length
@@ -1446,6 +1452,8 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	FallsSupplyAllocationFraction = xreal[62];
 		// fraction of Durham releases that are added to
 		// the Falls Lake water supply pool 
+		// this is overridden if the allocation of releases
+		// is to be equal to the allocation of Falls Lake 
 
 	//Drought surcharges - 2 variables for each utility, one for residential customers and one for commercial/industrial/irrigation customers
 	if (formulation<6)
@@ -1500,7 +1508,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 
 	durham.setCapacity(6349.0);
 	owasa.setCapacity(3558.0);
-	raleigh.setCapacity(14700.0+2789.66);
+	raleigh.setCapacity(falls_lake_supply_capacity + 2789.66);
 	cary.setCapacity(cary.jordanLakeAlloc*14924.0);
 		// should I switch this away from hardcoded numbers?
 		// what are these referencing?
@@ -3199,7 +3207,7 @@ void Simulation::realizationLoop()
 	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
 	double littleRiverRaleighActualInflow;
 	int season = 1, syntheticIndex = 0; // week 1 is non-irrigation season (season = 1)
-	double raleighBaselineMultiplier = 40434.0*.32*(14700.0/34700.0);
+	double raleighBaselineMultiplier = 40434.0*.32*(falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity);
 	double durham_res_supply_capacity = 6349.0;
 	double cane_creek_supply_capacity = 2909.0;
 	double stone_quarry_supply_capacity = 200.0;
@@ -3560,7 +3568,16 @@ void Simulation::realizationLoop()
 					}
 					else
 					{
-						FLSPreleaseFrac = FallsSupplyAllocationFraction;
+						if (indepReleaseAlloc)
+						{
+							FLSPreleaseFrac = FallsSupplyAllocationFraction;
+						}
+						else
+						{
+							FLSPreleaseFrac = systemStorage.getFallsSupplyAllocFrac();
+						}
+							// the input parameter for how much of each release goes to water supply
+							// is overwritten to be equal to the current conservation pool ratio 
 					}
 					
 					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
@@ -3637,7 +3654,7 @@ void Simulation::realizationLoop()
 
 			durhamSpill = systemStorage.getDurhamSpillage();
 			OWASASpill = systemStorage.getOWASASpillage();
-			insuranceFallsInflow = (fallsActualInflow + durhamSpill + durham.weeklyDemand*returnRatio[0][week-1]-systemStorage.fallsArea*actualFallsEvap)*(14700.0/34700.0) + raleigh.weeklyTransferVolume;
+			insuranceFallsInflow = (fallsActualInflow + durhamSpill + durham.weeklyDemand*returnRatio[0][week-1]-systemStorage.fallsArea*actualFallsEvap)*(falls_lake_supply_capacity/34700.0) + raleigh.weeklyTransferVolume;
 			insuranceJordanInflow = (OWASASpill + owasa.weeklyDemand*returnRatio[1][week-1] + durham.weeklyDemand*(returnRatio[1][week-1] - returnRatio[0][week-1]) +
 					jordanActualInflow-actualEvap*13900)*cary.jordanLakeAlloc*(45800.0/(94600.0+45800.0));
 

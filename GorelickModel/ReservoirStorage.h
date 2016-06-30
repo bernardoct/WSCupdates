@@ -50,6 +50,7 @@ public:
 	double getFallsQuality();
 	
 	double getFallsSupplyStorage();
+	double getFallsSupplyAllocFrac();
 	double getFallsSpillage();
 	
 	void upgradeCaryTreatmentPlant(int counter);
