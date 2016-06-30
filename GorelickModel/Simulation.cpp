@@ -1236,8 +1236,8 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 							// minimized, the final allocations are
 							// Cary = availableJLallocation - durham - raleigh - owasa
 							
-						//cary.jordanLakeAlloc = availableJLallocation - durham.jordanLakeAlloc - owasa.jordanLakeAlloc - raleigh.jordanLakeAlloc;
-						cary.jordanLakeAlloc = 0.85;
+						cary.jordanLakeAlloc = availableJLallocation - durham.jordanLakeAlloc - owasa.jordanLakeAlloc - raleigh.jordanLakeAlloc;
+						//cary.jordanLakeAlloc = 0.85;
 							// in this scenario, D allocation is 10%, OWASA is 5%, R is 0%
 					}
 					else
@@ -1418,7 +1418,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		raleigh.westernWakeTreatmentFrac = xreal[51];
 	}
 	fallsLakeReallocation = xreal[52];
-	fallsLakeReallocation = 10000;
+	//fallsLakeReallocation = 10000;
 
 	caryWTPcosts[0] = 69.1;
 	caryWTPcosts[1] = 21.4;
@@ -1524,8 +1524,6 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		c_obj[3] = maxValue(durham.totalLosses, owasa.totalLosses, raleigh.totalLosses, cary.totalLosses);
 		c_obj[4] = maxValue(durham.maxRestrictions, owasa.maxRestrictions, raleigh.maxRestrictions, cary.maxRestrictions);
 		c_obj[5] = xreal[7] + xreal[8] + xreal[9] + xreal[10];
-
-
 	}
 
 	else if(borgToggle == 3) //Mode to allow for manual input of parameters and individual objective function evaluation
@@ -1774,12 +1772,6 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
                 // expected demand set for a given week
 				// While seasonal trends and future growth are incorporated, no demand uncertainty is used (weekly averages only)
 			
-			//if (realization == 0) 
-			//{
-			//	createROFout << yearROF << "," << monthROF << "," << weekROF << ",";
-			//	createROFout << durhamROFDemand << "," << raleighROFDemand << ",";
-			//}
-			
 			riskOfFailureStorageROF.setDemands(durhamROFDemand, owasaROFDemand, raleighROFDemand, caryROFDemand, numdaysROF);
 				// passes demands to storage calcs
                 // demands set every week
@@ -1889,12 +1881,6 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 			rIPex += riskOfFailureStorageIP.getExcessR();//retrieve overall storage, Raleigh
 			cIPex += riskOfFailureStorageIP.getExcessC();
                 // if the reservoir was full, what was spilled over as excess
-			
-			//if (realization == 0)
-			//{
-			//	createROFout << dIPs << "," << rIPs << ",";
-			//	createROFout << dIPex << "," << rIPex << ",";
-			//}
 
 			if(oIPs < 0.2)
 			{
@@ -2359,11 +2345,6 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 				durham.ReleaseRiskVolume[week-1] = 1.0;
 			}
 			
-			if (realization == 0)
-			{
-				//createROFout << durham.ReleaseStorageRisk[x] << "," << durham.RRtrigger << "," << durham.ReleaseRiskVolume[week - 1] << ",";
-			}
-			
 			break;
 		}
 	}
@@ -2379,11 +2360,6 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 			if (raleigh.ReleaseRiskVolume[week-1] > 1.0)
 			{
 				raleigh.ReleaseRiskVolume[week-1] = 1.0;
-			}
-			
-			if (realization == 0)
-			{
-				//createROFout << raleigh.ReleaseStorageRisk[x] << "," << raleigh.RRtrigger << "," << raleigh.ReleaseRiskVolume[week - 1] << ",";
 			}
 			
 			break;
@@ -3324,89 +3300,67 @@ void Simulation::realizationLoop()
 	/////////////////////////////////////////////////////////////////////////
 	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
 	
-	int numRealizationsTOREAD = 100;
-		// read all realizations in current mode
-	
-	ofstream out100;
-	ofstream out101;
-	ofstream outNew;
-	ofstream outRiskParams;
-	ofstream placechecker;
-	
-	std::string filenameA = "output/JLTreatedTransfers";
-	//std::string filenameB = "output/JLTTD";
-	std::string filenameC = "output/RRfuncOutput";
-	std::string filenameD = "output/weeklyRiskParams";
-	std::string filenameE = "error/progresscounter";
-	std::string filenameG = "output/InfraBuilt";
-		// G is declared in the header file 
-	
-	std::string filenameEND = ".csv";
+	if (printDetailedOutput)
+	{
+		ofstream out100;
+		ofstream outNew;
+		ofstream outRiskParams;
 		
-	std::string completeFilenameA;
-	//std::string completeFilenameB;
-	std::string completeFilenameC;
-	std::string completeFilenameD;
-	std::string completeFilenameE;
-	//std::string completeFilenameF;
-	std::string completeFilenameG;
+		std::string filenameA = "output/JLTreatedTransfers";
+		std::string filenameC = "output/RRfuncOutput";
+		std::string filenameD = "output/weeklyRiskParams";
+		std::string filenameG = "output/InfraBuilt";
+			// G is declared in the header file 
 		
-	std::stringstream sstmA;
-	//std::stringstream sstmB;
-	std::stringstream sstmC;
-	std::stringstream sstmD;
-	std::stringstream sstmE;
-	//std::stringstream sstmF;
-	std::stringstream sstmG;
+		std::string filenameEND = ".csv";
+			
+		std::string completeFilenameA;
+		std::string completeFilenameC;
+		std::string completeFilenameD;
+		std::string completeFilenameG;
+			
+		std::stringstream sstmA;
+		std::stringstream sstmC;
+		std::stringstream sstmD;
+		std::stringstream sstmG;
+			
+		sstmA << filenameA << rank << filenameEND;
+		sstmC << filenameC << rank << filenameEND;
+		sstmD << filenameD << rank << filenameEND;
+		sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
 		
-	sstmA << filenameA << rank << filenameEND;
-	//sstmB << filenameB << rank << filenameEND;
-	sstmC << filenameC << rank << filenameEND;
-	sstmD << filenameD << rank << filenameEND;
-	sstmE << filenameE << rank << filenameEND;
-	//sstmF << filenameF << rank << filenameEND;
-	sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
-	
-	completeFilenameA = sstmA.str();
-	//completeFilenameB = sstmB.str();
-	completeFilenameC = sstmC.str();
-	completeFilenameD = sstmD.str();
-	completeFilenameE = sstmE.str();
-	//completeFilenameF = sstmF.str();
-	completeFilenameG = sstmG.str();
-	
-	// openFile(out100, completeFilenameA);
-	// //openFile(out101, completeFilenameB);
-	// openFile(outNew, completeFilenameC);
-	// openFile(outRiskParams, completeFilenameD);
-	// openFile(placechecker,  completeFilenameE);
-	//openFile(createROFout,  completeFilenameF);
-	// if (rdmNumber == 0)	
-	// {
+		completeFilenameA = sstmA.str();
+		completeFilenameC = sstmC.str();
+		completeFilenameD = sstmD.str();
+		completeFilenameG = sstmG.str();
+		
+		openFile(out100, completeFilenameA);
+		openFile(outNew, completeFilenameC);
+		openFile(outRiskParams, completeFilenameD);
 		openFile(InfraBuilt, completeFilenameG);
-		InfraBuilt << "Solution no" << "," << "RDM no" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
-	// }
-	
-	// out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	// out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
-	// out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
-	// 	// csv column headers of treated transfer output data
 		
-	// outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-	// outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
-	// outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
-	// outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
-	// outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
-	// outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
-	// 	// csv column headers for raw release output data and storage levels
+		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
+			// column headers for infrastructure builds 
 		
-	// outRiskParams << "Rank" << "," << "Realization" << ",";
-	// outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
-	// outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
-	// outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
-		// csv column headers for csv containing ROF values
-		
-		// column headers for infrastructure builds 
+		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
+		out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
+			// csv column headers of treated transfer output data
+			
+		outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+		outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+		outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
+		outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+		outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
+			// csv column headers for raw release output data and storage levels
+			
+		outRiskParams << "Rank" << "," << "Realization" << ",";
+		outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
+		outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
+		outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
+			// csv column headers for csv containing ROF values
+	}
 	
 	////////////// OTHER PARAMS /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -3427,9 +3381,6 @@ void Simulation::realizationLoop()
 	
 	for (int realization = 0; realization < numRealizations; realization++)
 	{
-
-
-
 		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
 		
 		weekcounter = 0;
@@ -3520,8 +3471,6 @@ void Simulation::realizationLoop()
 		zeroes(caryBuild,3);
 		thisYearFalls = 0;
 		
-		// placechecker << 1 << endl;
-		
 		while (year-1<(terminateYear))
             // in a single realization, from year to year
 		{
@@ -3538,13 +3487,9 @@ void Simulation::realizationLoop()
 			cary.fillRestrictionsArray(season);
 			raleigh.fillRestrictionsArray(season);
 			
-			// placechecker << "am i here" << endl;
-			
 			createRiskOfFailure(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
 								numIntervals);
                 // gives the ROF of this given week
-				
-			// placechecker << "but not here" << endl;
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3589,8 +3534,6 @@ void Simulation::realizationLoop()
 				28.7*owasaActualInflow, 1.2*owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow, crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
-
-			// placechecker << 2 << endl;
 			
 			if(formulation > 0)
                 // transfers allowed, assuming that releases will take priority over treated transfers, for the time being.
@@ -3607,8 +3550,6 @@ void Simulation::realizationLoop()
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
 					/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
 					
-					// placechecker << 3 << endl;
-					
 					if (systemStorage.getRaleighStorage() < NearFailureLimit)
 					{
 						FLSPreleaseFrac = 1.0;
@@ -3624,9 +3565,7 @@ void Simulation::realizationLoop()
 					
 					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
 												  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, 
-												  realization, outNew, year, week, numRealizationsTOREAD, rank);
-
-					// placechecker << 4 << endl;
+												  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput);
 													
 					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
@@ -3663,12 +3602,12 @@ void Simulation::realizationLoop()
 				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
                     // each utility assigned the costs of the transfers they get
 				
-				//if (realization < numRealizationsTOREAD) 
-				//{
-				//	out100 << rank << "," << realization << "," << year << "," << week << ",";
-				//	out100 << raleigh.weeklyTransferVolume << "," << durham.weeklyTransferVolume << ",";
-				//	out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << endl;
-				//}
+				if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
+				{
+					out100 << rank << "," << realization << "," << year << "," << week << ",";
+					out100 << raleigh.weeklyTransferVolume << "," << durham.weeklyTransferVolume << ",";
+					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << endl;
+				}
 				
 				durham.payForTransfers(transferCosts);
 				owasa.payForTransfers(transferCosts);
@@ -3777,7 +3716,7 @@ void Simulation::realizationLoop()
 
 		} // End weekly loop
 		
-		if (realization < numRealizationsTOREAD)
+		if ((realization < numRealizationsTOREAD) && printDetailedOutput)
 		{
 			outRiskParams << rank << "," << realization << ",";
 			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
@@ -3788,14 +3727,13 @@ void Simulation::realizationLoop()
 
 	} //end realization loop
 	
-	// out100.close();
-	//out101.close();
-	// outNew.close();
-	// outRiskParams.close();
-	// placechecker.close();
-	//createROFout.close();
-	// if (rdmNumber == nDeeplyUncertainSets - 1) 
+	if (printDetailedOutput)
+	{
+		out100.close();
+		outNew.close();
+		outRiskParams.close();
 		InfraBuilt.close();
+	}
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();

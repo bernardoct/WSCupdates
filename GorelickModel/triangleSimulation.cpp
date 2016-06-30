@@ -325,6 +325,12 @@ int main (int argc, char *argv[])
 		simulation.use_RDM_ext = false;
 			// determines how to read synthetic flows
 			// if true, read from folder extension bernardo uses 
+		simulation.printDetailedOutput = true;
+			// determines whether to write all the output csvs that I want 
+		simulation.numRealizationsTOREAD = numRealizations;
+			// read all realizations in current mode
+			// sets the number of realizations for which data
+			// will be added to output files 
 		//readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", numSolutions, c_num_dec);
 			// use this one for Bernardo's input file 
 		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);

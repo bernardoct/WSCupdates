@@ -47,6 +47,7 @@ public:
 	int formulation;
 	int borgToggle;
 	bool printDetailedOutput;
+	int numRealizationsTOREAD;
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
