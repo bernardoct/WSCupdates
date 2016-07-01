@@ -780,6 +780,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 		raleigh.futureDemand[x] = raleighFutureD[0][x]*rdm_factors[2] - raleighFutureD[0][0]*(rdm_factors[2]-1);
 		durham.futureDemand[x] = durhamFutureD[0][x]*rdm_factors[3] - durhamFutureD[0][0]*(rdm_factors[3]-1);
 		owasa.futureDemand[x] = owasaFutureD[0][x]*rdm_factors[4] - owasaFutureD[0][0]*(rdm_factors[4]-1);
+			// default RDM factors here should be 1
 	}
 
 
@@ -822,6 +823,8 @@ void Simulation::fixRDMFactors(int rdm_i)
 	cary.individualReductions[1][3] = .83 * rdm_factors[8];
 	cary.individualReductions[1][4] = .71 * rdm_factors[8];
 	
+		// set all these RDM factors to 1 if default
+	
 	// cout << "Capacities multiplier" << endl;
 	//MORDM EXTENSION - add allocation, and capacities multipliers	
 	falls_lake_supply_capacity = 14700.0*rdm_factors[9];
@@ -832,6 +835,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 	durham_cary_capacity = 10.0*rdm_factors[12];
 	durham_owasa_capacity = 7.0*rdm_factors[12];
 	raleigh_cary_capacity = 10.8*rdm_factors[12];
+		// set all RDM factors to 1 for default 
 	
 	// FALLS LAKE CONSERVATION POOL ALLOCATIONS
 	// store the fraction of falls lake conservation pool used for WQ and for supply
@@ -842,7 +846,9 @@ void Simulation::fixRDMFactors(int rdm_i)
 	// cout << "Financial info" << endl;
 	//MORDM EXTENSION - add bond rate and length
 	bondRate = rdm_factors[13];
+		// default is 0.04
 	bondLength = rdm_factors[14];
+		// default is 20 years 
 
 	// cout << "Setting permiting times" << endl;
 	//MORDM EXTENSION - permiting periods
@@ -863,8 +869,8 @@ void Simulation::fixRDMFactors(int rdm_i)
 	raleigh.infMatrix[3][2] = rdm_factors[27];
 
 	// for these last 6, the 12s and 27s must be the same.
-	owasa.infMatrix[4][2] = rdm_factors[28];
-	owasa.infMatrix[5][2] = rdm_factors[29];
+	owasa.infMatrix[4][2] = rdm_factors[28]; // 12
+	owasa.infMatrix[5][2] = rdm_factors[29]; // 27 
 	durham.infMatrix[5][2] = rdm_factors[28];
 	durham.infMatrix[6][2] = rdm_factors[29];
 	raleigh.infMatrix[4][2] = rdm_factors[28];
@@ -3347,8 +3353,10 @@ void Simulation::realizationLoop()
 			// column headers for infrastructure builds 
 		
 		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-		out100 << "RaleighTransferVolume" << "," << "DurhamTransferVolume" << ",";
-		out100 << "RaleighRRandTT_ROF" << "," << "DurhamRRandTT_ROF" <<	endl;
+		out100 << "RaleighDirectTransferVolume" << "," << "DurhamDirectTransferVolume" << ",";
+		out100 << "RaleighIndirectTransferVolume" << "," << "DurhamIndirectTransferVolume" << ",";
+		out100 << "OWASATransferVolume" << "," << "OWASAExtraVolume" << ",";
+		out100 << "RaleighShorttermROF" << "," << "DurhamShorttermROF" << "," << "OWASAshorttermROF" << endl;
 			// csv column headers of treated transfer output data
 			
 		outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
@@ -3618,8 +3626,10 @@ void Simulation::realizationLoop()
 				if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
 				{
 					out100 << rank << "," << realization << "," << year << "," << week << ",";
-					out100 << raleigh.weeklyTransferVolume << "," << durham.weeklyTransferVolume << ",";
-					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << endl;
+					out100 << systemStorage.raleighDirect << "," << systemStorage.durhamDirect << ",";
+					out100 << systemStorage.raleighIndirect << "," << systemStorage.durhamIndirect << ",";
+					out100 << systemStorage.owasaDirect << "," << systemStorage.extraCap << ",";
+					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << "," << owasa.riskOfFailure << endl;
 				}
 				
 				durham.payForTransfers(transferCosts);

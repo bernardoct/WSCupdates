@@ -136,7 +136,7 @@ int main (int argc, char *argv[])
 	simulation.setNumYears(terminateYear);
 	simulation.setStartYear(startSimulationYear);
 	
-	simulation.numIntervals = 20;
+	simulation.numIntervals = 50;
 		// the number of discrete volume increments
 		// used for insurance payouts and for 
 		// setting the "GUIDE curve" for raleigh

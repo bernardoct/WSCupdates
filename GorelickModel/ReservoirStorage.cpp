@@ -430,207 +430,6 @@ void ReservoirStorage::getReturnRatios(double raleighR, double durhamR)
 	return;
 }
 
-void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, double transferOWASA, double owasaRisk, double transferRaleigh, double raleighRisk, double OWASAD)
-{
-	double durhamRequestO;
-	double owasaRequestO;
-	double raleighRequestO;
-	//Determines how much water each utility needs to request to reach an acceptable risk-of-failure
-
-	// BINARY INDICATORS OF WHETHER OR NOT A GIVEN UTILITY WILL REQUEST A TRANSFER
-	if (owasaRisk>transferOWASA)
-		owasaRequestO = 1.0;
-	else
-		owasaRequestO = 0.0;
-
-	if (durhamRisk>transferDurham)
-		durhamRequestO = 1.0;
-	else
-		durhamRequestO = 0.0;
-
-	if (raleighRisk>transferRaleigh)
-		raleighRequestO = 1.0;
-	else
-		raleighRequestO = 0.0;
-
-
-	////Cary wants at least a 5 MGD buffer of unused capacity in its treatment plant
-	caryTreatmentBuffer = 5.0*numdays;
-
-	////Peaking factor at the Cary WTP used to move from daily capacity to average weekly capacity
-	caryPeakingFactor = .85;
-
-	//Total spare capacity to sell transfers at the Cary WTP
-	caryExtraCapacity = (CaryTreatmentCapacity*numdays - caryTreatmentBuffer)*caryPeakingFactor - CaryUse;
-
-	////Capacity of the Durham/OWASA interconnection is 7 MGD
-	DurhamOWASACapacity = 7*numdays;
-
-	//Weekly capacity of the Durham-Cary interconnection
-	double DCCap = DurhamCaryCapacity*numdays;
-
-	//Weekly capacity of the Raleigh-Cary interconnection
-	double RCCap = RaleighCaryCapacity*numdays;
-	double raleighExtra = 0.0;
-	double raleighExtraToDurham = 0.0;
-	double raleighExtraToOWASA = 0.0;
-	double durhamExtra = 0.0;
-
-	/////OWASA must maintain at least 3 MGD production in its own treatment plant
-	/////Transfers to OWASA cannot reduce OWASA domestic production below  3 MGD
-	double OWASAminimumUse = 3.0*numdays;
-	if (OWASAD-DurhamOWASACapacity<OWASAminimumUse)
-	{
-		DurhamOWASACapacity = OWASAD-OWASAminimumUse;
-	}
-	if (DurhamOWASACapacity<0.0)
-	{
-		DurhamOWASACapacity = 0.0;
-	}
-
-	//No transfers if Cary does not have the extra treatment capacity
-	if (caryExtraCapacity<0.0)
-	{
-		caryExtraCapacity=0.0;
-		durhamRequest = 0.0;
-		owasaRequest = 0.0;
-		raleighRequest = 0.0;
-	}
-	else///////////////check infrastructure constraints
-	{
-		////////Check Cary WTP (through line 480)
-		/////Figure out transfers as if the Cary WTP is the limiting factor
-		durhamRequest = (caryExtraCapacity*durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
-
-		owasaRequest = (caryExtraCapacity*owasaRisk*owasaRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
-
-		raleighRequest = (caryExtraCapacity*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
-
-		////Make sure each utility gets at least 25% of cary capacity
-		double transferFloor = .25;
-		if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
-		{
-			durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
-
-			owasaRequest = ((caryExtraCapacity-durhamRequest)*owasaRisk*owasaRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+.00001);
-
-			raleighRequest = ((caryExtraCapacity-durhamRequest)*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+.00001);
-
-			if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
-			{
-				owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
-
-				raleighRequest = (caryExtraCapacity-durhamRequest-owasaRequest)*raleighRequestO;
-			}
-			if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
-			{
-				raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
-
-				owasaRequest = (caryExtraCapacity - durhamRequest - raleighRequest)*owasaRequestO;
-			}
-		}
-		if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
-		{
-			owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
-
-			durhamRequest = ((caryExtraCapacity-owasaRequest)*durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO+durhamRisk*durhamRequestO+.00001);
-
-			raleighRequest = ((caryExtraCapacity-owasaRequest)*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+durhamRisk*durhamRequestO+.00001);
-
-			if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
-			{
-				durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
-
-				raleighRequest = (caryExtraCapacity-durhamRequest-owasaRequest)*raleighRequestO;
-			}
-			if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
-			{
-				raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
-
-				durhamRequest = (caryExtraCapacity - owasaRequest - raleighRequest)*durhamRequestO;
-			}
-		}
-		if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
-		{
-			raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
-
-			durhamRequest = ((caryExtraCapacity-raleighRequest)*durhamRisk*durhamRequestO)/(owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
-
-			owasaRequest = ((caryExtraCapacity-raleighRequest)*owasaRisk*owasaRequestO)/(owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
-
-			if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
-			{
-				durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
-
-				owasaRequest = (caryExtraCapacity-durhamRequest-raleighRequest)*owasaRequestO;
-			}
-			if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
-			{
-				owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
-
-				durhamRequest = (caryExtraCapacity - owasaRequest - raleighRequest)*durhamRequestO;
-			}
-		}
-
-
-		///////////Check for conveyence constraints
-		///////Raleigh capacity constraint
-		if (raleighRequest>RCCap)//Make sure Raleigh's request does not exceed its interconnection capacity
-		{
-			raleighExtra = raleighRequest - RCCap;//If Raleigh can not take all of the water allotted to it, the extra water is available to Durham and OWASA
-			raleighRequest = RCCap;
-			if ((durhamRequest+owasaRequest+raleighExtra) > DCCap)//Make sure Durham can take all the additional water (all water to Durham and OWASA must go through Durham)
-			{
-				raleighExtra = DCCap - durhamRequest - owasaRequest;
-			}
-
-			/////If Durham-Cary interconnection is limiting, available water is divided between Durham & OWASA based on relative risk of failure
-
-			raleighExtraToDurham = raleighExtra*durhamRisk*durhamRequestO/(durhamRisk*durhamRequestO+owasaRisk*owasaRequestO+.00001);
-
-			raleighExtraToOWASA = raleighExtra*owasaRisk*owasaRequestO/(durhamRisk*durhamRequestO+owasaRisk*owasaRequestO+.00001);
-
-			durhamRequest += raleighExtraToDurham * durhamRequestO;
-			owasaRequest += raleighExtraToOWASA * owasaRequestO;
-				// ADJUST TO ENSURE NO EXTRA IS GIVEN IF NO TRANSFER IS REQUESTED
-				
-			/////make sure owasa doesnt take more than its connection between durham & owasa
-			if(owasaRequest>DurhamOWASACapacity)
-			{
-				durhamRequest += owasaRequest - DurhamOWASACapacity;
-				owasaRequest = DurhamOWASACapacity;
-			}
-		}
-		if ((durhamRequest+owasaRequest) > DCCap)//Make sure Durham/OWASA's request does not exceed ints interconnection capacity
-		{
-			/////If Durham-Cary interconnection is limiting, available water is divided between Durham & OWASA based on relative risk of failure
-			durhamExtra = durhamRequest + owasaRequest - DCCap;
-			durhamRequest = DCCap*durhamRisk*durhamRequestO/(durhamRisk*durhamRequestO+owasaRisk*owasaRequestO+.00001);
-
-			owasaRequest = DCCap*owasaRisk*owasaRequestO/(durhamRisk*durhamRequestO+owasaRisk*owasaRequestO+.00001);
-			if(owasaRequest>DurhamOWASACapacity)
-			{
-				durhamRequest += owasaRequest - DurhamOWASACapacity;
-				owasaRequest = DurhamOWASACapacity;
-			}
-			raleighRequest += durhamExtra * raleighRequestO;
-				// ADJUSTED SO THAT RALEIGH GETS NOTHING EVEN IF THERE IS EXTRA
-				
-			if (raleighRequest>RCCap)//Make sure Raleigh can take all the additional water
-			{
-				raleighRequest = RCCap;
-			}
-		}
-	}
-
-	durhamUse -= durhamRequest;
-
-	OWASAUse -= owasaRequest;
-	raleighUse -= raleighRequest;
-
-	return;
-}
-
 void ReservoirStorage::setInflow(double durham, double ccr, double ul, double stq, double falls, double wb, double clayton, double crabtree, double jordan, double lillington,
 									double ralRet, double durRet, double durRet2, double owasaRet, double evaporationf, double evaporationwb, double evaporation, double ltlRvrRal)
 {
@@ -1592,6 +1391,294 @@ void ReservoirStorage::upgradeDurhamCaryConnection()
 void ReservoirStorage::upgradeDurhamOWASAConnection()
 {
 	DurhamOWASACapacity = 16;
+}
+
+/// TREATED TRANSFER FUNCTION /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, double transferOWASA, double owasaRisk, double transferRaleigh, double raleighRisk, double OWASAD)
+{
+	double durhamRequestO;
+	double owasaRequestO;
+	double raleighRequestO;
+		//Determines how much water each utility needs to request to reach an acceptable risk-of-failure
+
+	// BINARY INDICATORS OF WHETHER OR NOT A GIVEN UTILITY WILL REQUEST A TRANSFER
+	if (owasaRisk > transferOWASA)
+		owasaRequestO = 1.0;
+	else
+		owasaRequestO = 0.0;
+
+	if (durhamRisk > transferDurham)
+		durhamRequestO = 1.0;
+	else
+		durhamRequestO = 0.0;
+
+	if (raleighRisk > transferRaleigh)
+		raleighRequestO = 1.0;
+	else
+		raleighRequestO = 0.0;
+
+
+	////Cary wants at least a 5 MGD buffer of unused capacity in its treatment plant
+	caryTreatmentBuffer = 5.0*numdays;
+
+	////Peaking factor at the Cary WTP used to move from daily capacity to average weekly capacity
+	caryPeakingFactor = .85;
+
+	//Total spare capacity to sell transfers at the Cary WTP
+	caryExtraCapacity = (CaryTreatmentCapacity*numdays - caryTreatmentBuffer)*caryPeakingFactor - CaryUse;
+
+	////Capacity of the Durham/OWASA interconnection is 7 MGD
+	DurhamOWASACapacity = DurhamOWASACapacity * numdays;
+
+	//Weekly capacity of the Durham-Cary interconnection
+	double DCCap = DurhamCaryCapacity*numdays;
+
+	//Weekly capacity of the Raleigh-Cary interconnection
+	double RCCap = RaleighCaryCapacity*numdays;
+	double raleighExtra = 0.0;
+	double raleighExtraToDurham = 0.0;
+	double raleighExtraToOWASA = 0.0;
+	double durhamExtra = 0.0;
+	
+	raleighDirect = 0.0;
+	raleighIndirect = 0.0;
+	durhamDirect = 0.0;
+	durhamIndirect = 0.0;
+	extraCap = 0.0;
+	owasaDirect = 0.0;
+
+	/////OWASA must maintain at least 3 MGD production in its own treatment plant
+	/////Transfers to OWASA cannot reduce OWASA domestic production below  3 MGD
+	double OWASAminimumUse = 3.0*numdays;
+	if (OWASAD-DurhamOWASACapacity < OWASAminimumUse)
+	{
+		DurhamOWASACapacity = OWASAD-OWASAminimumUse;
+	}
+	if (DurhamOWASACapacity < 0.0)
+	{
+		DurhamOWASACapacity = 0.0;
+	}
+
+	//No transfers if Cary does not have the extra treatment capacity
+	if (caryExtraCapacity < 0.0)
+	{
+		caryExtraCapacity = 0.0;
+		durhamRequest = 0.0;
+		owasaRequest = 0.0;
+		raleighRequest = 0.0;
+	}
+	else ///////////////check infrastructure constraints
+	{
+		////////Check Cary WTP (through line 480)
+		/////Figure out transfers as if the Cary WTP is the limiting factor
+		durhamRequest  = (caryExtraCapacity*durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
+		owasaRequest   = (caryExtraCapacity*owasaRisk*owasaRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
+		raleighRequest = (caryExtraCapacity*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
+			// determine the request size of each utility based on how much each requests relative to each other, and the extra cary water is divided up 
+			// limited by the WTP at Cary, not by interconnection capacities 
+			
+		////Make sure each utility gets at least 25% of cary capacity
+		double transferFloor = .25;
+		if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
+		{
+			durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
+
+			owasaRequest = ((caryExtraCapacity-durhamRequest)*owasaRisk*owasaRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+.00001);
+
+			raleighRequest = ((caryExtraCapacity-durhamRequest)*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+owasaRisk*owasaRequestO+.00001);
+
+			if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
+			{
+				owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
+
+				raleighRequest = (caryExtraCapacity-durhamRequest-owasaRequest)*raleighRequestO;
+			}
+			if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
+			{
+				raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
+
+				owasaRequest = (caryExtraCapacity - durhamRequest - raleighRequest)*owasaRequestO;
+			}
+		}
+		if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
+		{
+			owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
+
+			durhamRequest = ((caryExtraCapacity-owasaRequest)*durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO+durhamRisk*durhamRequestO+.00001);
+
+			raleighRequest = ((caryExtraCapacity-owasaRequest)*raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO+durhamRisk*durhamRequestO+.00001);
+
+			if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
+			{
+				durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
+
+				raleighRequest = (caryExtraCapacity-durhamRequest-owasaRequest)*raleighRequestO;
+			}
+			if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
+			{
+				raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
+
+				durhamRequest = (caryExtraCapacity - owasaRequest - raleighRequest)*durhamRequestO;
+			}
+		}
+		if(raleighRequest < transferFloor*caryExtraCapacity*raleighRequestO)
+		{
+			raleighRequest = transferFloor*caryExtraCapacity*raleighRequestO;
+
+			durhamRequest = ((caryExtraCapacity-raleighRequest)*durhamRisk*durhamRequestO)/(owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
+
+			owasaRequest = ((caryExtraCapacity-raleighRequest)*owasaRisk*owasaRequestO)/(owasaRisk*owasaRequestO+durhamRisk*durhamRequestO+.00001);
+
+			if(durhamRequest < transferFloor*caryExtraCapacity*durhamRequestO)
+			{
+				durhamRequest = transferFloor*caryExtraCapacity*durhamRequestO;
+
+				owasaRequest = (caryExtraCapacity-durhamRequest-raleighRequest)*owasaRequestO;
+			}
+			if(owasaRequest < transferFloor*caryExtraCapacity*owasaRequestO)
+			{
+				owasaRequest = transferFloor*caryExtraCapacity*owasaRequestO;
+
+				durhamRequest = (caryExtraCapacity - owasaRequest - raleighRequest)*durhamRequestO;
+			}
+		}
+
+		///////////Check for conveyence constraints
+		
+		// June/July 2016: David adds ability for Raleigh and Durham to wheel water to eachother through shared interconnections
+		// 	to do so, this is the new order of operations:
+		//		0.	OWASA's request is checked to see if it is too large for the Durham-OWASA interconnection 
+		//		1.	Check if total combined request from all 3 utilities is less/greater than the sum of C-D and C-R connections
+		//				a.  it is also important to know if whatever water bound for OWASA will fit through the R-D interconnect,
+		//				    but this interconnection is currently larger than the D-O interconnect, so it isn't an issue
+		//				b.	if this statement is true, can allocate all requests without needing to do any risk weighting
+		//				c.	if not, then proceed with a risk weighting and allocation 
+		//		2.	All of OWASA's request goes through C-D connect
+		//		3.	Raleigh's request is calculated, extra routed through C-D-R 
+		//		4.	Durham calculated last. 
+		
+		// Key for terms:
+		//	owasaDirect     = water flowing from JL through Cary-Durham-OWASA (C-D-O) interconnection path. Only way to get water to OWASA.
+		//	durhamDirect    = water flowing through C-D interconnection to Durham  
+		//	raleighDirect   = water flowing through C-R interconnection to Raleigh
+		//  durhamIndirect  = water taking C-R-D pathway to Durham 
+		//  raleighIndirect = water taking C-D-R pathway to Raleigh 
+		
+					
+		if (owasaRequest > DurhamOWASACapacity)
+		{
+			owasaRequest = DurhamOWASACapacity;
+			extraCap     = owasaRequest - DurhamOWASACapacity;
+			
+			durhamRequest  += (extraCap)*(durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
+			raleighRequest += (extraCap)*(raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
+				// take the remaining capacity once OWASA is constrained and divide among D and R 
+		}
+			// STEP 0.  If OWASA's 25% of Cary extra capacity is too large for D-O interconnect, the extra capacity
+			// is re-allocated to raleigh and durham 
+			
+		if ((raleighRequest + durhamRequest + owasaRequest) < (RCCap + DCCap))
+		{
+			// ASSUME ALL OF OWASAs REQUEST GOES THROUGH C-D-O PATH, NOT C-R-D-O PATH
+			// THIS WILL PREVENT THE NEED OF WATER TO MOVE BOTH WAYS IN A WEEK THROUGH R-D PATH
+			//		this also assumes the D-O is always smaller than the C-D interconnect 
+			
+			// now, if the C-R and C-D connects have enough capacity for a week's total requests,
+			// once water is sent to OWASA, remaining transfers will only need to move one way 
+			// through the R-D interconnect 
+			
+			if (raleighRequest > RCCap)
+			{
+				raleighDirect   = RCCap;
+				raleighIndirect = raleighRequest - raleighDirect;
+			}	
+			else
+			{
+				raleighDirect = raleighRequest;
+			}
+				// set Raleigh's needs next.  if Raleigh needs its entire C-R connection, extra is routed through C-D-R path 
+				// if not, all goes direct and none is indirect.
+			
+			if (durhamRequest > (DCCap - owasaRequest))
+			{
+				durhamDirect   = DCCap - owasaRequest;
+				durhamIndirect = durhamRequest - durhamDirect;
+			}
+			else
+			{
+				durhamDirect = durhamRequest;
+			}
+				// Durham is calculated last.  if the remaining capacity in the C-D interconnect after OWASA request has been added 
+				// is not enough, extra water is routed through the C-R-D interconnect path  
+		}
+		else
+		{
+			// in this scenario, more water is requested than there is conveyance to move 
+			// so, total capacity that can be moved (C-D + C-R interconnect capacities) is divided
+			// among the 3 utilities based on their risk levels.  previously, requests were limited
+			// by Cary WTP extra capacity, now need to be redone based on interconnect capacities.
+			
+			durhamRequest  = (RCCap + DCCap)*(durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO + owasaRisk*owasaRequestO + durhamRisk*durhamRequestO + 0.00001);
+			owasaRequest   = (RCCap + DCCap)*(owasaRisk*owasaRequestO)/(raleighRisk*raleighRequestO + owasaRisk*owasaRequestO + durhamRisk*durhamRequestO + 0.00001);
+			raleighRequest = (RCCap + DCCap)*(raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO + owasaRisk*owasaRequestO + durhamRisk*durhamRequestO + 0.00001);
+				// this will only happen if requests are large enough to total more than the interconnection capacities and/or 
+				// the extra Cary capacity is larger than the interconnection capacities
+			
+			if (owasaRequest > DurhamOWASACapacity)
+			{
+				owasaRequest = DurhamOWASACapacity;
+				extraCap     = owasaRequest - DurhamOWASACapacity;
+				
+				durhamRequest  += (extraCap)*(durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
+				raleighRequest += (extraCap)*(raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
+					// take the remaining capacity once OWASA is constrained and divide among D and R 
+			}
+				// STEP 0
+				
+			if (raleighRequest > RCCap)
+			{
+				raleighDirect   = RCCap;
+				raleighIndirect = raleighRequest - raleighDirect;
+			}	
+			else
+			{
+				raleighDirect = raleighRequest;
+			}
+				// set Raleigh's needs next.  if Raleigh needs its entire C-R connection, extra is routed through C-D-R path 
+				// if not, all goes direct and none is indirect.
+			
+			if (durhamRequest > (DCCap - owasaRequest))
+			{
+				durhamDirect   = DCCap - owasaRequest;
+				durhamIndirect = durhamRequest - durhamDirect;
+			}
+			else
+			{
+				durhamDirect = durhamRequest;
+			}
+		}
+		
+		if (raleighIndirect > RaleighDurhamCapacity * numdays)
+		{
+			raleighIndirect = RaleighDurhamCapacity * numdays;
+		}
+		if (durhamIndirect > RaleighDurhamCapacity * numdays)
+		{
+			durhamIndirect = RaleighDurhamCapacity * numdays;
+		}
+			// make sure the D-R interconnect isn't over-used 
+		
+		// CHECK IF THIS IS WORKING - IF THERE ARE ANY WEEKS WHERE BOTH DURHAM/RALEIGH INDIRECT VOLUMES > 0, IT ISN'T RIGHT
+	}
+	
+	owasaDirect = owasaRequest;
+
+	durhamUse  -= (durhamDirect + durhamIndirect);
+	OWASAUse   -= owasaDirect;
+	raleighUse -= (raleighDirect + raleighIndirect);
+
+	return;
 }
 
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

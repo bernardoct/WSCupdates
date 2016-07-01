@@ -53,6 +53,13 @@ public:
 	double getFallsSupplyAllocFrac();
 	double getFallsSpillage();
 	
+	double raleighDirect;
+	double durhamDirect;
+	double raleighIndirect;
+	double durhamIndirect;
+	double extraCap;
+	double owasaDirect;
+	
 	void upgradeCaryTreatmentPlant(int counter);
 	void upgradeCaryTreatmentPlant2();
 	void upgradeDurhamCaryConnection();
