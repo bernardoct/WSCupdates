@@ -163,13 +163,13 @@ int main (int argc, char *argv[])
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 63;
+	int c_num_dec = 64;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
         // c_num_dec is number of dec vars
 		// MAY 2016: ADD NEW VARIABLES TO THIS 
-		// NOW 63 VARIABLES 
+		// NOW 64 VARIABLES 
 	
 	simulation.setNumDecisions(c_num_dec);
 

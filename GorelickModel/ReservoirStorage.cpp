@@ -1684,7 +1684,7 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 /// CALCULATING RELASES FUNCTION //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel,  
-									   double RstorageTarget, double DstorageTarget, double FallsSupplyFraction,
+									   double RstorageTarget, double DstorageTarget, double FallsSupplyFraction, double DbuybackLevel,
 									   int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput)
 	// function accepts release max or min constraints, plus critical storage levels,
 	// returns the volume of water requested for release, as well as the volume	
@@ -1782,11 +1782,23 @@ void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMi
 			}
 		}
 		
-		if (DstorageTarget > durhamStorage/durhamCapacity)
-			// storage target is based on Durham RR trigger
+		if ((durhamStorage - RreleaseRequest)/durhamCapacity < DstorageTarget)
+			// if the resultant storage level is below the critical ROF floor 
+		{
+			RreleaseRequest -= (DstorageTarget*durhamCapacity - (durhamStorage - RreleaseRequest));
+				// limit the request by the deficit relative to durham's critical threshold
+			if (RreleaseRequest < 0.0)
+			{
+				RreleaseRequest = 0.0;
+					// ensure non-negative value (possibly introduced when accounting for spillage)
+			}
+		}
+		
+		if (DbuybackLevel > durhamStorage/durhamCapacity)
+			// storage target is based on Durham RR trigger - buyback buffer zone 
 			// and subsequently calculated rating curve for Durham
 		{
-			DbuybackStorageLevel = DstorageTarget;
+			DbuybackStorageLevel = DbuybackLevel;
 				// if Durham has ROF levels above the trigger for transfers,
 				// it will act to buy back releases at a proportional level
 				// to its risk.
@@ -1865,7 +1877,7 @@ void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMi
 		streamFile << (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage) << "," << (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) << ",";
 		streamFile << (durhamStorage/durhamCapacity) << "," << durhamSpillage << ",";
 		streamFile << RreleaseRequest << "," << DbuybackQuantity << "," << DbuybackStorageLevel << "," << fallsLakeSupplyStorage << "," << durhamStorage << ",";
-		streamFile << RstorageTarget << "," << DstorageTarget << ",";
+		streamFile << RstorageTarget << "," << DstorageTarget << "," << DbuybackLevel << ",";
 		streamFile << DreleaseMax << "," << requestadjusted << ","<< DminEnvSpill << ",";
 		streamFile << fallsLakeQualityStorage << "," << fallsLakeQualityCapacity << "," << fallsLakeSupplyCapacity << "," << durhamCapacity << "," << FallsSupplyFraction << endl;
 	}

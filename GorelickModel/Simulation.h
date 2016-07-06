@@ -29,6 +29,9 @@ public:
 	
 	void createRiskOfFailure(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand,
 							 int discreteintervals);
+	void createRiskOfFailure_InsuranceReleases(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
+											   int discreteintervals);
+	void createRiskOfFailure_RestrictionsTransfers(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue);
 	int numIntervals;
 	
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
@@ -85,6 +88,7 @@ public:
 	double ReleaseContractPrice;
 	double FallsSupplyAllocationFraction;
 	double FLSPfrac;
+	double BuybackROFZone;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;

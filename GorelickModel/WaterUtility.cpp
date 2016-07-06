@@ -45,6 +45,7 @@ WaterUtility::~WaterUtility()
 
 	zap(ReleaseStorageRisk);
 	zap(ReleaseRiskVolume);
+	zap(BuybackRiskVolume);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
@@ -120,6 +121,7 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 
 	general_1d_allocate(ReleaseStorageRisk, volumeIncrements, 0.0);
 	general_1d_allocate(ReleaseRiskVolume, 52, 0.0);
+	general_1d_allocate(BuybackRiskVolume, 52, 0.0);
 
 	usesROF = true;
 
