@@ -44,6 +44,7 @@ class WaterUtility
 	
 	// RAW RELEASE TRIGGER DECISION VARIABLES
 	double RRtrigger;
+	double RRcontractTrigger;
 	
 	// Storage amount (fraction of full)
 	double storageFraction;
@@ -105,12 +106,17 @@ class WaterUtility
 	double *ReleaseStorageRisk; 
 	double *ReleaseRiskVolume;
 	double *BuybackRiskVolume;
+	double *SpinupRisk;
+	double *CurrentRisk;
+	double *TransferHistory;
+	double *TransferFrequency;
+	
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	void calcWaterPrice(double elasticity_Of_Demand[]);
 	void calcSurchargePrice(double elasticity_Of_Demand[], int constant);
 	void configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int terminateYear,
-		int volumeInc, int numRealizations, int formulation, int infCount);
+		int volumeInc, int numRealizations, int formulation, int infCount, int nContractRiskYears);
 	void clearVariablesForSimulation();
 	void clearVariablesForRealization(int year);
 	void fillRestrictionsArray(int season);

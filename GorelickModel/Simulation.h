@@ -51,12 +51,22 @@ public:
 	int borgToggle;
 	bool printDetailedOutput;
 	int numRealizationsTOREAD;
+	int contractlength;
+	int startYear;
+	int endYear;
+	int currentYear;
+	int numContractRiskYears;
+	
+	double annualpayment;
+	double adjustedannualpayment;
+	double adjustedbuybackpayment;
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
 	
 	string directoryName;
 	string historicFlowPath;
+	string fakesynthFlowPath;
 	string syntheticFlowPath;
 	string evaporationPath;
 	string oldstochPath;
@@ -68,6 +78,9 @@ public:
 	
 	bool use_RDM_ext;
 	bool indepReleaseAlloc;
+	bool runHistoric;
+	bool allowReleaseContract;
+	bool previousContract;
 	
 	double rdm_factors[30];
 	int rdmNumber;

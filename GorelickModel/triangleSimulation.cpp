@@ -127,9 +127,13 @@ int main (int argc, char *argv[])
 	//set defaults
 	simulation.setNumRealizations(numRealizations);
 
-	int startYear = 2010;
-	int endYear = 2060;
-	int currentYear = 2015;
+	simulation.startYear = 2010;
+	simulation.endYear = 2060;
+	simulation.currentYear = 2015;
+	
+	int startYear = simulation.startYear;
+	int endYear = simulation.endYear;
+	int currentYear = simulation.currentYear;
 
 	int terminateYear = endYear-startYear + 1;
 	int startSimulationYear = currentYear - startYear + 1;
@@ -141,6 +145,9 @@ int main (int argc, char *argv[])
 		// used for insurance payouts and for 
 		// setting the "GUIDE curve" for raleigh
 		// and durham water supply for release determination
+	simulation.numContractRiskYears = 20;
+		// the number of years of baseline ROF that will be stored
+		// for use in release contract determination 
 	simulation.availableJLallocation = 0.69;
 		// the fraction of Jordan Lake water supply pool
 		// that can be divided among Cary, OWASA, Durham, and Raleigh.
@@ -163,7 +170,7 @@ int main (int argc, char *argv[])
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 64;
+	int c_num_dec = 65;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
@@ -176,8 +183,14 @@ int main (int argc, char *argv[])
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
 	
+	simulation.runHistoric = true;
+		// determines whether to use fake historic streamflows
+		// in place of synthetic flows 
+		// these flows still won't be read until the fixRDMFactors function runs 
+	
 	simulation.directoryName = "./inputfiles/";
 	simulation.historicFlowPath = "./historicflows/";
+	simulation.fakesynthFlowPath = "./historicfakesyntheticflows/";
 	simulation.syntheticFlowPath = "./syntheticflows/";
 	simulation.evaporationPath = "./evapfiles/";
 	simulation.oldstochPath = "./oldstochfiles/";

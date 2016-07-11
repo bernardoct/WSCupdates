@@ -119,6 +119,55 @@ double average_array_colwise (double **data, int rows, int cols, int col_of_inte
 
 }
 
+double std_dev_vector(double *data, int length)
+{
+	double sum = 0.0;
+	for (int i = 0; i < length; i++)
+	{
+		sum += data[i];
+	}
+
+	double mean = sum / length;
+
+	double squared_sum = 0.0;
+
+	for (int i = 0; i < length; i++)
+	{
+		squared_sum += pow((data[i]-mean),2.0);
+	}
+
+	return sqrt( squared_sum / (length-1) );
+}
+
+double maxValue_array(double *data, int length)
+{
+	double maxval = data[0];
+	
+	for (int i = 1; i < length; i++)
+	{
+		if (data[i] > maxval)
+		{
+			maxval = data[i];
+		}
+	}
+	
+	return maxval;
+}
+
+double minValue_array(double *data, int length)
+{
+	double minval = data[0];
+	
+	for (int i = 1; i < length; i++)
+	{
+		if (data[i] < minval)
+		{
+			minval = data[i];
+		}
+	}
+	
+	return minval;
+}
 
 double std_dev_colwise(double **data, int length, int col_of_interest)
 {

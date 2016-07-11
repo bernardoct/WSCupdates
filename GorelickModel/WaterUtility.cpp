@@ -46,10 +46,14 @@ WaterUtility::~WaterUtility()
 	zap(ReleaseStorageRisk);
 	zap(ReleaseRiskVolume);
 	zap(BuybackRiskVolume);
+	zap(SpinupRisk);
+	zap(CurrentRisk);
+	zap(TransferHistory);
+	zap(TransferFrequency);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
-		int volumeInc, int nrealizations, int formulation, int infCount)
+		int volumeInc, int nrealizations, int formulation, int infCount, int nContractRiskYears)
 {
 	numMonths = nmonths;
 	numYears = nyears;
@@ -122,7 +126,11 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	general_1d_allocate(ReleaseStorageRisk, volumeIncrements, 0.0);
 	general_1d_allocate(ReleaseRiskVolume, 52, 0.0);
 	general_1d_allocate(BuybackRiskVolume, 52, 0.0);
-
+	general_1d_allocate(SpinupRisk, nContractRiskYears, 0.0);
+	general_1d_allocate(CurrentRisk, nContractRiskYears, 0.0);
+	general_1d_allocate(TransferHistory, nContractRiskYears, 0.0);
+	general_1d_allocate(TransferFrequency, nContractRiskYears, 0.0);
+	
 	usesROF = true;
 
 }
@@ -346,14 +354,14 @@ void WaterUtility::payForTransfers(double transferCosts)
 
 void WaterUtility::payForReleases(double contractValue, double contractLengthWeeks)
 {
-	Fund.subtract(contractValue/contractLengthWeeks*52.0);
+	Fund.subtract(contractValue);
 		// DO I NEED TO PRESENT VALUE THIS NOW OR IS IT DONE LATER?
 		// THIS IS NOW AN ANNUAL PAYMENT
 }
 
 void WaterUtility::acceptReleasePayment(double contractValue, double contractLengthWeeks)
 {
-	Fund.add(contractValue/contractLengthWeeks*52.0);
+	Fund.add(contractValue);
 }
 
 //////////////////////////// pay for buybacks ///////////////////////////////////////////////////////////////////////////////
