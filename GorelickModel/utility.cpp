@@ -64,7 +64,7 @@ void readFile(data_t &matrix, string filename, int rows, int columns)
 
 // Statistics Helper Functions
 
-double average_array (double *data_set, const int length)
+double average_array(double *data_set, const int length)
 {
 	double sum = 0.0;
 
@@ -76,7 +76,7 @@ double average_array (double *data_set, const int length)
 	return (sum / length);
 }
 
-double average_array (vector<double> data, const int length)
+double average_array(vector<double> data, const int length)
 {
 	double sum = 0.0;
 	for (int i = 0; i < length; i++)
@@ -87,7 +87,7 @@ double average_array (vector<double> data, const int length)
 	return (sum/length);
 }
 
-double average_array_colwise (double **data, int rows, int cols, int col_of_interest)
+double average_array_colwise(double **data, int rows, int cols, int col_of_interest)
 {
 	double dummy_sum = 0.0;
 	double average = 0.0;
@@ -103,7 +103,7 @@ double average_array_colwise (double **data, int rows, int cols, int col_of_inte
 
 }
 
-double average_array_colwise (double **data, int rows, int cols, int col_of_interest, int startYear)
+double average_array_colwise(double **data, int rows, int cols, int col_of_interest, int startYear)
 {
 	double dummy_sum = 0.0;
 	double average = 0.0;
@@ -152,6 +152,18 @@ double maxValue_array(double *data, int length)
 	}
 	
 	return maxval;
+}
+
+double sumValue_array(double *data, int length, int startindex)
+{
+	double sumval = data[startindex - 1];
+	
+	for (int i = startindex; i < length; i++)
+	{
+		sumval += data[i];
+	}
+	
+	return sumval;
 }
 
 double minValue_array(double *data, int length)

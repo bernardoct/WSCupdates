@@ -1491,6 +1491,13 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	annualpayment = xreal[61];
 		// annual payment by Raleigh to Durham for release contracts 
 		// in $MM 
+	raleigh.TTmagnitudetrigger = xreal[67];
+	durham.TTmagnitudetrigger  = xreal[68];
+		// annual amount of treated transfers to Raleigh or Durham (in MG)
+		// used to trigger release contracts 
+	raleigh.TTfrequencytrigger = xreal[69];
+	durham.TTfrequencytrigger  = xreal[70];
+		// number of weeks in a year with transfers that will trigger releases 
 
 		
 	if (durham.RRtrigger - BuybackROFZone < 0)
@@ -3374,6 +3381,7 @@ void Simulation::realizationLoop()
 		std::string filenameC = "output/RRfuncOutput";
 		std::string filenameD = "output/weeklyRiskParams";
 		std::string filenameG = "output/InfraBuilt"; 
+		std::string filenameZ = "output/ReleaseContract";
 		
 		std::string filenameEND = ".csv";
 			
@@ -3381,26 +3389,31 @@ void Simulation::realizationLoop()
 		std::string completeFilenameC;
 		std::string completeFilenameD;
 		std::string completeFilenameG;
+		std::string completeFilenameZ;
 			
 		std::stringstream sstmA;
 		std::stringstream sstmC;
 		std::stringstream sstmD;
 		std::stringstream sstmG;
+		std::stringstream sstmZ;
 			
 		sstmA << filenameA << rank << filenameEND;
 		sstmC << filenameC << rank << filenameEND;
 		sstmD << filenameD << rank << filenameEND;
 		sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
+		sstmZ << filenameZ << solutionNumber << "_" << rdmNumber << filenameEND;
 		
 		completeFilenameA = sstmA.str();
 		completeFilenameC = sstmC.str();
 		completeFilenameD = sstmD.str();
 		completeFilenameG = sstmG.str();
+		completeFilenameZ = sstmZ.str();
 		
 		openFile(out100, completeFilenameA);
 		openFile(outNew, completeFilenameC);
 		openFile(outRiskParams, completeFilenameD);
 		openFile(InfraBuilt, completeFilenameG);
+		openFile(ReleaseContractData, completeFilenameZ);
 			// all these are defined in the header file 
 		
 		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
@@ -3426,6 +3439,15 @@ void Simulation::realizationLoop()
 		outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
 		outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
 			// csv column headers for csv containing ROF values
+			
+		ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << ",";
+		ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
+		ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
+		ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
+		ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << ",";
+		ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
+		ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
 	}
 	
 	////////////// OTHER PARAMS /////////////////////////////////////////////
@@ -3435,6 +3457,8 @@ void Simulation::realizationLoop()
 	int contractriskyearcounter;
 	int LOOPCHECKER;
 	int contractcount;
+	int firstyear;
+	int yearcounter;
 	
 	fallsFailurePoint = 0.2;
 	zeroes(totalFallsFailure, terminateYear);
@@ -3527,7 +3551,7 @@ void Simulation::realizationLoop()
 		
 		if (yearcounter == 0)
 		{
-			int firstyear = year;
+			firstyear = year;
 			adjustedannualpayment = annualpayment;
 			adjustedbuybackpayment = buybackratePerMG;
 		}
@@ -3624,8 +3648,8 @@ void Simulation::realizationLoop()
 				
 				if (durham.weeklyBuybackVolume > 0.0)
 				{
-					durham.payForBuybacks(buybackratePerMG);
-					raleigh.acceptBuybackPayment(buybackratePerMG);
+					durham.payForBuybacks(adjustedbuybackpayment);
+					raleigh.acceptBuybackPayment(adjustedbuybackpayment);
 				}
 				
 				if (week == 1)
@@ -3796,9 +3820,18 @@ void Simulation::realizationLoop()
 				createInfrastructureRisk(realization, year-1, durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
 					// infrastructure risk is also used for renegotiating release contracts 
 					
-				raleigh.CurrentRisk[contractriskyearcounter] = raleigh.infRisk;
-				durham.CurrentRisk[contractriskyearcounter]  = durham.infRisk;
+				raleigh.SpinupRisk[contractriskyearcounter] = raleigh.infRisk;
+				durham.SpinupRisk[contractriskyearcounter]  = durham.infRisk;
 					// store the most recent 20 years of annual baseline ROF 
+				
+				if (printDetailedOutput)
+				{
+					ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
+					ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
+					ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
+					ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
+					ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+				}
 				
 				contractriskyearcounter += 1;
 				if (contractriskyearcounter > 19)
@@ -3857,7 +3890,7 @@ void Simulation::realizationLoop()
 					{
 						LOOPCHECKER = 1;
 						
-						for (yr = 0; yr < numContractRiskYears; yr++)
+						for (int yr = 1; yr < numContractRiskYears; yr++)
 						{
 							createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
 															durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, 
@@ -3871,6 +3904,11 @@ void Simulation::realizationLoop()
 						}
 						
 						yearcounter = 1;
+					} 
+					
+					if (printDetailedOutput)
+					{
+						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
 					}
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3893,6 +3931,17 @@ void Simulation::realizationLoop()
 					if (year % contractlength == firstyear)
 						// contract re-negotiated in the first week of the first year and every 10 years afterward
 					{
+						RtriggerDiff = 0.0;
+						DtriggerDiff = 0.0;
+						triggerDiff  = 0.0;
+						RBBstddev    = 0.0;
+						DBBstddev    = 0.0;
+						contractSplits   = 0.0;
+						RTTmagnitudeDiff = 0.0;
+						DTTmagnitudeDiff = 0.0;
+						RTTfrequencyDiff = 0.0;
+						DTTfrequencyDiff = 0.0;
+				
 						if (allowReleaseContract && contractcount > 1)
 						{
 							previousContract = true;
@@ -3907,15 +3956,17 @@ void Simulation::realizationLoop()
 							// if this is the first contract, just use spinup risk and no transfer info 
 							// assumes the contract is of some reasonably long length (> 5 years)
 						{
-							if (maxValue_array(raleigh.SpinupRisk) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk) < durham.RRcontractTrigger)
+							transferRiskYears = 0;
+							
+							if (maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
 								// a contract will be made if Raleigh's risk is great enough and Durham's is low enough
 								// based on the most recent 20 years 
 							{
 								allowReleaseContract = true;
 									// first, determine whether to have a contract or not 
 									
-								double RtriggerDiff = raleigh.RRcontractTrigger - average_array(raleigh.SpinupRisk);
-								double DtriggerDiff = durham.RRcontractTrigger - average_array(durham.SpinupRisk);
+								RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
+								DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
 									// find differences between each city's average past risk and their contract triggers
 									// for Raleigh, if RtriggerDiff > 0, on average they want releases, if < 0, the opposite.
 									// for Durham, if DtriggerDiff > 0, they average too much risk to want to do releases.
@@ -3943,28 +3994,208 @@ void Simulation::realizationLoop()
 									//		annualpayment = annualpayment * (1 + RtriggerDiff)
 									//	5.	in any other case, when the trigger equals the average risk, the annual payment is unchanged
 									
-								double triggerDiff = RtriggerDiff + DtriggerDiff;
+								triggerDiff = RtriggerDiff + DtriggerDiff;
 									// because the effects of each are the same sign (positive R or D triggerDiff increases the annual payment)
 									// add them and adjust the annual payment
 								
+								// if (triggerDiff > 0.5)
+								// {
+									// triggerDiff = 0.5;
+								// }
+								// if (triggerDiff < -0.5)
+								// {
+									// triggerDiff = -0.5;
+								// }
+									// keep the contract annual payment within a reasonable range 
+								
 								adjustedannualpayment = annualpayment * (1 + triggerDiff);
 								
-								double RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
-								double DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+								RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+								DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
 									// a similar system is employed to determine price of buybacks 
 									// the variability of risk affects spot prices 
-									// for both, high variability = high spot price for release water
+									// for Raleigh, high variability = want high spot price for release water
+									// for Durham, high variability means they want lower spot rate 
 									// as a addition to $3,000 per MG, or whatever the base price for
 									// transfers is? 
 								
-								adjustedbuybackpayment = buybackratePerMG + RBBstddev + DBBstddev;
+								adjustedbuybackpayment = buybackratePerMG + RBBstddev - DBBstddev;
 							}
 							else
 							{
 								allowReleaseContract = false;
 									// if triggers aren't met, no contract 
+									
+								adjustedannualpayment  = 0.0;
+								adjustedbuybackpayment = 0.0;
+								
+								RtriggerDiff = 0.0;
+								DtriggerDiff = 0.0;
+								triggerDiff  = 0.0;
+								RBBstddev    = 0.0;
+								DBBstddev    = 0.0;
+								contractSplits   = 0.0;
+								RTTmagnitudeDiff = 0.0;
+								DTTmagnitudeDiff = 0.0;
+								RTTfrequencyDiff = 0.0;
+								DTTfrequencyDiff = 0.0;
 							}
+							
+							contractcount += 1;
 						}
+						else
+							// the scenario of any contract negotiation after year 0 
+						{
+							if ((year - firstyear) > (numContractRiskYears - 1))
+							{
+								transferRiskYears = numContractRiskYears;
+							}
+							else
+							{
+								transferRiskYears = year - firstyear;
+							}
+								// check how many years have passed and the record that will be used 
+								// for contract determination 
+								
+							if ((maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
+								|| (maxValue_array(raleigh.TransferHistory, transferRiskYears) > raleigh.TTmagnitudetrigger && minValue_array(durham.TransferHistory, transferRiskYears) < durham.TTmagnitudetrigger) 
+								|| (maxValue_array(raleigh.TransferFrequency, transferRiskYears) > raleigh.TTfrequencytrigger && minValue_array(durham.TransferFrequency, transferRiskYears) < durham.TTfrequencytrigger))
+									// a contract will be used if baseline ROF range is great enough, 
+									// or if treated transfer frequency or magnitude is great enough 
+							{
+								allowReleaseContract = true;
+								
+								if (previousContract)
+									// if the last contract period had a release contract, 
+									// it can be judged based on how "even" the finances worked out
+									// the difference between annual payments and buyback payments over the contract should be close to equal to
+									// the transfer costs for Durham (can't really get the additional costs just due to releases)
+									// if contractSplits > 0, Durham had a favorable contract and so annual payments will be reduced this time
+									// if the opposite is true, annual payments should be increased 
+								{
+									if (transferRiskYears - contractriskyearcounter < contractlength)
+									{
+										contractSplits = (adjustedannualpayment - adjustedbuybackpayment)*contractlength - 
+														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter) + 
+														  sumValue_array(durham.TransferHistory, contractlength - (transferRiskYears - contractriskyearcounter), 0))*transferCosts;
+									}
+									else
+									{
+										contractSplits = (adjustedannualpayment - adjustedbuybackpayment)*contractlength - 
+														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter))*transferCosts;
+									}
+										// this statement makes sure the proper Durham transfers are used 
+										// (only accounts for most recent contract years)
+									
+									contractSplits = contractSplits/(adjustedannualpayment*contractlength);
+										// determine the relative discrepancy between how the contract performed
+										// and the size of the last contract based on annual payments 
+								}
+								else 
+								{
+									contractSplits = 0.0;
+										// no previous contract existed, so it will not affect negotiations 
+								}
+								
+								RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
+								DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
+								
+								triggerDiff  = RtriggerDiff + DtriggerDiff;
+								
+								RTTmagnitudeDiff = (average_array(raleigh.TransferHistory, transferRiskYears) - raleigh.TTmagnitudetrigger)/average_array(raleigh.TransferHistory, transferRiskYears);
+								DTTmagnitudeDiff = (average_array(durham.TransferHistory, transferRiskYears) - durham.TTmagnitudetrigger)/average_array(durham.TransferHistory, transferRiskYears);
+									// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
+									// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
+									// Durham does not necessarily have leverage if they have high transfer magnitude, finances should adjust later
+									// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
+									// but this isn't really a useful negotiation position at that point 
+									// this difference is normalized by the average transfer magnitude record 
+								
+								if (RTTmagnitudeDiff > 0)
+								{
+									triggerDiff += RTTmagnitudeDiff;
+								}
+								if (DTTmagnitudeDiff < 0)
+								{
+									triggerDiff += DTTmagnitudeDiff;
+								}
+								
+								triggerDiff -= contractSplits;
+									// introduce the previous contract effect 
+								
+								// if (triggerDiff > 0.5)
+								// {
+									// triggerDiff = 0.5;
+								// }
+								// if (triggerDiff < -0.5)
+								// {
+									// triggerDiff = -0.5;
+								// }
+									// keep the contract annual payment within a reasonable range 
+								
+								adjustedannualpayment = annualpayment * (1 + triggerDiff);
+									// once into the modeling past the first contract, the annual payment is based on
+									// previous contracts, treated transfers, and baseline ROF records 
+								
+								RTTfrequencyDiff = (average_array(raleigh.TransferFrequency, transferRiskYears) - raleigh.TTfrequencytrigger)/average_array(raleigh.TransferFrequency, transferRiskYears);
+								DTTfrequencyDiff = (average_array(durham.TransferFrequency, transferRiskYears) - durham.TTfrequencytrigger)/average_array(durham.TransferFrequency, transferRiskYears);
+									// if RTTfrequencyDiff > 0, transfers happen very often, so buybacks would also as Raleigh is requesting often, 
+									//		Raleigh will want high buyback price because the water is worth more to them 
+									// if RTTfrequencyDiff < 0, less transfer requests, so less buyback requests, Raleigh doesn't mind if buyback price drops 
+									// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
+									// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price 
+								
+								// if (RTTfrequencyDiff > 1.0)
+								// {
+									// RTTfrequencyDiff = 1.0;
+								// }
+								// if (RTTfrequencyDiff < -0.25)
+								// {
+									// RTTfrequencyDiff = -0.25;
+								// }
+								// if (DTTfrequencyDiff > 1.0)
+								// {
+									// DTTfrequencyDiff = 1.0;
+								// }
+								// if (DTTfrequencyDiff < -0.25)
+								// {
+									// DTTfrequencyDiff = -0.25;
+								// }
+									// bound these leverage effects based on their relative importance 
+								
+								RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+								DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+								
+								adjustedbuybackpayment = buybackratePerMG + RBBstddev - DBBstddev + RTTfrequencyDiff - DTTfrequencyDiff;
+							}
+							else 
+							{
+								allowReleaseContract = false;
+								
+								adjustedannualpayment  = 0.0;
+								adjustedbuybackpayment = 0.0;
+								
+								RtriggerDiff = 0.0;
+								DtriggerDiff = 0.0;
+								triggerDiff  = 0.0;
+								RBBstddev    = 0.0;
+								DBBstddev    = 0.0;
+								contractSplits   = 0.0;
+								RTTmagnitudeDiff = 0.0;
+								DTTmagnitudeDiff = 0.0;
+								RTTfrequencyDiff = 0.0;
+								DTTfrequencyDiff = 0.0;
+							}
+							
+							contractcount += 1;
+						}
+					}
+					
+					if (printDetailedOutput)
+					{
+						ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << ",";
+						ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
+						ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
 					}
 				}
 			}
@@ -3988,6 +4219,7 @@ void Simulation::realizationLoop()
 		outNew.close();
 		outRiskParams.close();
 		InfraBuilt.close();
+		ReleaseContractData.close();
 	}
 
 	durham.calculateObjectives();

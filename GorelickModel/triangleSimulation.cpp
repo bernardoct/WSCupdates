@@ -170,7 +170,7 @@ int main (int argc, char *argv[])
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 65;
+	int c_num_dec = 71;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars

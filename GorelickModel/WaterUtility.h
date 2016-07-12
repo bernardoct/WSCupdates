@@ -45,6 +45,8 @@ class WaterUtility
 	// RAW RELEASE TRIGGER DECISION VARIABLES
 	double RRtrigger;
 	double RRcontractTrigger;
+	double TTmagnitudetrigger;
+	double TTfrequencytrigger;
 	
 	// Storage amount (fraction of full)
 	double storageFraction;

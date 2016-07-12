@@ -35,7 +35,11 @@ public:
 	int numIntervals;
 	
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
+	void createInfrastructureRisk_spinup(int realization, int synthYear, 
+										 double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue);
+										 
 	data_t parameterInput;
+	
 	void createInfrastructure(int realization);
 	void triggerInfrastructure(int realization);
 	void updateFallsQuality();
@@ -51,15 +55,29 @@ public:
 	int borgToggle;
 	bool printDetailedOutput;
 	int numRealizationsTOREAD;
-	int contractlength;
+	
+	
 	int startYear;
 	int endYear;
 	int currentYear;
 	int numContractRiskYears;
+	int transferRiskYears;
 	
+	int contractlength;
 	double annualpayment;
 	double adjustedannualpayment;
 	double adjustedbuybackpayment;
+	
+	double RtriggerDiff;
+	double DtriggerDiff;
+	double triggerDiff;
+	double RBBstddev;
+	double DBBstddev;
+	double contractSplits;
+	double RTTmagnitudeDiff;
+	double DTTmagnitudeDiff;
+	double RTTfrequencyDiff;
+	double DTTfrequencyDiff;
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
@@ -75,6 +93,7 @@ public:
 	ofstream out100;
 	ofstream outNew;
 	ofstream outRiskParams;
+	ofstream ReleaseContractData;
 	
 	bool use_RDM_ext;
 	bool indepReleaseAlloc;
