@@ -3441,7 +3441,7 @@ void Simulation::realizationLoop()
 			// csv column headers for csv containing ROF values
 			
 		ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-		ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << ",";
+		ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << "," << "contractbuybacks" << ",";
 		ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
 		ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
 		ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
@@ -3455,10 +3455,11 @@ void Simulation::realizationLoop()
 		
 	int weekcounter;
 	int contractriskyearcounter;
-	int LOOPCHECKER;
+	int LOOPCHECKER = 0;
 	int contractcount;
 	int firstyear;
 	int yearcounter;
+	int currentcontract;
 	
 	fallsFailurePoint = 0.2;
 	zeroes(totalFallsFailure, terminateYear);
@@ -3482,6 +3483,8 @@ void Simulation::realizationLoop()
 		contractriskyearcounter = 0;
 		allowReleaseContract = true;
 		contractcount = 1;
+		currentcontract = 1;
+		contractbuybacks = 0.0;
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -3587,7 +3590,6 @@ void Simulation::realizationLoop()
 			//	4.	Restrictions imposed, demand recalculated
 			//	5.	Treated transfers calculated, storage etc. updated
 			
-			LOOPCHECKER = 0;
 			
 			syntheticIndex = (year-1)*52+week-1;
 
@@ -3646,6 +3648,19 @@ void Simulation::realizationLoop()
 				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
 				
+				if (currentcontract == contractcount)
+				{
+					contractbuybacks += durham.weeklyBuybackVolume;
+				}
+				else 
+				{
+					contractbuybacks = 0.0;
+					contractbuybacks += durham.weeklyBuybackVolume;
+					
+					currentcontract = contractcount;
+				}
+					// count the buybacks that occur over the course of the contract 
+				
 				if (durham.weeklyBuybackVolume > 0.0)
 				{
 					durham.payForBuybacks(adjustedbuybackpayment);
@@ -3660,7 +3675,6 @@ void Simulation::realizationLoop()
 						// because payment type has been changed to annual type,
 						// the contract length variable is unnecessary 
 				}
-				
 				
 				//Update reservoir storage levels
 				systemStorage.setSpillover(week-1);
@@ -3729,6 +3743,15 @@ void Simulation::realizationLoop()
 					
 				if (allowReleases == 1)
 				{
+					if (week == 1)
+					{
+						raleigh.TransferHistory[contractriskyearcounter]   = 0.0;
+						raleigh.TransferFrequency[contractriskyearcounter] = 0.0;
+						
+						durham.TransferHistory[contractriskyearcounter]   = 0.0;
+						durham.TransferFrequency[contractriskyearcounter] = 0.0;
+					}
+					
 					if (raleigh.weeklyTransferVolume > 0)
 					{
 						raleigh.TransferHistory[contractriskyearcounter]   += raleigh.weeklyTransferVolume;
@@ -3827,18 +3850,11 @@ void Simulation::realizationLoop()
 				if (printDetailedOutput)
 				{
 					ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
-					ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
+					ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
 					ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
 					ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
 					ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
 				}
-				
-				contractriskyearcounter += 1;
-				if (contractriskyearcounter > 19)
-				{
-					contractriskyearcounter = 0;
-				}					
-					// adjust this index every 20 years to overwrite itself with new ROF data 
 					
 				triggerInfrastructure(realization);
                     // check on infra
@@ -3888,7 +3904,7 @@ void Simulation::realizationLoop()
 					
 					if (yearcounter == 0)
 					{
-						LOOPCHECKER = 1;
+						LOOPCHECKER += 1;
 						
 						for (int yr = 1; yr < numContractRiskYears; yr++)
 						{
@@ -3905,11 +3921,6 @@ void Simulation::realizationLoop()
 						
 						yearcounter = 1;
 					} 
-					
-					if (printDetailedOutput)
-					{
-						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
-					}
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////
 					/////////////////////////// RENEGOTIATE RELEASE CONTRACT ////////////////////////////////////////////////
@@ -3936,6 +3947,7 @@ void Simulation::realizationLoop()
 						triggerDiff  = 0.0;
 						RBBstddev    = 0.0;
 						DBBstddev    = 0.0;
+						
 						contractSplits   = 0.0;
 						RTTmagnitudeDiff = 0.0;
 						DTTmagnitudeDiff = 0.0;
@@ -3998,14 +4010,14 @@ void Simulation::realizationLoop()
 									// because the effects of each are the same sign (positive R or D triggerDiff increases the annual payment)
 									// add them and adjust the annual payment
 								
-								// if (triggerDiff > 0.5)
-								// {
-									// triggerDiff = 0.5;
-								// }
-								// if (triggerDiff < -0.5)
-								// {
-									// triggerDiff = -0.5;
-								// }
+								if (triggerDiff > 0.5)
+								{
+									triggerDiff = 0.5;
+								}
+								if (triggerDiff < -0.5)
+								{
+									triggerDiff = -0.5;
+								}
 									// keep the contract annual payment within a reasonable range 
 								
 								adjustedannualpayment = annualpayment * (1 + triggerDiff);
@@ -4019,7 +4031,7 @@ void Simulation::realizationLoop()
 									// as a addition to $3,000 per MG, or whatever the base price for
 									// transfers is? 
 								
-								adjustedbuybackpayment = buybackratePerMG + RBBstddev - DBBstddev;
+								adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG;
 							}
 							else
 							{
@@ -4075,13 +4087,15 @@ void Simulation::realizationLoop()
 								{
 									if (transferRiskYears - contractriskyearcounter < contractlength)
 									{
-										contractSplits = (adjustedannualpayment - adjustedbuybackpayment)*contractlength - 
+										contractSplits = (adjustedannualpayment*contractlength) - 
+														 (adjustedbuybackpayment*contractbuybacks) - 
 														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter) + 
 														  sumValue_array(durham.TransferHistory, contractlength - (transferRiskYears - contractriskyearcounter), 0))*transferCosts;
 									}
 									else
 									{
-										contractSplits = (adjustedannualpayment - adjustedbuybackpayment)*contractlength - 
+										contractSplits = (adjustedannualpayment*contractlength) - 
+														 (adjustedbuybackpayment*contractbuybacks) - 
 														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter))*transferCosts;
 									}
 										// this statement makes sure the proper Durham transfers are used 
@@ -4123,14 +4137,14 @@ void Simulation::realizationLoop()
 								triggerDiff -= contractSplits;
 									// introduce the previous contract effect 
 								
-								// if (triggerDiff > 0.5)
-								// {
-									// triggerDiff = 0.5;
-								// }
-								// if (triggerDiff < -0.5)
-								// {
-									// triggerDiff = -0.5;
-								// }
+								if (triggerDiff > 0.5)
+								{
+									triggerDiff = 0.5;
+								}
+								if (triggerDiff < -0.5)
+								{
+									triggerDiff = -0.5;
+								}
 									// keep the contract annual payment within a reasonable range 
 								
 								adjustedannualpayment = annualpayment * (1 + triggerDiff);
@@ -4145,28 +4159,29 @@ void Simulation::realizationLoop()
 									// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
 									// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price 
 								
-								// if (RTTfrequencyDiff > 1.0)
-								// {
-									// RTTfrequencyDiff = 1.0;
-								// }
-								// if (RTTfrequencyDiff < -0.25)
-								// {
-									// RTTfrequencyDiff = -0.25;
-								// }
-								// if (DTTfrequencyDiff > 1.0)
-								// {
-									// DTTfrequencyDiff = 1.0;
-								// }
-								// if (DTTfrequencyDiff < -0.25)
-								// {
-									// DTTfrequencyDiff = -0.25;
-								// }
+								if (RTTfrequencyDiff > 1.0)
+								{
+									RTTfrequencyDiff = 1.0;
+								}
+								if (RTTfrequencyDiff < -0.25)
+								{
+									RTTfrequencyDiff = -0.25;
+								}
+								if (DTTfrequencyDiff > 1.0)
+								{
+									DTTfrequencyDiff = 1.0;
+								}
+								if (DTTfrequencyDiff < -0.25)
+								{
+									DTTfrequencyDiff = -0.25;
+								}
 									// bound these leverage effects based on their relative importance 
 								
 								RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
 								DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
 								
-								adjustedbuybackpayment = buybackratePerMG + RBBstddev - DBBstddev + RTTfrequencyDiff - DTTfrequencyDiff;
+								adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG + (RTTfrequencyDiff - DTTfrequencyDiff)*buybackratePerMG;
+									// the transfer frequency difference values are normalized to a 0-to-1 scale, so they need to be scaled relative to the baseline buyback rate 
 							}
 							else 
 							{
@@ -4198,6 +4213,13 @@ void Simulation::realizationLoop()
 						ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
 					}
 				}
+				
+				contractriskyearcounter += 1;
+				if (contractriskyearcounter > 19)
+				{
+					contractriskyearcounter = 0;
+				}					
+					// adjust this index every 20 years to overwrite itself with new ROF data 
 			}
 
 		} // End weekly loop
