@@ -68,6 +68,7 @@ public:
 	double adjustedannualpayment;
 	double adjustedbuybackpayment;
 	double contractbuybacks;
+	double contracttransfersD;
 	
 	double RtriggerDiff;
 	double DtriggerDiff;

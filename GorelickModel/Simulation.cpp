@@ -845,8 +845,13 @@ void Simulation::fixRDMFactors(int rdm_i)
 	//MORDM EXTENSION - add allocation, and capacities multipliers	
 	falls_lake_supply_capacity = 14700.0*rdm_factors[9];
 	falls_lake_wq_capacity = (14700.0 - falls_lake_supply_capacity) + 20000.0;
+	
 	jordan_lake_supply_capacity = 14924.0*rdm_factors[10];
 	jordan_lake_wq_capacity = (14924.0 - jordan_lake_supply_capacity) + 30825.0;
+		// i switched these numbers to reflect the numbers in reservoir storage
+		// also changed any capacity or allocation numbers to not be hardcoded after this
+		// these numbers are in MG of storage 
+		
 	cary_treatment_capacity = 40.0*rdm_factors[11];
 	durham_cary_capacity = 10.0*rdm_factors[12];
 	durham_owasa_capacity = 7.0*rdm_factors[12];
@@ -1561,7 +1566,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	durham.setCapacity(6349.0);
 	owasa.setCapacity(3558.0);
 	raleigh.setCapacity(falls_lake_supply_capacity + 2789.66);
-	cary.setCapacity(cary.jordanLakeAlloc*14924.0);
+	cary.setCapacity(cary.jordanLakeAlloc*jordan_lake_supply_capacity);
 		// should I switch this away from hardcoded numbers?
 		// what are these referencing?
 
@@ -3445,7 +3450,7 @@ void Simulation::realizationLoop()
 		ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
 		ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
 		ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
-		ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << ",";
+		ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
 		ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
 		ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
 	}
@@ -3656,10 +3661,9 @@ void Simulation::realizationLoop()
 				{
 					contractbuybacks = 0.0;
 					contractbuybacks += durham.weeklyBuybackVolume;
-					
-					currentcontract = contractcount;
 				}
 					// count the buybacks that occur over the course of the contract 
+					// the contract count is updated after transfer info is captured below 
 				
 				if (durham.weeklyBuybackVolume > 0.0)
 				{
@@ -3762,6 +3766,18 @@ void Simulation::realizationLoop()
 					{
 						durham.TransferHistory[contractriskyearcounter]   += durham.weeklyTransferVolume;
 						durham.TransferFrequency[contractriskyearcounter] += 1;
+					}
+
+					if (currentcontract == contractcount)
+					{
+						contracttransfersD += durham.weeklyTransferVolume;
+					}
+					else 
+					{
+						contracttransfersD = 0.0;
+						contracttransfersD += durham.weeklyTransferVolume;
+						
+						currentcontract = contractcount;
 					}					
 				}
 					// collect transfer information of most recent 20 years for release contract negotiation 
@@ -4085,19 +4101,9 @@ void Simulation::realizationLoop()
 									// if contractSplits > 0, Durham had a favorable contract and so annual payments will be reduced this time
 									// if the opposite is true, annual payments should be increased 
 								{
-									if (transferRiskYears - contractriskyearcounter < contractlength)
-									{
-										contractSplits = (adjustedannualpayment*contractlength) - 
-														 (adjustedbuybackpayment*contractbuybacks) - 
-														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter) + 
-														  sumValue_array(durham.TransferHistory, contractlength - (transferRiskYears - contractriskyearcounter), 0))*transferCosts;
-									}
-									else
-									{
-										contractSplits = (adjustedannualpayment*contractlength) - 
-														 (adjustedbuybackpayment*contractbuybacks) - 
-														 (sumValue_array(durham.TransferHistory, transferRiskYears, contractriskyearcounter))*transferCosts;
-									}
+									contractSplits = (adjustedannualpayment*contractlength) - 
+													 (adjustedbuybackpayment*contractbuybacks) - 
+													 (contracttransfersD*transferCosts);
 										// this statement makes sure the proper Durham transfers are used 
 										// (only accounts for most recent contract years)
 									
@@ -4120,20 +4126,11 @@ void Simulation::realizationLoop()
 								DTTmagnitudeDiff = (average_array(durham.TransferHistory, transferRiskYears) - durham.TTmagnitudetrigger)/average_array(durham.TransferHistory, transferRiskYears);
 									// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
 									// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
-									// Durham does not necessarily have leverage if they have high transfer magnitude, finances should adjust later
 									// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
-									// but this isn't really a useful negotiation position at that point 
 									// this difference is normalized by the average transfer magnitude record 
 								
-								if (RTTmagnitudeDiff > 0)
-								{
-									triggerDiff += RTTmagnitudeDiff;
-								}
-								if (DTTmagnitudeDiff < 0)
-								{
-									triggerDiff += DTTmagnitudeDiff;
-								}
-								
+								triggerDiff += RTTmagnitudeDiff;
+								triggerDiff += DTTmagnitudeDiff;
 								triggerDiff -= contractSplits;
 									// introduce the previous contract effect 
 								
@@ -4208,7 +4205,7 @@ void Simulation::realizationLoop()
 					
 					if (printDetailedOutput)
 					{
-						ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << ",";
+						ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
 						ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
 						ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
 					}

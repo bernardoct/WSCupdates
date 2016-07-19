@@ -205,11 +205,11 @@ void ReservoirStorage::initializeReservoirStorage(double durhamCap, double CCRCa
 	owasaJordanCapacity = owasaJordanAlloc*jordanLakeSupplyCapacity;
 	owasaJordanStorage = owasaJordanCapacity;
 		///Inflow fractions (how to divide the inflows to respective allocations)
-	jordanQualityFraction = 94600.0/(45800.0+94600.0);
-	jordanRaleighFraction = raleighAllocation*45800.0/(94600.0+45800.0);
-	jordanDurhamFraction = durhamAllocation*45800.0/(94600.0+45800.0);
-	jordanCaryFraction = caryAllocation*45800.0/(94600.0+45800.0);
-	jordanOWASAFraction = owasaAllocation*45800.0/(94600.0+45800.0);
+	jordanQualityFraction = jordanLakeQualityCapacity;
+	jordanRaleighFraction = raleighAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanDurhamFraction = durhamAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanCaryFraction = caryAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanOWASAFraction = owasaAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
 
 	durhamRequest = 0;//Durham intial transfer request
 	owasaRequest = 0;//OWASA initial transfer request
@@ -306,11 +306,11 @@ void ReservoirStorage::initializeReservoirStorageROF(double durhamCap, double CC
 	owasaAllocation = owasaJordanAlloc;// owasa allocation to jordan lake
 	owasaJordanCapacity = owasaJordanAlloc*jordanLakeSupplyCapacity;
 		///Inflow fractions (how to divide the inflows to respective allocations)
-	jordanQualityFraction = 94600.0/(45800.0+94600.0);
-	jordanRaleighFraction = raleighAllocation*45800.0/(94600.0+45800.0);
-	jordanDurhamFraction = durhamAllocation*45800.0/(94600.0+45800.0);
-	jordanCaryFraction = caryAllocation*45800.0/(94600.0+45800.0);
-	jordanOWASAFraction = owasaAllocation*45800.0/(94600.0+45800.0);
+	jordanQualityFraction = jordanLakeQualityCapacity;
+	jordanRaleighFraction = raleighAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanDurhamFraction = durhamAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanCaryFraction = caryAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
+	jordanOWASAFraction = owasaAllocation*(jordanLakeSupplyCapacity/(jordanLakeSupplyCapacity + jordanLakeQualityCapacity));
 
 	durhamRequest = 0;//Durham intial transfer request
 	owasaRequest = 0;//OWASA initial transfer request
