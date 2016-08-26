@@ -378,6 +378,48 @@ void WaterUtility::acceptBuybackPayment(double buybackratePerMG)
 	Fund.add(buybackratePerMG*weeklyBuybackVolume);
 }
 
+//////////////////////////// pay for spot releases //////////////////////////////////////////////////////////////////////////
+
+void WaterUtility::ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor)
+{
+	if (tiered)
+	{
+		double numTiers = weeklyReleaseVolume / tiersize;
+			// 
+		
+		for (int tier = 0; tier < (numTiers - 1); tier++)
+		{
+			Fund.subtract(tiersize * floorRate * (1 + tier * tierFactor));
+		}
+		
+		Fund.subtract((weeklyReleaseVolume - (int)numTiers * tiersize) * floorRate * (1 + (int)numTiers * tierFactor));
+	}
+	else
+	{
+		Fund.subtract(weeklyReleaseVolume * floorRate);
+	}
+}
+
+void WaterUtility::ReleaseSpotAccept(bool tiered, double floorRate, double tiersize, double tierFactor)
+{
+	if (tiered)
+	{
+		double numTiers = weeklyReleaseVolume / tiersize;
+			// 
+		
+		for (int tier = 0; tier < (numTiers - 1); tier++)
+		{
+			Fund.add(tiersize * floorRate * (1 + tier * tierFactor));
+		}
+		
+		Fund.add((weeklyReleaseVolume - (int)numTiers * tiersize) * floorRate * (1 + (int)numTiers * tierFactor));
+	}
+	else
+	{
+		Fund.add(weeklyReleaseVolume * floorRate);
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void WaterUtility::clearVariablesForSimulation()

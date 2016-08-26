@@ -37,6 +37,8 @@ public:
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
 	void createInfrastructureRisk_spinup(int realization, int synthYear, 
 										 double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue);
+	void calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount);
+	void calculateSpotContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount);
 										 
 	data_t parameterInput;
 	
@@ -55,7 +57,10 @@ public:
 	int borgToggle;
 	bool printDetailedOutput;
 	int numRealizationsTOREAD;
-	
+	bool spotPricing;
+	bool tieredSpotPricing;
+	int RequestCurtail;
+	int RequestMade;
 	
 	int startYear;
 	int endYear;
@@ -70,9 +75,13 @@ public:
 	double contractbuybacks;
 	double contracttransfersD;
 	
+	double adjustedspotpayment;
+	
 	double RtriggerDiff;
 	double DtriggerDiff;
 	double triggerDiff;
+	double magDiff;
+	double freqDiff;
 	double RBBstddev;
 	double DBBstddev;
 	double contractSplits;
@@ -80,6 +89,10 @@ public:
 	double DTTmagnitudeDiff;
 	double RTTfrequencyDiff;
 	double DTTfrequencyDiff;
+	
+	double tieredFloorPrice;
+	double tierSize;
+	double tierPriceInc;
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
@@ -122,7 +135,10 @@ public:
 	double ReleaseContractPrice;
 	double FallsSupplyAllocationFraction;
 	double FLSPfrac;
+	double FLSPreleaseFrac;
 	double BuybackROFZone;
+	double RcriticalStorageLevel;
+	double DcriticalStorageLevel;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;

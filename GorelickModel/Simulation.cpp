@@ -1503,7 +1503,15 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	raleigh.TTfrequencytrigger = xreal[69];
 	durham.TTfrequencytrigger  = xreal[70];
 		// number of weeks in a year with transfers that will trigger releases 
-
+	tieredFloorPrice = xreal[71];
+		// the base rate per MG that is paid for spot releases 
+		// by Raleigh to Durham 
+	tierSize = xreal[72];
+		// assuming spot pricing tiers are equal sizes,
+		// this is the size in MG of water releases for each tier 
+	tierPriceInc = xreal[73];
+		// a fractional (0 to 1) rate for how much the tieredFloorPrice 
+		// is adjusted upward as the number of tiers increases 
 		
 	if (durham.RRtrigger - BuybackROFZone < 0)
 	{
@@ -3272,1008 +3280,6 @@ void Simulation::triggerInfrastructure(int realization)
 return;
 }
 
-void Simulation::realizationLoop()
-{
-	double durhamActualInflow, owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow;
-	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
-	double littleRiverRaleighActualInflow;
-	int season = 1, syntheticIndex = 0; // week 1 is non-irrigation season (season = 1)
-	double raleighBaselineMultiplier = 40434.0*.32*(falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity));
-	double durham_res_supply_capacity = 6349.0;
-	double cane_creek_supply_capacity = 2909.0;
-	double stone_quarry_supply_capacity = 200.0;
-	double university_lake_supply_capacity = 449.0;
-	double lake_wheeler_benson_supply_capacity = 2789.66;
-	double raleigh_durham_capacity = 10.0;
-	double teer_quarry_supply_capacity = 1315.0;
-	double teer_quarry_intake_capacity = 0.0;
-	double teer_quarry_outflow_capacity = 0.0;
-	double little_river_raleigh_supply_capacity = 0.0;
-	double western_wake_treatment_capacity = 0.0;
-	double durham_reclaimation_capacity = 0.0;
-	double raleigh_quarry_capacity = 4000.0;
-	double raleigh_quarry_intake_capacity = 0.0;
-	double raleigh_quarry_outflow_capacity = 0.0;
-	double raleigh_intake_capacity = 0.0;
-	double cary_quarry_capacity = 0.0;
-	double cary_quarry_intake_capacity = 0.0;
-	double cary_quarry_outflow_capacity = 0.0;
-	
-	/////////////////////////////////////////////////////////////////////////
-	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
-	
-	//double LMreleaseCap = 2000.0;
-		// assume that the max release allowed is 20% of total Durham storage 
-		// but that this is an additional, firm ceiling constraint
-		// now included above, read in the parameter input file
-	double LMreleaseMin = 0.0;
-		// no minimum contractual release
-	//double FallsSupplyAllocationFraction = 0.423;
-	double FLSPreleaseFrac;
-		// fraction of FL conservation pool dedicated to
-		// water supply storage (the rest is the WQ pool)
-		// now in parameter input file
-	double NearFailureLimit = 0.2;
-		// if FL storage is below this, any releases 
-		// will go 100% into the water supply pool 
-	
-	/////////////////////////////////////////////////////////////////////////
-	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
-	
-	// int allowReleases = 1;
-		// logical to decide if releases are allowed or not
-		// specified in trianglesimulation 
-		
-	// numIntervals = 20;
-		// the number of discrete intervals of reservoir volume
-		// that will be tested in the createReservoirTargets function
-		// THIS IS SPECIFIED IN TRIANGLESIMULATIONSCRIPT
-	
-	//double ReleaseContractLength = 100.0*52;
-		// number of weeks the contract is good
-		// replaced by contractlength variable 
-	//double ReleaseContractPrice = 30000000.0/1000000.0;
-		// total cost of the releases contract in millions, to be paid on an annual basis?
-		// now included in parameter input file
-	
-	double RcriticalStorageLevel = 1.00;
-	double DcriticalStorageLevel = 0.25;
-		// currently arbitrarily set, later should be optimized
-		// previous to March 15, 2016, releases were based on 
-		// R and D reservoir levels alone, now they are based on
-		// the same ROF values as treated transfers
-
-	//double buybackratePerMG = 3500.0/1000000.0;
-		// currently equal to cost per quantity of treated transfer
-		// MAY 2016: RAISED TO 3500
-		// now included in parameter input file
-	
-	// MAY 2016 CHANGES - INCREASED TO 16 RANKS -----------------------------------
-	
-	rank = solutionNumber;
-		// solutionNumber is assigned as rank in triangleSimulation.cpp
-	
-	// ALL OF THIS COMMENTED CHUNK IS NOW DEALT WITH IN THE PARAMETER INPUT FILE 
-	/* durham.RRtrigger  = 0.02;
-	durham.TTriggerN  = 0.02;
-		// keep this firm at a very low level to preserve durham risk
-	
-	if (rank < 8)
-	{
-		raleigh.RRtrigger = 0.02 + rank * 0.02;
-			// vary this at 2% increasing by rank
-	}
-	else
-	{
-		raleigh.RRtrigger = 0.02 + (rank-8) * 0.02;
-			// vary this at 2% increasing by rank
-	}
-		// for now, I am running 16 ranks and I want 
-		// 2 matching sets of 8 runs
-		// because half will be done without releases and half with them.
-		
-	raleigh.TTriggerN = 0.02;
-		// hold this low across all ranks */
-	
-	// ----------------------------------------------------------------------------
-
-	/////////////////////////////////////////////////////////////////////////
-	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
-	
-	if (printDetailedOutput)
-	{
-		std::string filenameA = "output/JLTreatedTransfers";
-		std::string filenameC = "output/RRfuncOutput";
-		std::string filenameD = "output/weeklyRiskParams";
-		std::string filenameG = "output/InfraBuilt"; 
-		std::string filenameZ = "output/ReleaseContract";
-		
-		std::string filenameEND = ".csv";
-			
-		std::string completeFilenameA;
-		std::string completeFilenameC;
-		std::string completeFilenameD;
-		std::string completeFilenameG;
-		std::string completeFilenameZ;
-			
-		std::stringstream sstmA;
-		std::stringstream sstmC;
-		std::stringstream sstmD;
-		std::stringstream sstmG;
-		std::stringstream sstmZ;
-			
-		sstmA << filenameA << rank << filenameEND;
-		sstmC << filenameC << rank << filenameEND;
-		sstmD << filenameD << rank << filenameEND;
-		sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
-		sstmZ << filenameZ << solutionNumber << "_" << rdmNumber << filenameEND;
-		
-		completeFilenameA = sstmA.str();
-		completeFilenameC = sstmC.str();
-		completeFilenameD = sstmD.str();
-		completeFilenameG = sstmG.str();
-		completeFilenameZ = sstmZ.str();
-		
-		openFile(out100, completeFilenameA);
-		openFile(outNew, completeFilenameC);
-		openFile(outRiskParams, completeFilenameD);
-		openFile(InfraBuilt, completeFilenameG);
-		openFile(ReleaseContractData, completeFilenameZ);
-			// all these are defined in the header file 
-		
-		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
-			// column headers for infrastructure builds 
-		
-		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-		out100 << "RaleighDirectTransferVolume" << "," << "DurhamDirectTransferVolume" << ",";
-		out100 << "RaleighIndirectTransferVolume" << "," << "DurhamIndirectTransferVolume" << ",";
-		out100 << "OWASATransferVolume" << "," << "OWASAExtraVolume" << ",";
-		out100 << "RaleighShorttermROF" << "," << "DurhamShorttermROF" << "," << "OWASAshorttermROF" << endl;
-			// csv column headers of treated transfer output data
-			
-		outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-		outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
-		outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
-		outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << "," << "DurhamTargetBuybackLevel" << ",";
-		outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
-		outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
-			// csv column headers for raw release output data and storage levels
-			
-		outRiskParams << "Rank" << "," << "Realization" << ",";
-		outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
-		outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
-		outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
-			// csv column headers for csv containing ROF values
-			
-		ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-		ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << "," << "contractbuybacks" << ",";
-		ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
-		ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
-		ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
-		ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
-		ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
-		ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
-	}
-	
-	////////////// OTHER PARAMS /////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////
-		
-	int weekcounter;
-	int contractriskyearcounter;
-	int LOOPCHECKER = 0;
-	int contractcount;
-	int firstyear;
-	int yearcounter;
-	int currentcontract;
-	
-	fallsFailurePoint = 0.2;
-	zeroes(totalFallsFailure, terminateYear);
-	maxFallsFailure = 0.0;
-        // setting initial infrastructure values, storage and capacities
-        // must all be equal to 0 at beginning of each realization, before 60yrs go by
-
-	//systemStorage.openResFiles();
-	//openFile(out1,"raleighDemand.csv");
-	//openFile(out3,"riskOfFailureFile.csv");
-	
-	///////////// RUN THE LOOP //////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////
-	
-	for (int realization = 0; realization < numRealizations; realization++)
-	{
-		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
-		
-		weekcounter = 0;
-		yearcounter = 0;
-		contractriskyearcounter = 0;
-		allowReleaseContract = true;
-		contractcount = 1;
-		currentcontract = 1;
-		contractbuybacks = 0.0;
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-		// Initialize demand and reservoir storage objects (year, month, week, daysPerWeek, leapYearCounter)
-		simDates.initializeDates(startSimulationYear,1,1,7,0);
-
-		systemStorage.initializeReservoirStorage(durham_res_supply_capacity,
-													cane_creek_supply_capacity, stone_quarry_supply_capacity,university_lake_supply_capacity, lake_wheeler_benson_supply_capacity, falls_lake_supply_capacity, falls_lake_wq_capacity,
-													jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity, 
-													raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
-													little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, raleigh_quarry_intake_capacity, 
-													raleigh_quarry_outflow_capacity, raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
-													owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,1,
-													LMreleaseCap, LMreleaseMin); 
-														// infrastructure included in the model
-														// MICHIE RELEASE MIN AND CAP INCLUDED HERE (BY DAVID)
-            // actual reservoir storage
-
-		riskOfFailureStorageInf.initializeReservoirStorageROF(durham_res_supply_capacity,
-																cane_creek_supply_capacity,	stone_quarry_supply_capacity,				
-																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,falls_lake_supply_capacity, 
-																falls_lake_wq_capacity, jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, 
-																durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity,raleigh.jordanLakeAlloc, 
-																durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, 
-																teer_quarry_intake_capacity, teer_quarry_outflow_capacity, little_river_raleigh_supply_capacity, 
-																western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, 
-																raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
-																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
-																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
-            // used once per year to calculate ROF
-
-		riskOfFailureStorageROF.initializeReservoirStorageROF(durham_res_supply_capacity,
-																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
-																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
-																falls_lake_supply_capacity, falls_lake_wq_capacity,					
-																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
-																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
-																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
-																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
-																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
-																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, 
-																raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
-																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
-            // calculated every week using current storage
-
-		riskOfFailureStorageIP.initializeReservoirStorageROF(durham_res_supply_capacity,
-																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
-																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
-																falls_lake_supply_capacity, falls_lake_wq_capacity,					
-																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
-																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
-																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
-																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
-																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
-																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
-																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, owasa.westernWakeTreatmentFrac, 
-																durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
-            // based on weekly changes this calculates insurance payouts
-
-		year = simDates.getYear();//passes the dates from the simDates class to the main simulation
-		month = simDates.getMonth();
-		week = simDates.getWeek();
-		numdays = simDates.getDays();
-		
-		if (yearcounter == 0)
-		{
-			firstyear = year;
-			adjustedannualpayment = annualpayment;
-			adjustedbuybackpayment = buybackratePerMG;
-		}
-
-		durham.clearVariablesForRealization(year);
-		owasa.clearVariablesForRealization(year);
-		raleigh.clearVariablesForRealization(year);
-		cary.clearVariablesForRealization(year);
-            // another level of resetting
-
-		durham.priceInsurance(year, realization);
-		owasa.priceInsurance(year, realization);
-		raleigh.priceInsurance(year, realization);
-		cary.priceInsurance(year, realization);
-
-		int caryWTPcounter = 0;
-		double durhamReclaimedCap = durham_reclaimation_capacity;
-		double durhamTreatmentCap = western_wake_treatment_capacity*durham.westernWakeTreatmentFrac;
-		double owasaTreatmentCap = western_wake_treatment_capacity*owasa.westernWakeTreatmentFrac;
-		double raleighTreatmentCap = western_wake_treatment_capacity*raleigh.westernWakeTreatmentFrac;
-		double raleighIntakeCap = raleigh_intake_capacity;
-		zeroes(caryBuild,3);
-		thisYearFalls = 0;
-		
-		while (year-1<(terminateYear))
-            // in a single realization, from year to year
-		{
-			// July 2016: new weekly order of operations for non-structural options
-			//	0.	Dates are updated, etc.
-			//	1. 	ROF calculated for insurance and releases 
-			//	2.	Releases calculated, storage and spillage re-set 
-			//	3.	ROF for transfers and restrictions calculated 
-			//	4.	Restrictions imposed, demand recalculated
-			//	5.	Treated transfers calculated, storage etc. updated
-			
-			
-			syntheticIndex = (year-1)*52+week-1;
-
-			// update on/off triggers for each restriction stage
-			if (week > 16 && week < 39) 
-				// Irrigation season
-				season = 0;
-			else
-				season = 1;
-
-
-			createRiskOfFailure_InsuranceReleases(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
-												  numIntervals);
-                // gives the ROF of this given week
-				// July 2016: this function just does ROF for insurance and releases 
-
-			if (allowReleases == 1 && allowReleaseContract)
-				// allow transfers, apply raw releases 
-				// in a given week, transfers calculated before transfers
-				// however, ROF is not updated.  this should work out as long as
-				// release quantities are not capped at a low level
-				// (think: first week of a month of triggered ROF will see large
-				// transfers and releases, but the releases in first week will lead to
-				// no transfers in following weeks)
-			{	
-				/////////////////////////////////////////////////////////////////////////////////////////////////////////
-				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
-				
-				if (systemStorage.getRaleighStorage() < NearFailureLimit)
-				{
-					FLSPreleaseFrac = 1.0;
-						// if Raleigh's total storage is below 30%
-						// any request releases can be completely used to
-						// augment water supply, rather than be split between
-						// water supply and water quality FL pools
-				}
-				else
-				{
-					if (indepReleaseAlloc)
-					{
-						FLSPreleaseFrac = FallsSupplyAllocationFraction;
-					}
-					else
-					{
-						FLSPreleaseFrac = systemStorage.getFallsSupplyAllocFrac();
-					}
-						// the input parameter for how much of each release goes to water supply
-						// is overwritten to be equal to the current conservation pool ratio 
-				}
-				
-				systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
-											  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, durham.BuybackRiskVolume[week-1],
-											  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput);
-												
-				durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
-				raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
-				
-				if (currentcontract == contractcount)
-				{
-					contractbuybacks += durham.weeklyBuybackVolume;
-				}
-				else 
-				{
-					contractbuybacks = 0.0;
-					contractbuybacks += durham.weeklyBuybackVolume;
-				}
-					// count the buybacks that occur over the course of the contract 
-					// the contract count is updated after transfer info is captured below 
-				
-				if (durham.weeklyBuybackVolume > 0.0)
-				{
-					durham.payForBuybacks(adjustedbuybackpayment);
-					raleigh.acceptBuybackPayment(adjustedbuybackpayment);
-				}
-				
-				if (week == 1)
-				{
-					raleigh.payForReleases(adjustedannualpayment, contractlength);
-					durham.acceptReleasePayment(adjustedannualpayment, contractlength);
-						// annual payment
-						// because payment type has been changed to annual type,
-						// the contract length variable is unnecessary 
-				}
-				
-				//Update reservoir storage levels
-				systemStorage.setSpillover(week-1);
-				systemStorage.updateStorage(week-1);
-					// set min releases
-			}
-			
-			createRiskOfFailure_RestrictionsTransfers(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
-				// generate the week's ROF for restrictions and transfers
-				// which are applied after releases are in a week 
-			
-			durham.fillRestrictionsArray(season);
-			owasa.fillRestrictionsArray(season);
-			cary.fillRestrictionsArray(season);
-			raleigh.fillRestrictionsArray(season);
-			
-			// Use the demand PDF to estimate uncertain demand, also finds current level of restrictions (and revenue losses from them)
-			// Raleigh uses Durham's data for the inflow-demand PDF
-			durham.calculateDemand(realization, week, numdays, year);
-			owasa.calculateDemand(realization, week, numdays, year);
-			cary.calculateDemand(realization, week, numdays, year);
-			raleigh.calculateDemand(realization, week, numdays, year);
-                // give unrestricted demand in each week
-				
-			durham.calculateRestrictions(year, week, numdays, month, realization);
-			owasa.calculateRestrictions(year, week, numdays, month, realization);
-			cary.calculateRestrictions(year, week, numdays, month, realization);
-			raleigh.calculateRestrictions(year, week, numdays, month, realization);
-                // is ROF high enough to implement restrictions?
-
-			systemStorage.setDemands(durham.weeklyDemand, owasa.weeklyDemand, raleigh.weeklyDemand, cary.weeklyDemand, numdays);
-				//pass weekly demand values to reservoir storage update function
-
-			//Translate inflows and evap from weekly variations to a physical volume
-			durhamActualInflow = durhamInflows.synthetic[realization][syntheticIndex];
-			owasaActualInflow = owasaInflows.synthetic[realization][syntheticIndex];
-			fallsActualInflow = fallsInflows.synthetic[realization][syntheticIndex];
-			wbActualInflow = wheelerInflows.synthetic[realization][syntheticIndex];
-			claytonActualInflow = claytonInflows.synthetic[realization][syntheticIndex];
-			crabtreeActualInflow = crabtreeInflows.synthetic[realization][syntheticIndex];
-			jordanActualInflow = jordanInflows.synthetic[realization][syntheticIndex];
-			lillingtonActualInflow = lillingtonInflows.synthetic[realization][syntheticIndex];
-			littleRiverRaleighActualInflow = littleRiverRaleighInflows.synthetic[realization][syntheticIndex];
-
-			actualEvap = durhamOwasaEvap.synthetic[realization][syntheticIndex];
-			actualFallsEvap = fallsEvap.synthetic[realization][syntheticIndex];
-			actualWBEvap = wheelerEvap.synthetic[realization][syntheticIndex];
-                // real inflow and evap records
-
-			//Pass along inflow values
-			systemStorage.setInflow(durhamActualInflow, 31.4*owasaActualInflow,
-				28.7*owasaActualInflow, 1.2*owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow, crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,
-							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
-							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
-			
-			if (formulation > 0)
-			{
-				//Transfer requests are granted based on the limitations of infrastructure
-				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand);
-                    // who gets transfers based on want and availability
-
-				durham.weeklyTransferVolume = systemStorage.getDurhamTransfers();
-				owasa.weeklyTransferVolume = systemStorage.getOWASATransfers();
-				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
-                    // each utility assigned the costs of the transfers they get
-					
-				if (allowReleases == 1)
-				{
-					if (week == 1)
-					{
-						raleigh.TransferHistory[contractriskyearcounter]   = 0.0;
-						raleigh.TransferFrequency[contractriskyearcounter] = 0.0;
-						
-						durham.TransferHistory[contractriskyearcounter]   = 0.0;
-						durham.TransferFrequency[contractriskyearcounter] = 0.0;
-					}
-					
-					if (raleigh.weeklyTransferVolume > 0)
-					{
-						raleigh.TransferHistory[contractriskyearcounter]   += raleigh.weeklyTransferVolume;
-						raleigh.TransferFrequency[contractriskyearcounter] += 1;
-					}
-					
-					if (durham.weeklyTransferVolume > 0)
-					{
-						durham.TransferHistory[contractriskyearcounter]   += durham.weeklyTransferVolume;
-						durham.TransferFrequency[contractriskyearcounter] += 1;
-					}
-
-					if (currentcontract == contractcount)
-					{
-						contracttransfersD += durham.weeklyTransferVolume;
-					}
-					else 
-					{
-						contracttransfersD = 0.0;
-						contracttransfersD += durham.weeklyTransferVolume;
-						
-						currentcontract = contractcount;
-					}					
-				}
-					// collect transfer information of most recent 20 years for release contract negotiation 
-				
-				if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
-				{
-					out100 << rank << "," << realization << "," << year << "," << week << ",";
-					out100 << systemStorage.raleighDirect << "," << systemStorage.durhamDirect << ",";
-					out100 << systemStorage.raleighIndirect << "," << systemStorage.durhamIndirect << ",";
-					out100 << systemStorage.owasaDirect << "," << systemStorage.extraCap << ",";
-					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << "," << owasa.riskOfFailure << endl;
-				}
-				
-				durham.payForTransfers(transferCosts);
-				owasa.payForTransfers(transferCosts);
-				raleigh.payForTransfers(transferCosts);
-					
-				if((durham.weeklyTransferVolume+owasa.weeklyTransferVolume+raleigh.weeklyTransferVolume)>0.0)
-				{
-					cary.Fund.add((durham.weeklyTransferVolume + owasa.weeklyTransferVolume + raleigh.weeklyTransferVolume)*transferCosts);
-						// Use the mitigation fund to calculate water transfer payments (sent to Cary)
-				}
-				
-				//Update reservoir storage levels
-				systemStorage.setSpillover(week-1);
-				systemStorage.updateStorage(week-1);
-					// set min releases
-				
-				weekcounter += 1;
-			}
-			
-			//Update reservoir storage levels
-			systemStorage.setSpillover(week-1);
-			systemStorage.updateStorage(week-1);
-                // set min releases
-
-			//Retrieve the weekly transfers
-			// Get current weekly demand baseline values for each utility
-			durhamFlowWeekBaseline = durham.demandBaseline[year-1][week-1] - durhamReclaimedInsuranceTrigger*durhamReclaimedCap*numdays - wwWTPInsuranceTrigger*durhamTreatmentCap*numdays;
-			owasaFlowWeekBaseline = owasa.demandBaseline[year-1][week-1]  - wwWTPInsuranceTrigger*owasaTreatmentCap*numdays;
-			raleighFlowWeekBaseline = raleigh.demandBaseline[year-1][week-1] + fallsEvap.averages[week-1]*raleigh.Fund.insuranceStorage*raleighBaselineMultiplier - wwWTPInsuranceTrigger*raleighTreatmentCap*numdays - ralIntakeInsuranceTrigger*raleighIntakeCap*numdays;
-			caryFlowWeekBaseline = cary.demandBaseline[year-1][week-1];
-                // expect withdrawal from reservoirs, corrected for reclaimed water or treatment at JL
-
-			durhamSpill = systemStorage.getDurhamSpillage();
-			OWASASpill = systemStorage.getOWASASpillage();
-			insuranceFallsInflow = (fallsActualInflow + durhamSpill + durham.weeklyDemand*returnRatio[0][week-1]-systemStorage.fallsArea*actualFallsEvap)*(falls_lake_supply_capacity/34700.0) + raleigh.weeklyTransferVolume;
-			insuranceJordanInflow = (OWASASpill + owasa.weeklyDemand*returnRatio[1][week-1] + durham.weeklyDemand*(returnRatio[1][week-1] - returnRatio[0][week-1]) +
-					jordanActualInflow-actualEvap*13900)*cary.jordanLakeAlloc*(45800.0/(94600.0+45800.0));
-
-			//Determine insurance payout (goes directly to the mitigation fund)
-			durham.setInsurancePayment(durhamFlowWeekBaseline, durhamActualInflow + durham.weeklyTransferVolume, week);
-			owasa.setInsurancePayment(owasaFlowWeekBaseline, owasaActualInflow*61.3 + owasa.weeklyTransferVolume, week);
-			raleigh.setInsurancePayment(raleighFlowWeekBaseline, insuranceFallsInflow + littleRiverRalInsuranceTrigger*littleRiverRaleighActualInflow, week);
-			cary.setInsurancePayment(caryFlowWeekBaseline, insuranceJordanInflow, week);
-
-			//retrieve updated storage levels
-			owasa.storageFraction = systemStorage.getOWASAStorage();
-			durham.storageFraction = systemStorage.getDurhamStorage();
-			raleigh.storageFraction = systemStorage.getRaleighStorage();
-			cary.storageFraction = systemStorage.getCaryStorage();
-
-			//update timestep
-			simDates.increase();
-			year = simDates.getYear();
-			month = simDates.getMonth();
-			week = simDates.getWeek();
-			numdays = simDates.getDays();
-			durham.weeklyUpdate();
-			owasa.weeklyUpdate();
-			raleigh.weeklyUpdate();
-			cary.weeklyUpdate();
-			updateFallsQuality();
-			
-			if (week == 1)
-                // if on a new year...
-			{
-				createInfrastructure(realization);
-				createInfrastructureRisk(realization, year-1, durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
-					// infrastructure risk is also used for renegotiating release contracts 
-					
-				raleigh.SpinupRisk[contractriskyearcounter] = raleigh.infRisk;
-				durham.SpinupRisk[contractriskyearcounter]  = durham.infRisk;
-					// store the most recent 20 years of annual baseline ROF 
-				
-				if (printDetailedOutput)
-				{
-					ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
-					ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
-					ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
-					ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
-					ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
-				}
-					
-				triggerInfrastructure(realization);
-                    // check on infra
-
-				durham.annualUpdate(year-1, realization);
-				owasa.annualUpdate(year-1, realization);
-				cary.annualUpdate(year-1, realization);
-				raleigh.annualUpdate(year-1, realization);
-                    // update of financial stuff
-
-				//Upgrade Cary WTP to 56 MGD in 2016
-				if (caryUpgrades[caryWTPcounter]<cary.averageUse&&caryBuild[caryWTPcounter]==0)
-                    // thresholds based on annual demand
-				{
-					cary.addDebt(year, realization, caryWTPcosts[caryWTPcounter], bondLength, bondRate);
-					caryBuild[caryWTPcounter] += 1;
-					caryWTPcounter++;
-				}
-				for(int x = 0; x<3; x++)
-				{
-					if(caryBuild[x]>0&&caryBuild[x]<4)
-					{
-						caryBuild[x] += 1;
-						if(caryBuild[x]==4)
-						{
-							systemStorage.upgradeCaryTreatmentPlant(x);
-						}
-					}
-				}
-				if(thisYearFalls == 1)
-				{
-					totalFallsFailure[year-2] += 1.0/double(numRealizations);
-                        // failure for falls lake WQ pool
-				}
-				thisYearFalls = 0;
-				durhamReclaimedCap = systemStorage.getDurhamReclaimedCap();
-				durhamTreatmentCap = systemStorage.getDurhamTreatment();
-				owasaTreatmentCap = systemStorage.getOWASATreatment();
-				raleighTreatmentCap = systemStorage.getRaleighTreatment();
-				raleighIntakeCap = systemStorage.getRaleighIntake();
-                    // all reset for the week
-			
-				if (allowReleases == 1)
-				{
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////
-					/////////////////////////// CALCULATE SPINUP RISK ///////////////////////////////////////////////////////
-					
-					if (yearcounter == 0)
-					{
-						LOOPCHECKER += 1;
-						
-						for (int yr = 1; yr < numContractRiskYears; yr++)
-						{
-							createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
-															durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, 
-															raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
-															
-							raleigh.SpinupRisk[yr] = raleigh.infRisk;
-							durham.SpinupRisk[yr]  = durham.infRisk;
-								// this loop determines 20 years of risk for years before the real simulation starts
-								// as a basis for release contract determination 
-								// SHOULD ONLY RUN IN THE FIRST WEEK OF THE FIRST YEAR 
-						}
-						
-						yearcounter = 1;
-					} 
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////
-					/////////////////////////// RENEGOTIATE RELEASE CONTRACT ////////////////////////////////////////////////
-					
-					// In re-negotiating a release contract, baseline ROF records, treated transfer history, 
-					// and past contract financial performance of the last 20 years 
-					// are used a decision variables to determine:
-					//	1.	whether or not to have a new release contract
-					//	2.	the size annual payments to Durham and spot price of buybacks by Durham 
-					//	3.	constraints upon the frequency and magnitude of releases 
-					
-					if (contractlength < firstyear)
-					{
-						firstyear += contractlength;
-							// this ensures the next if statement modulus works properly
-					}
-					
-					
-					if (year % contractlength == firstyear)
-						// contract re-negotiated in the first week of the first year and every 10 years afterward
-					{
-						RtriggerDiff = 0.0;
-						DtriggerDiff = 0.0;
-						triggerDiff  = 0.0;
-						RBBstddev    = 0.0;
-						DBBstddev    = 0.0;
-						
-						contractSplits   = 0.0;
-						RTTmagnitudeDiff = 0.0;
-						DTTmagnitudeDiff = 0.0;
-						RTTfrequencyDiff = 0.0;
-						DTTfrequencyDiff = 0.0;
-				
-						if (allowReleaseContract && contractcount > 1)
-						{
-							previousContract = true;
-						}
-						else
-						{
-							previousContract = false;
-						}
-							// check if there was a contract during the last contract period 
-						
-						if (contractcount == 1)
-							// if this is the first contract, just use spinup risk and no transfer info 
-							// assumes the contract is of some reasonably long length (> 5 years)
-						{
-							transferRiskYears = 0;
-							
-							if (maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
-								// a contract will be made if Raleigh's risk is great enough and Durham's is low enough
-								// based on the most recent 20 years 
-							{
-								allowReleaseContract = true;
-									// first, determine whether to have a contract or not 
-									
-								RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
-								DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
-									// find differences between each city's average past risk and their contract triggers
-									// for Raleigh, if RtriggerDiff > 0, on average they want releases, if < 0, the opposite.
-									// for Durham, if DtriggerDiff > 0, they average too much risk to want to do releases.
-									// the magnitude and direction of these indicators asks as a proxy for how much leverage 
-									// each city has during contract negotiations.  There will be 9 scenarios:
-									//	1.	DtriggerDiff > 0 and RtriggerDiff > 0
-									//	2.	DtriggerDiff > 0 and RtriggerDiff < 0 
-									//	3.	DtriggerDiff < 0 and RtriggerDiff > 0 
-									// 	4.	DtriggerDiff < 0 and RtriggerDiff > 0 
-									// 	5.	DtriggerDiff = 0 and RtriggerDiff > 0 
-									// 	6.	DtriggerDiff = 0 and RtriggerDiff < 0 
-									// 	7.	DtriggerDiff < 0 and RtriggerDiff = 0 
-									// 	8.	DtriggerDiff > 0 and RtriggerDiff = 0
-									// 	9.	DtriggerDiff = 0 and RtriggerDiff = 0 
-									// The annual contract payment will be set arbitrarily the first time, as no treated transfer
-									// record or previous contract record has been established. This contract price, x, will be 
-									// adjusted by multipliers, based on the state of negotiation leverage. The multipliers are:
-									//	1.	if DtriggerDiff > 0, the average payments by Raleigh are larger (Durham needs to be
-									//		persuaded more to be part of the contract), annualpayment = annualpayment * (1 + DtriggerDiff)
-									//	2.	if DtriggerDiff < 0, average payments are lower (Durham has excess risk capacity), 
-									//		annualpayment = annualpayment * (1 + DtriggerDiff)
-									//	3.	if RtriggerDiff > 0, Raleigh needs releases more 
-									//		annualpayment = annualpayment * (1 + RtriggerDiff)
-									//	4.	if RtriggerDiff < 0, on average Raleigh doesn't need extra releases 
-									//		annualpayment = annualpayment * (1 + RtriggerDiff)
-									//	5.	in any other case, when the trigger equals the average risk, the annual payment is unchanged
-									
-								triggerDiff = RtriggerDiff + DtriggerDiff;
-									// because the effects of each are the same sign (positive R or D triggerDiff increases the annual payment)
-									// add them and adjust the annual payment
-								
-								if (triggerDiff > 0.5)
-								{
-									triggerDiff = 0.5;
-								}
-								if (triggerDiff < -0.5)
-								{
-									triggerDiff = -0.5;
-								}
-									// keep the contract annual payment within a reasonable range 
-								
-								adjustedannualpayment = annualpayment * (1 + triggerDiff);
-								
-								RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
-								DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
-									// a similar system is employed to determine price of buybacks 
-									// the variability of risk affects spot prices 
-									// for Raleigh, high variability = want high spot price for release water
-									// for Durham, high variability means they want lower spot rate 
-									// as a addition to $3,000 per MG, or whatever the base price for
-									// transfers is? 
-								
-								adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG;
-							}
-							else
-							{
-								allowReleaseContract = false;
-									// if triggers aren't met, no contract 
-									
-								adjustedannualpayment  = 0.0;
-								adjustedbuybackpayment = 0.0;
-								
-								RtriggerDiff = 0.0;
-								DtriggerDiff = 0.0;
-								triggerDiff  = 0.0;
-								RBBstddev    = 0.0;
-								DBBstddev    = 0.0;
-								contractSplits   = 0.0;
-								RTTmagnitudeDiff = 0.0;
-								DTTmagnitudeDiff = 0.0;
-								RTTfrequencyDiff = 0.0;
-								DTTfrequencyDiff = 0.0;
-							}
-							
-							contractcount += 1;
-						}
-						else
-							// the scenario of any contract negotiation after year 0 
-						{
-							if ((year - firstyear) > (numContractRiskYears - 1))
-							{
-								transferRiskYears = numContractRiskYears;
-							}
-							else
-							{
-								transferRiskYears = year - firstyear;
-							}
-								// check how many years have passed and the record that will be used 
-								// for contract determination 
-								
-							if ((maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
-								|| (maxValue_array(raleigh.TransferHistory, transferRiskYears) > raleigh.TTmagnitudetrigger && minValue_array(durham.TransferHistory, transferRiskYears) < durham.TTmagnitudetrigger) 
-								|| (maxValue_array(raleigh.TransferFrequency, transferRiskYears) > raleigh.TTfrequencytrigger && minValue_array(durham.TransferFrequency, transferRiskYears) < durham.TTfrequencytrigger))
-									// a contract will be used if baseline ROF range is great enough, 
-									// or if treated transfer frequency or magnitude is great enough 
-							{
-								allowReleaseContract = true;
-								
-								if (previousContract)
-									// if the last contract period had a release contract, 
-									// it can be judged based on how "even" the finances worked out
-									// the difference between annual payments and buyback payments over the contract should be close to equal to
-									// the transfer costs for Durham (can't really get the additional costs just due to releases)
-									// if contractSplits > 0, Durham had a favorable contract and so annual payments will be reduced this time
-									// if the opposite is true, annual payments should be increased 
-								{
-									contractSplits = (adjustedannualpayment*contractlength) - 
-													 (adjustedbuybackpayment*contractbuybacks) - 
-													 (contracttransfersD*transferCosts);
-										// this statement makes sure the proper Durham transfers are used 
-										// (only accounts for most recent contract years)
-									
-									contractSplits = contractSplits/(adjustedannualpayment*contractlength);
-										// determine the relative discrepancy between how the contract performed
-										// and the size of the last contract based on annual payments 
-								}
-								else 
-								{
-									contractSplits = 0.0;
-										// no previous contract existed, so it will not affect negotiations 
-								}
-								
-								RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
-								DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
-								
-								triggerDiff  = RtriggerDiff + DtriggerDiff;
-								
-								RTTmagnitudeDiff = (average_array(raleigh.TransferHistory, transferRiskYears) - raleigh.TTmagnitudetrigger)/average_array(raleigh.TransferHistory, transferRiskYears);
-								DTTmagnitudeDiff = (average_array(durham.TransferHistory, transferRiskYears) - durham.TTmagnitudetrigger)/average_array(durham.TransferHistory, transferRiskYears);
-									// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
-									// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
-									// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
-									// this difference is normalized by the average transfer magnitude record 
-								
-								triggerDiff += RTTmagnitudeDiff;
-								triggerDiff += DTTmagnitudeDiff;
-								triggerDiff -= contractSplits;
-									// introduce the previous contract effect 
-								
-								if (triggerDiff > 0.5)
-								{
-									triggerDiff = 0.5;
-								}
-								if (triggerDiff < -0.5)
-								{
-									triggerDiff = -0.5;
-								}
-									// keep the contract annual payment within a reasonable range 
-								
-								adjustedannualpayment = annualpayment * (1 + triggerDiff);
-									// once into the modeling past the first contract, the annual payment is based on
-									// previous contracts, treated transfers, and baseline ROF records 
-								
-								RTTfrequencyDiff = (average_array(raleigh.TransferFrequency, transferRiskYears) - raleigh.TTfrequencytrigger)/average_array(raleigh.TransferFrequency, transferRiskYears);
-								DTTfrequencyDiff = (average_array(durham.TransferFrequency, transferRiskYears) - durham.TTfrequencytrigger)/average_array(durham.TransferFrequency, transferRiskYears);
-									// if RTTfrequencyDiff > 0, transfers happen very often, so buybacks would also as Raleigh is requesting often, 
-									//		Raleigh will want high buyback price because the water is worth more to them 
-									// if RTTfrequencyDiff < 0, less transfer requests, so less buyback requests, Raleigh doesn't mind if buyback price drops 
-									// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
-									// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price 
-								
-								if (RTTfrequencyDiff > 1.0)
-								{
-									RTTfrequencyDiff = 1.0;
-								}
-								if (RTTfrequencyDiff < -0.25)
-								{
-									RTTfrequencyDiff = -0.25;
-								}
-								if (DTTfrequencyDiff > 1.0)
-								{
-									DTTfrequencyDiff = 1.0;
-								}
-								if (DTTfrequencyDiff < -0.25)
-								{
-									DTTfrequencyDiff = -0.25;
-								}
-									// bound these leverage effects based on their relative importance 
-								
-								RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
-								DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
-								
-								adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG + (RTTfrequencyDiff - DTTfrequencyDiff)*buybackratePerMG;
-									// the transfer frequency difference values are normalized to a 0-to-1 scale, so they need to be scaled relative to the baseline buyback rate 
-							}
-							else 
-							{
-								allowReleaseContract = false;
-								
-								adjustedannualpayment  = 0.0;
-								adjustedbuybackpayment = 0.0;
-								
-								RtriggerDiff = 0.0;
-								DtriggerDiff = 0.0;
-								triggerDiff  = 0.0;
-								RBBstddev    = 0.0;
-								DBBstddev    = 0.0;
-								contractSplits   = 0.0;
-								RTTmagnitudeDiff = 0.0;
-								DTTmagnitudeDiff = 0.0;
-								RTTfrequencyDiff = 0.0;
-								DTTfrequencyDiff = 0.0;
-							}
-							
-							contractcount += 1;
-						}
-					}
-					
-					if (printDetailedOutput)
-					{
-						ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
-						ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
-						ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
-					}
-				}
-				
-				contractriskyearcounter += 1;
-				if (contractriskyearcounter > 19)
-				{
-					contractriskyearcounter = 0;
-				}					
-					// adjust this index every 20 years to overwrite itself with new ROF data 
-			}
-
-		} // End weekly loop
-		
-		if ((realization < numRealizationsTOREAD) && printDetailedOutput)
-		{
-			outRiskParams << rank << "," << realization << ",";
-			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
-			outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
-			outRiskParams << raleigh.jordanLakeAlloc << "," << durham.jordanLakeAlloc << "," << availableJLallocation << endl;
-				// write outputs for risk and other triggers that don't change over the course of simulation
-		}
-
-	} //end realization loop
-	
-	if (printDetailedOutput)
-	{
-		out100.close();
-		outNew.close();
-		outRiskParams.close();
-		InfraBuilt.close();
-		ReleaseContractData.close();
-	}
-
-	durham.calculateObjectives();
-	owasa.calculateObjectives();
-	cary.calculateObjectives();
-	raleigh.calculateObjectives();
-        // calculate objectives once all simulations are finished
-
-	for(int x = 0; x< terminateYear; x++)
-	{
-		if(totalFallsFailure[x]>maxFallsFailure)
-		{
-			maxFallsFailure = totalFallsFailure[x];
-		}
-	}
-
-	return;
-}
-void Simulation::updateFallsQuality()
-{
-	double qualityStorage = 0.0;
-	qualityStorage = systemStorage.getFallsQuality();
-	if(qualityStorage < fallsFailurePoint)
-	{
-		thisYearFalls = 1;
-	}
-	return;
-}
-Simulation::~Simulation()
-{
-	zap(xreal);
-	zap(actualStreamflows);
-	zap(totalFallsFailure);
-}
-
 void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
 													   int discreteintervals)
 {
@@ -4827,13 +3833,11 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 		}
 	}
 	
-	bool notfound = true;
-	
 	for(int x = 0; x < discreteintervals; x++)
 	{
 		durham.ReleaseStorageRisk[x] = durham.ReleaseStorageRisk[x]/(double(numRiskYears));
 		
-		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger - BuybackROFZone && notfound)
+		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger - BuybackROFZone)
 			// if the risk of failure becomes greater than the ROF trigger level 
 			// for buybacks (equal to the ROF trigger for release denial - ROF buffer amount)
 		{
@@ -4845,8 +3849,6 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			{
 				durham.BuybackRiskVolume[week-1] = 1.0;
 			}
-			
-			notfound = false;
 		}
 		
 		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger)
@@ -5345,3 +4347,1350 @@ void Simulation::createInfrastructureRisk_spinup(int realization, int synthYear,
 
 	return;
 }
+
+void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount)
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// CALCULATE SPINUP RISK ///////////////////////////////////////////////////////
+	
+	if (yearcounter == 0)
+	{
+		LOOPCHECKER += 1;
+		
+		for (int yr = 1; yr < numContractRiskYears; yr++)
+		{
+			createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
+											durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, 
+											raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
+											
+			raleigh.SpinupRisk[yr] = raleigh.infRisk;
+			durham.SpinupRisk[yr]  = durham.infRisk;
+				// this loop determines 20 years of risk for years before the real simulation starts
+				// as a basis for release contract determination 
+				// SHOULD ONLY RUN IN THE FIRST WEEK OF THE FIRST YEAR 
+		}
+		
+		yearcounter = 1;
+	} 
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// RENEGOTIATE RELEASE CONTRACT ////////////////////////////////////////////////
+	
+	// In re-negotiating a release contract, baseline ROF records, treated transfer history, 
+	// and past contract financial performance of the last 20 years 
+	// are used a decision variables to determine:
+	//	1.	whether or not to have a new release contract
+	//	2.	the size annual payments to Durham and spot price of buybacks by Durham 
+	//	3.	constraints upon the frequency and magnitude of releases 
+	
+	if (contractlength < firstyear)
+	{
+		firstyear += contractlength;
+			// this ensures the next if statement modulus works properly
+	}
+	
+	
+	if (year % contractlength == firstyear)
+		// contract re-negotiated in the first week of the first year and every 10 years afterward
+	{
+		RtriggerDiff = 0.0;
+		DtriggerDiff = 0.0;
+		triggerDiff  = 0.0;
+		RBBstddev    = 0.0;
+		DBBstddev    = 0.0;
+		
+		contractSplits   = 0.0;
+		RTTmagnitudeDiff = 0.0;
+		DTTmagnitudeDiff = 0.0;
+		RTTfrequencyDiff = 0.0;
+		DTTfrequencyDiff = 0.0;
+
+		if (allowReleaseContract && contractcount > 1)
+		{
+			previousContract = true;
+		}
+		else
+		{
+			previousContract = false;
+		}
+			// check if there was a contract during the last contract period 
+		
+		if (contractcount == 1)
+			// if this is the first contract, just use spinup risk and no transfer info 
+			// assumes the contract is of some reasonably long length (> 5 years)
+		{
+			transferRiskYears = 0;
+			
+			if (maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
+				// a contract will be made if Raleigh's risk is great enough and Durham's is low enough
+				// based on the most recent 20 years 
+			{
+				allowReleaseContract = true;
+					// first, determine whether to have a contract or not 
+					
+				RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
+				DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
+					// find differences between each city's average past risk and their contract triggers
+					// for Raleigh, if RtriggerDiff > 0, on average they want releases, if < 0, the opposite.
+					// for Durham, if DtriggerDiff > 0, they average too much risk to want to do releases.
+					// the magnitude and direction of these indicators asks as a proxy for how much leverage 
+					// each city has during contract negotiations.  There will be 9 scenarios:
+					//	1.	DtriggerDiff > 0 and RtriggerDiff > 0
+					//	2.	DtriggerDiff > 0 and RtriggerDiff < 0 
+					//	3.	DtriggerDiff < 0 and RtriggerDiff > 0 
+					// 	4.	DtriggerDiff < 0 and RtriggerDiff > 0 
+					// 	5.	DtriggerDiff = 0 and RtriggerDiff > 0 
+					// 	6.	DtriggerDiff = 0 and RtriggerDiff < 0 
+					// 	7.	DtriggerDiff < 0 and RtriggerDiff = 0 
+					// 	8.	DtriggerDiff > 0 and RtriggerDiff = 0
+					// 	9.	DtriggerDiff = 0 and RtriggerDiff = 0 
+					// The annual contract payment will be set arbitrarily the first time, as no treated transfer
+					// record or previous contract record has been established. This contract price, x, will be 
+					// adjusted by multipliers, based on the state of negotiation leverage. The multipliers are:
+					//	1.	if DtriggerDiff > 0, the average payments by Raleigh are larger (Durham needs to be
+					//		persuaded more to be part of the contract), annualpayment = annualpayment * (1 + DtriggerDiff)
+					//	2.	if DtriggerDiff < 0, average payments are lower (Durham has excess risk capacity), 
+					//		annualpayment = annualpayment * (1 + DtriggerDiff)
+					//	3.	if RtriggerDiff > 0, Raleigh needs releases more 
+					//		annualpayment = annualpayment * (1 + RtriggerDiff)
+					//	4.	if RtriggerDiff < 0, on average Raleigh doesn't need extra releases 
+					//		annualpayment = annualpayment * (1 + RtriggerDiff)
+					//	5.	in any other case, when the trigger equals the average risk, the annual payment is unchanged
+					
+				triggerDiff = RtriggerDiff + DtriggerDiff;
+					// because the effects of each are the same sign (positive R or D triggerDiff increases the annual payment)
+					// add them and adjust the annual payment
+				
+				if (triggerDiff > 0.5)
+				{
+					triggerDiff = 0.5;
+				}
+				if (triggerDiff < -0.5)
+				{
+					triggerDiff = -0.5;
+				}
+					// keep the contract annual payment within a reasonable range 
+				
+				adjustedannualpayment = annualpayment * (1 + triggerDiff);
+				
+				RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+				DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+					// a similar system is employed to determine price of buybacks 
+					// the variability of risk affects spot prices 
+					// for Raleigh, high variability = want high spot price for release water
+					// for Durham, high variability means they want lower spot rate 
+					// as a addition to $3,000 per MG, or whatever the base price for
+					// transfers is? 
+				
+				adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG;
+			}
+			else
+			{
+				allowReleaseContract = false;
+					// if triggers aren't met, no contract 
+					
+				adjustedannualpayment  = 0.0;
+				adjustedbuybackpayment = 0.0;
+				
+				RtriggerDiff = 0.0;
+				DtriggerDiff = 0.0;
+				triggerDiff  = 0.0;
+				RBBstddev    = 0.0;
+				DBBstddev    = 0.0;
+				contractSplits   = 0.0;
+				RTTmagnitudeDiff = 0.0;
+				DTTmagnitudeDiff = 0.0;
+				RTTfrequencyDiff = 0.0;
+				DTTfrequencyDiff = 0.0;
+			}
+			
+			contractcount += 1;
+		}
+		else
+			// the scenario of any contract negotiation after year 0 
+		{
+			if ((year - firstyear) > (numContractRiskYears - 1))
+			{
+				transferRiskYears = numContractRiskYears;
+			}
+			else
+			{
+				transferRiskYears = year - firstyear;
+			}
+				// check how many years have passed and the record that will be used 
+				// for contract determination 
+				
+			if ((maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
+				|| (maxValue_array(raleigh.TransferHistory, transferRiskYears) > raleigh.TTmagnitudetrigger && minValue_array(durham.TransferHistory, transferRiskYears) < durham.TTmagnitudetrigger) 
+				|| (maxValue_array(raleigh.TransferFrequency, transferRiskYears) > raleigh.TTfrequencytrigger && minValue_array(durham.TransferFrequency, transferRiskYears) < durham.TTfrequencytrigger))
+					// a contract will be used if baseline ROF range is great enough, 
+					// or if treated transfer frequency or magnitude is great enough 
+			{
+				allowReleaseContract = true;
+				
+				if (previousContract)
+					// if the last contract period had a release contract, 
+					// it can be judged based on how "even" the finances worked out
+					// the difference between annual payments and buyback payments over the contract should be close to equal to
+					// the transfer costs for Durham (can't really get the additional costs just due to releases)
+					// if contractSplits > 0, Durham had a favorable contract and so annual payments will be reduced this time
+					// if the opposite is true, annual payments should be increased 
+				{
+					contractSplits = (adjustedannualpayment*contractlength) - 
+									 (adjustedbuybackpayment*contractbuybacks) - 
+									 (contracttransfersD*transferCosts);
+						// this statement makes sure the proper Durham transfers are used 
+						// (only accounts for most recent contract years)
+					
+					contractSplits = contractSplits/(adjustedannualpayment*contractlength);
+						// determine the relative discrepancy between how the contract performed
+						// and the size of the last contract based on annual payments 
+				}
+				else 
+				{
+					contractSplits = 0.0;
+						// no previous contract existed, so it will not affect negotiations 
+				}
+				
+				RtriggerDiff = average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger;
+				DtriggerDiff = average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger;
+				
+				triggerDiff  = RtriggerDiff + DtriggerDiff;
+				
+				RTTmagnitudeDiff = (average_array(raleigh.TransferHistory, transferRiskYears) - raleigh.TTmagnitudetrigger)/average_array(raleigh.TransferHistory, transferRiskYears);
+				DTTmagnitudeDiff = (average_array(durham.TransferHistory, transferRiskYears) - durham.TTmagnitudetrigger)/average_array(durham.TransferHistory, transferRiskYears);
+					// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
+					// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
+					// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
+					// this difference is normalized by the average transfer magnitude record 
+				
+				triggerDiff += RTTmagnitudeDiff;
+				triggerDiff += DTTmagnitudeDiff;
+				triggerDiff -= contractSplits;
+					// introduce the previous contract effect 
+				
+				if (triggerDiff > 0.5)
+				{
+					triggerDiff = 0.5;
+				}
+				if (triggerDiff < -0.5)
+				{
+					triggerDiff = -0.5;
+				}
+					// keep the contract annual payment within a reasonable range 
+				
+				adjustedannualpayment = annualpayment * (1 + triggerDiff);
+					// once into the modeling past the first contract, the annual payment is based on
+					// previous contracts, treated transfers, and baseline ROF records 
+				
+				RTTfrequencyDiff = (average_array(raleigh.TransferFrequency, transferRiskYears) - raleigh.TTfrequencytrigger)/average_array(raleigh.TransferFrequency, transferRiskYears);
+				DTTfrequencyDiff = (average_array(durham.TransferFrequency, transferRiskYears) - durham.TTfrequencytrigger)/average_array(durham.TransferFrequency, transferRiskYears);
+					// if RTTfrequencyDiff > 0, transfers happen very often, so buybacks would also as Raleigh is requesting often, 
+					//		Raleigh will want high buyback price because the water is worth more to them 
+					// if RTTfrequencyDiff < 0, less transfer requests, so less buyback requests, Raleigh doesn't mind if buyback price drops 
+					// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
+					// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price 
+				
+				if (RTTfrequencyDiff > 1.0)
+				{
+					RTTfrequencyDiff = 1.0;
+				}
+				if (RTTfrequencyDiff < -0.25)
+				{
+					RTTfrequencyDiff = -0.25;
+				}
+				if (DTTfrequencyDiff > 1.0)
+				{
+					DTTfrequencyDiff = 1.0;
+				}
+				if (DTTfrequencyDiff < -0.25)
+				{
+					DTTfrequencyDiff = -0.25;
+				}
+					// bound these leverage effects based on their relative importance 
+				
+				RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+				DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+				
+				adjustedbuybackpayment = buybackratePerMG + (RBBstddev - DBBstddev)*buybackratePerMG + (RTTfrequencyDiff - DTTfrequencyDiff)*buybackratePerMG;
+					// the transfer frequency difference values are normalized to a 0-to-1 scale, so they need to be scaled relative to the baseline buyback rate 
+			}
+			else 
+			{
+				allowReleaseContract = false;
+				
+				adjustedannualpayment  = 0.0;
+				adjustedbuybackpayment = 0.0;
+				
+				RtriggerDiff = 0.0;
+				DtriggerDiff = 0.0;
+				triggerDiff  = 0.0;
+				RBBstddev    = 0.0;
+				DBBstddev    = 0.0;
+				contractSplits   = 0.0;
+				RTTmagnitudeDiff = 0.0;
+				DTTmagnitudeDiff = 0.0;
+				RTTfrequencyDiff = 0.0;
+				DTTfrequencyDiff = 0.0;
+			}
+			
+			contractcount += 1;
+		}
+	}
+}
+
+void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount)
+	// This function adjusts parameters of the spot purchasing of releases by Raleigh,
+	// specifically the floor price per volume of water released, whether or not to 
+	// renew the contract itself, and if tiered pricing is used, the price increase
+	// per tier increase.  These decisions will be based on an updating, 20-year baseline ROF record
+	// and records of past contract performance and treated transfer usage.
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// CALCULATE SPINUP RISK ///////////////////////////////////////////////////////
+	
+	if (yearcounter == 0)
+	{
+		LOOPCHECKER += 1;
+		
+		for (int yr = 1; yr < numContractRiskYears; yr++)
+		{
+			createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
+											durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, 
+											raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
+											
+			raleigh.SpinupRisk[yr] = raleigh.infRisk;
+			durham.SpinupRisk[yr]  = durham.infRisk;
+				// this loop determines 20 years of risk for years before the real simulation starts
+				// as a basis for release contract determination 
+				// SHOULD ONLY RUN IN THE FIRST WEEK OF THE FIRST YEAR 
+		}
+		
+		yearcounter = 1;
+	} 
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// RENEGOTIATE RELEASE CONTRACT ////////////////////////////////////////////////
+	
+	// In re-negotiating a release contract, baseline ROF records, treated transfer history, 
+	// and past contract financial performance of the last 20 years 
+	// are used a decision variables to determine:
+	//	1.	whether or not to have a new release contract
+	//	2.	the rate per MG for spot payments 
+	//	3.	if tiered pricing is used, the price increase per rise in tier 
+	
+	if (contractlength < firstyear)
+	{
+		firstyear += contractlength;
+			// this ensures the next if statement modulus works properly
+	}
+	
+	if (year % contractlength == firstyear)
+		// contract re-negotiated in the first week of the first year and every 10 years afterward
+	{
+		adjustedspotpayment = 0.0;
+				
+		RtriggerDiff = 0.0;
+		DtriggerDiff = 0.0;
+		triggerDiff  = 0.0;
+		magDiff      = 0.0;
+		freqDiff     = 0.0;
+		RBBstddev    = 0.0;
+		DBBstddev    = 0.0;
+		contractSplits   = 0.0;
+		RTTmagnitudeDiff = 0.0;
+		DTTmagnitudeDiff = 0.0;
+		RTTfrequencyDiff = 0.0;
+		DTTfrequencyDiff = 0.0;
+	
+		if (allowReleaseContract && contractcount > 1)
+		{
+			previousContract = true;
+		}
+		else
+		{
+			previousContract = false;
+		}
+			// check if there was a contract during the last contract period 
+		
+		if (contractcount == 1)
+			// if this is the first contract, just use spinup risk and no transfer info 
+			// assumes the contract is of some reasonably long length (> 5 years)
+		{
+			transferRiskYears = 0;
+			
+			if (maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
+				// a contract will be made if Raleigh's risk is great enough and Durham's is low enough
+				// based on the most recent 20 years 
+			{
+				allowReleaseContract = true;
+					// first, determine whether to have a contract or not 
+				
+				RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+				DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+					// next, set the first contract purchase rate based on standard deviation of ROF
+					// of the past 20 years 
+				
+				adjustedspotpayment = tieredFloorPrice + (RBBstddev - DBBstddev)*tieredFloorPrice;
+			}
+			else
+			{
+				allowReleaseContract = false;
+				adjustedspotpayment = 0.0;
+				
+				RtriggerDiff = 0.0;
+				DtriggerDiff = 0.0;
+				triggerDiff  = 0.0;
+				magDiff      = 0.0;
+				freqDiff     = 0.0;
+				RBBstddev    = 0.0;
+				DBBstddev    = 0.0;
+				contractSplits   = 0.0;
+				RTTmagnitudeDiff = 0.0;
+				DTTmagnitudeDiff = 0.0;
+				RTTfrequencyDiff = 0.0;
+				DTTfrequencyDiff = 0.0;
+			}
+		
+			contractcount += 1;
+		}
+		else
+		{
+			if ((year - firstyear) > (numContractRiskYears - 1))
+			{
+				transferRiskYears = numContractRiskYears;
+			}
+			else
+			{
+				transferRiskYears = year - firstyear;
+			}
+				// check how many years have passed and the record that will be used 
+				// for contract determination 
+			
+			if ((maxValue_array(raleigh.SpinupRisk, numContractRiskYears) > raleigh.RRcontractTrigger && minValue_array(durham.SpinupRisk, numContractRiskYears) < durham.RRcontractTrigger)
+				|| (maxValue_array(raleigh.TransferHistory, transferRiskYears) > raleigh.TTmagnitudetrigger && minValue_array(durham.TransferHistory, transferRiskYears) < durham.TTmagnitudetrigger) 
+				|| (maxValue_array(raleigh.TransferFrequency, transferRiskYears) > raleigh.TTfrequencytrigger && minValue_array(durham.TransferFrequency, transferRiskYears) < durham.TTfrequencytrigger))
+					// a contract will be used if baseline ROF range is great enough, 
+					// or if treated transfer frequency or magnitude is great enough 
+					// IN THE FUTURE, INCLUDE RESTRICTIONS??
+			{
+				allowReleaseContract = true;
+				
+				if (previousContract)
+					// if the last contract period had a release contract, 
+					// it can be judged based on how often Raleigh
+					// asked for releases and was denied or given less than requested.
+				{
+					if (RequestMade < 1)
+					{
+						contractSplits = 0.5;
+					}
+					else
+					{
+						contractSplits = systemStorage.ReqCurtail/systemStorage.ReqCount * 0.2;
+					}
+						// fraction of weeks where releases were requested
+						// that were curtailed by Durham
+						// the closer this is to 1 (all requests limited),
+						// the more Durham wants for them. 
+						// this is multiplied by 0.2 to mean that 
+						// the most this can impact the spot payment price
+						// is by a 20% increase.
+					
+					adjustedspotpayment = tieredFloorPrice * (1 + contractSplits);
+				}
+				else 
+				{
+					contractSplits = 0.0;
+						// no previous contract existed, so it will not affect negotiations 
+				}
+				
+				RtriggerDiff = (average_array(raleigh.SpinupRisk, numContractRiskYears) - raleigh.RRcontractTrigger)/raleigh.RRcontractTrigger;
+				DtriggerDiff = (average_array(durham.SpinupRisk, numContractRiskYears) - durham.RRcontractTrigger)/durham.RRcontractTrigger;
+					// how different ROF was from each city's trigger 
+					// if positive, Durham wants more expensive spot price but Raleigh doesn't
+					
+				if (RtriggerDiff < 0)
+				{
+					RtriggerDiff = 0.0;
+				}
+				
+				if (DtriggerDiff < 0)
+				{
+					DtriggerDiff = 0.0;
+				}
+				
+				triggerDiff = (DtriggerDiff - RtriggerDiff);
+				
+				if (triggerDiff > 0.2)
+				{
+					triggerDiff = 0.2;
+				}
+				else if (triggerDiff < -0.2)
+				{
+					triggerDiff = -0.2;
+				}
+					// cap this effect at 20%
+					
+				RTTmagnitudeDiff = (average_array(raleigh.TransferHistory, transferRiskYears) - raleigh.TTmagnitudetrigger)/average_array(raleigh.TransferHistory, transferRiskYears);
+				DTTmagnitudeDiff = (average_array(durham.TransferHistory, transferRiskYears) - durham.TTmagnitudetrigger)/average_array(durham.TransferHistory, transferRiskYears);
+					// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
+					// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
+					// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
+					// this difference is normalized by the average transfer magnitude record 
+
+				magDiff = (RTTmagnitudeDiff + DTTmagnitudeDiff);
+				
+				if (magDiff > 0.2)
+				{
+					magDiff = 0.2;
+				}
+				else if (magDiff < -0.2)
+				{
+					magDiff = -0.2;
+				}
+					// cap this effect at 20%
+				
+				RTTfrequencyDiff = (average_array(raleigh.TransferFrequency, transferRiskYears) - raleigh.TTfrequencytrigger)/average_array(raleigh.TransferFrequency, transferRiskYears);
+				DTTfrequencyDiff = (average_array(durham.TransferFrequency, transferRiskYears) - durham.TTfrequencytrigger)/average_array(durham.TransferFrequency, transferRiskYears);
+					// if RTTfrequencyDiff > 0, transfers happen very often, so buybacks would also as Raleigh is requesting often, 
+					//		Raleigh will want high buyback price because the water is worth more to them 
+					// if RTTfrequencyDiff < 0, less transfer requests, so less buyback requests, Raleigh doesn't mind if buyback price drops 
+					// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
+					// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price
+				
+				freqDiff = (RTTfrequencyDiff - DTTfrequencyDiff);
+				
+				if (freqDiff > 0.2)
+				{
+					freqDiff = 0.2;
+				}
+				else if (freqDiff < -0.2)
+				{
+					freqDiff = -0.2;
+				}
+					// cap this effect at 20%
+					
+				RBBstddev = std_dev_vector(raleigh.SpinupRisk, numContractRiskYears);
+				DBBstddev = std_dev_vector(durham.SpinupRisk, numContractRiskYears);
+				
+				adjustedspotpayment = tieredFloorPrice * (1 + triggerDiff + (RBBstddev - DBBstddev) + freqDiff + magDiff);
+					// spot price is influenced by all factors 
+			}
+			else 
+			{
+				allowReleaseContract = false;
+				
+				adjustedspotpayment = 0.0;
+				
+				RtriggerDiff = 0.0;
+				DtriggerDiff = 0.0;
+				triggerDiff  = 0.0;
+				magDiff      = 0.0;
+				freqDiff     = 0.0;
+				RBBstddev    = 0.0;
+				DBBstddev    = 0.0;
+				contractSplits   = 0.0;
+				RTTmagnitudeDiff = 0.0;
+				DTTmagnitudeDiff = 0.0;
+				RTTfrequencyDiff = 0.0;
+				DTTfrequencyDiff = 0.0;
+			}
+			
+			contractcount += 1;
+		}
+	}
+}
+
+void Simulation::realizationLoop()
+{
+	double durhamActualInflow, owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow;
+	double crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,actualEvap, actualFallsEvap, actualWBEvap;
+	double littleRiverRaleighActualInflow;
+	int season = 1, syntheticIndex = 0; // week 1 is non-irrigation season (season = 1)
+	double raleighBaselineMultiplier = 40434.0*.32*(falls_lake_supply_capacity/(falls_lake_supply_capacity + falls_lake_wq_capacity));
+	double durham_res_supply_capacity = 6349.0;
+	double cane_creek_supply_capacity = 2909.0;
+	double stone_quarry_supply_capacity = 200.0;
+	double university_lake_supply_capacity = 449.0;
+	double lake_wheeler_benson_supply_capacity = 2789.66;
+	double raleigh_durham_capacity = 10.0;
+	double teer_quarry_supply_capacity = 1315.0;
+	double teer_quarry_intake_capacity = 0.0;
+	double teer_quarry_outflow_capacity = 0.0;
+	double little_river_raleigh_supply_capacity = 0.0;
+	double western_wake_treatment_capacity = 0.0;
+	double durham_reclaimation_capacity = 0.0;
+	double raleigh_quarry_capacity = 4000.0;
+	double raleigh_quarry_intake_capacity = 0.0;
+	double raleigh_quarry_outflow_capacity = 0.0;
+	double raleigh_intake_capacity = 0.0;
+	double cary_quarry_capacity = 0.0;
+	double cary_quarry_intake_capacity = 0.0;
+	double cary_quarry_outflow_capacity = 0.0;
+	
+	/////////////////////////////////////////////////////////////////////////
+	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
+	
+	//double LMreleaseCap = 2000.0;
+		// assume that the max release allowed is 20% of total Durham storage 
+		// but that this is an additional, firm ceiling constraint
+		// now included above, read in the parameter input file
+	double LMreleaseMin = 0.0;
+		// no minimum contractual release
+	//double FallsSupplyAllocationFraction = 0.423;
+	//double FLSPreleaseFrac;
+		// fraction of FL conservation pool dedicated to
+		// water supply storage (the rest is the WQ pool)
+		// now in parameter input file
+	double NearFailureLimit = 0.2;
+		// if FL storage is below this, any releases 
+		// will go 100% into the water supply pool 
+	
+	/////////////////////////////////////////////////////////////////////////
+	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
+	
+	// int allowReleases = 1;
+		// logical to decide if releases are allowed or not
+		// specified in trianglesimulation 
+		
+	// numIntervals = 20;
+		// the number of discrete intervals of reservoir volume
+		// that will be tested in the createReservoirTargets function
+		// THIS IS SPECIFIED IN TRIANGLESIMULATIONSCRIPT
+	
+	//double ReleaseContractLength = 100.0*52;
+		// number of weeks the contract is good
+		// replaced by contractlength variable 
+	//double ReleaseContractPrice = 30000000.0/1000000.0;
+		// total cost of the releases contract in millions, to be paid on an annual basis?
+		// now included in parameter input file
+	
+	RcriticalStorageLevel = 1.00;
+	DcriticalStorageLevel = 0.25;
+		// currently arbitrarily set, later should be optimized
+		// previous to March 15, 2016, releases were based on 
+		// R and D reservoir levels alone, now they are based on
+		// the same ROF values as treated transfers
+
+	//double buybackratePerMG = 3500.0/1000000.0;
+		// currently equal to cost per quantity of treated transfer
+		// MAY 2016: RAISED TO 3500
+		// now included in parameter input file
+	
+	// MAY 2016 CHANGES - INCREASED TO 16 RANKS -----------------------------------
+	
+	rank = solutionNumber;
+		// solutionNumber is assigned as rank in triangleSimulation.cpp
+	
+	// ALL OF THIS COMMENTED CHUNK IS NOW DEALT WITH IN THE PARAMETER INPUT FILE 
+	/* durham.RRtrigger  = 0.02;
+	durham.TTriggerN  = 0.02;
+		// keep this firm at a very low level to preserve durham risk
+	
+	if (rank < 8)
+	{
+		raleigh.RRtrigger = 0.02 + rank * 0.02;
+			// vary this at 2% increasing by rank
+	}
+	else
+	{
+		raleigh.RRtrigger = 0.02 + (rank-8) * 0.02;
+			// vary this at 2% increasing by rank
+	}
+		// for now, I am running 16 ranks and I want 
+		// 2 matching sets of 8 runs
+		// because half will be done without releases and half with them.
+		
+	raleigh.TTriggerN = 0.02;
+		// hold this low across all ranks */
+	
+	// ----------------------------------------------------------------------------
+
+	/////////////////////////////////////////////////////////////////////////
+	///////////////// CREATE OUTPUT NAMES AND LOCATIONS /////////////////////
+	
+	if (printDetailedOutput)
+	{
+		std::string filenameA = "output/JLTreatedTransfers";
+		std::string filenameC = "output/RRfuncOutput";
+		std::string filenameD = "output/weeklyRiskParams";
+		std::string filenameG = "output/InfraBuilt"; 
+		std::string filenameZ = "output/ReleaseContract";
+		
+		std::string filenameEND = ".csv";
+			
+		std::string completeFilenameA;
+		std::string completeFilenameC;
+		std::string completeFilenameD;
+		std::string completeFilenameG;
+		std::string completeFilenameZ;
+			
+		std::stringstream sstmA;
+		std::stringstream sstmC;
+		std::stringstream sstmD;
+		std::stringstream sstmG;
+		std::stringstream sstmZ;
+			
+		sstmA << filenameA << rank << filenameEND;
+		sstmC << filenameC << rank << filenameEND;
+		sstmD << filenameD << rank << filenameEND;
+		sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
+		sstmZ << filenameZ << solutionNumber << "_" << rdmNumber << filenameEND;
+		
+		completeFilenameA = sstmA.str();
+		completeFilenameC = sstmC.str();
+		completeFilenameD = sstmD.str();
+		completeFilenameG = sstmG.str();
+		completeFilenameZ = sstmZ.str();
+		
+		openFile(out100, completeFilenameA);
+		openFile(outNew, completeFilenameC);
+		openFile(outRiskParams, completeFilenameD);
+		openFile(InfraBuilt, completeFilenameG);
+		openFile(ReleaseContractData, completeFilenameZ);
+			// all these are defined in the header file 
+		
+		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
+			// column headers for infrastructure builds 
+		
+		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+		out100 << "RaleighDirectTransferVolume" << "," << "DurhamDirectTransferVolume" << ",";
+		out100 << "RaleighIndirectTransferVolume" << "," << "DurhamIndirectTransferVolume" << ",";
+		out100 << "OWASATransferVolume" << "," << "OWASAExtraVolume" << ",";
+		out100 << "RaleighShorttermROF" << "," << "DurhamShorttermROF" << "," << "OWASAshorttermROF" << endl;
+			// csv column headers of treated transfer output data
+			
+		outRiskParams << "Rank" << "," << "Realization" << ",";
+		outRiskParams << "RaleighRRtrigger" << "," << "RaleighTTtrigger" << "," << "RaleighINFtrigger" << ",";
+		outRiskParams << "DurhamRRtrigger"  << "," << "DurhamTTtrigger"  << "," << "DurhamINFtrigger"  << ",";
+		outRiskParams << "RaleighJLalloc" << "," << "DurhamJLalloc" << "," << "JLallocationCap" << endl;
+			// csv column headers for csv containing ROF values
+			
+		if (spotPricing)
+		{
+			outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+			outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+			outNew << "ReleaseRequest" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+			outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
+			outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+			outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
+				// csv column headers for raw release output data and storage levels
+				
+			ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+			ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << ",";
+			ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << ",";
+			ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
+			ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
+			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
+			ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
+			ReleaseContractData << "contractcount" << "," << "adjustedspotpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << ",";
+			ReleaseContractData << "RequestMade" << "," << "RequestCurtail" << endl;
+		}
+		else
+		{
+			outNew << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+			outNew << "RaleighStorageRatio" << "," << "RaleighActualStorage" << "," << "RsupplyCapacity" << "," << "DurhamStorageRatio" << "," << "DurhamSpillage" << ",";
+			outNew << "ReleaseRequest" << "," << "BuybackQuantity" << "," << "BuybackStorageLevel" << "," << "FLsupplyStorage" << "," << "DurhamActualStorage" << ",";
+			outNew << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << "," << "DurhamTargetBuybackLevel" << ",";
+			outNew << "ReleaseMaxLimit" << "," << "AdjustedRequestLogical" << "," << "MinimumEnvReleaseToFL" << ",";
+			outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
+				// csv column headers for raw release output data and storage levels
+				
+			ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+			ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << "," << "contractbuybacks" << ",";
+			ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
+			ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
+			ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
+			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
+			ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
+			ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
+		}	
+	}
+	
+	////////////// OTHER PARAMS /////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+		
+	int weekcounter;
+	int contractriskyearcounter;
+	int LOOPCHECKER;
+	int contractcount;
+	int firstyear;
+	int yearcounter;
+	int currentcontract;
+	
+	fallsFailurePoint = 0.2;
+	zeroes(totalFallsFailure, terminateYear);
+	maxFallsFailure = 0.0;
+        // setting initial infrastructure values, storage and capacities
+        // must all be equal to 0 at beginning of each realization, before 60yrs go by
+
+	//systemStorage.openResFiles();
+	//openFile(out1,"raleighDemand.csv");
+	//openFile(out3,"riskOfFailureFile.csv");
+	
+	///////////// RUN THE LOOP //////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+	
+	for (int realization = 0; realization < numRealizations; realization++)
+	{
+		///////////////////// RESET COUNTERS /////////////////////////////////////////////////////////////////////////////
+		
+		weekcounter = 0;
+		yearcounter = 0;
+		contractriskyearcounter = 0;
+		LOOPCHECKER = 0;
+		allowReleaseContract = true;
+		contractcount = 1;
+		currentcontract = 1;
+		contractbuybacks = 0.0;
+		systemStorage.ReqCount = 0;
+		systemStorage.ReqCurtail = 0;
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		// Initialize demand and reservoir storage objects (year, month, week, daysPerWeek, leapYearCounter)
+		simDates.initializeDates(startSimulationYear,1,1,7,0);
+
+		systemStorage.initializeReservoirStorage(durham_res_supply_capacity,
+													cane_creek_supply_capacity, stone_quarry_supply_capacity,university_lake_supply_capacity, lake_wheeler_benson_supply_capacity, falls_lake_supply_capacity, falls_lake_wq_capacity,
+													jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity, 
+													raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
+													little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, raleigh_quarry_intake_capacity, 
+													raleigh_quarry_outflow_capacity, raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
+													owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,1,
+													LMreleaseCap, LMreleaseMin); 
+														// infrastructure included in the model
+														// MICHIE RELEASE MIN AND CAP INCLUDED HERE (BY DAVID)
+            // actual reservoir storage
+
+		riskOfFailureStorageInf.initializeReservoirStorageROF(durham_res_supply_capacity,
+																cane_creek_supply_capacity,	stone_quarry_supply_capacity,				
+																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,falls_lake_supply_capacity, 
+																falls_lake_wq_capacity, jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, 
+																durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity,raleigh.jordanLakeAlloc, 
+																durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, 
+																teer_quarry_intake_capacity, teer_quarry_outflow_capacity, little_river_raleigh_supply_capacity, 
+																western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, 
+																raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
+																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
+																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
+																LMreleaseCap, LMreleaseMin);
+            // used once per year to calculate ROF
+
+		riskOfFailureStorageROF.initializeReservoirStorageROF(durham_res_supply_capacity,
+																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
+																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
+																falls_lake_supply_capacity, falls_lake_wq_capacity,					
+																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
+																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
+																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
+																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
+																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
+																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, 
+																raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
+																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
+																LMreleaseCap, LMreleaseMin);
+            // calculated every week using current storage
+
+		riskOfFailureStorageIP.initializeReservoirStorageROF(durham_res_supply_capacity,
+																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
+																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
+																falls_lake_supply_capacity, falls_lake_wq_capacity,					
+																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
+																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
+																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
+																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
+																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
+																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
+																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, owasa.westernWakeTreatmentFrac, 
+																durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
+																LMreleaseCap, LMreleaseMin);
+            // based on weekly changes this calculates insurance payouts
+
+		year = simDates.getYear();//passes the dates from the simDates class to the main simulation
+		month = simDates.getMonth();
+		week = simDates.getWeek();
+		numdays = simDates.getDays();
+		
+		if (yearcounter == 0)
+		{
+			firstyear = year;
+			adjustedannualpayment = annualpayment;
+			adjustedbuybackpayment = buybackratePerMG;
+		}
+
+		durham.clearVariablesForRealization(year);
+		owasa.clearVariablesForRealization(year);
+		raleigh.clearVariablesForRealization(year);
+		cary.clearVariablesForRealization(year);
+            // another level of resetting
+
+		durham.priceInsurance(year, realization);
+		owasa.priceInsurance(year, realization);
+		raleigh.priceInsurance(year, realization);
+		cary.priceInsurance(year, realization);
+
+		int caryWTPcounter = 0;
+		double durhamReclaimedCap = durham_reclaimation_capacity;
+		double durhamTreatmentCap = western_wake_treatment_capacity*durham.westernWakeTreatmentFrac;
+		double owasaTreatmentCap = western_wake_treatment_capacity*owasa.westernWakeTreatmentFrac;
+		double raleighTreatmentCap = western_wake_treatment_capacity*raleigh.westernWakeTreatmentFrac;
+		double raleighIntakeCap = raleigh_intake_capacity;
+		zeroes(caryBuild,3);
+		thisYearFalls = 0;
+		
+		while (year-1<(terminateYear))
+            // in a single realization, from year to year
+		{
+			// July 2016: new weekly order of operations for non-structural options
+			//	0.	Dates are updated, etc.
+			//	1. 	ROF calculated for insurance and releases 
+			//	2.	Releases calculated, storage and spillage re-set 
+			//	3.	ROF for transfers and restrictions calculated 
+			//	4.	Restrictions imposed, demand recalculated
+			//	5.	Treated transfers calculated, storage etc. updated
+			
+			
+			syntheticIndex = (year-1)*52+week-1;
+
+			// update on/off triggers for each restriction stage
+			if (week > 16 && week < 39) 
+				// Irrigation season
+				season = 0;
+			else
+				season = 1;
+
+
+			createRiskOfFailure_InsuranceReleases(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
+												  numIntervals);
+                // gives the ROF of this given week
+				// July 2016: this function just does ROF for insurance and releases 
+
+			if (allowReleases == 1 && allowReleaseContract)
+				// allow transfers, apply raw releases 
+				// in a given week, transfers calculated before transfers
+				// however, ROF is not updated.  this should work out as long as
+				// release quantities are not capped at a low level
+				// (think: first week of a month of triggered ROF will see large
+				// transfers and releases, but the releases in first week will lead to
+				// no transfers in following weeks)
+			{	
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////// CALCULATE RELEASES HERE /////////////////////////////////////////////////////
+				
+				if (systemStorage.getRaleighStorage() < NearFailureLimit)
+				{
+					FLSPreleaseFrac = 1.0;
+						// if Raleigh's total storage is below 30%
+						// any request releases can be completely used to
+						// augment water supply, rather than be split between
+						// water supply and water quality FL pools
+				}
+				else
+				{
+					if (indepReleaseAlloc)
+					{
+						FLSPreleaseFrac = FallsSupplyAllocationFraction;
+					}
+					else
+					{
+						FLSPreleaseFrac = systemStorage.getFallsSupplyAllocFrac();
+					}
+						// the input parameter for how much of each release goes to water supply
+						// is overwritten to be equal to the current conservation pool ratio 
+				}
+				
+				if (spotPricing)
+				{
+					if (currentcontract != contractcount)
+					{
+						systemStorage.ReqCount   = 0;
+						systemStorage.ReqCurtail = 0;
+					}
+					
+					systemStorage.calcSpotReleases(realization, outNew, allowReleaseContract, numRealizationsTOREAD, printDetailedOutput, 
+												   LMreleaseCap, rank, year, week, raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1],
+												   FLSPreleaseFrac, RcriticalStorageLevel, DcriticalStorageLevel);
+						// function calculates releases to Raleigh when spot pricing is used 
+						
+					raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
+					durham.weeklyReleaseVolume  = systemStorage.getRaleighReleases();
+					
+					raleigh.ReleaseSpotPayment(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
+					durham.ReleaseSpotAccept(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
+				}
+				else
+				{
+					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
+											  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, durham.BuybackRiskVolume[week-1],
+											  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput);
+						// AUGUST 2016: this function calculates releases and buybacks using an option system 
+						// (annual Raleigh payment, buyback payments by Durham for "breaking" the contract)
+					
+					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					
+					if (currentcontract == contractcount)
+					{
+						contractbuybacks += durham.weeklyBuybackVolume;
+					}
+					else 
+					{
+						contractbuybacks = 0.0;
+						contractbuybacks += durham.weeklyBuybackVolume;
+					}
+						// count the buybacks that occur over the course of the contract 
+						// the contract count is updated after transfer info is captured below 
+					
+					if (durham.weeklyBuybackVolume > 0.0)
+					{
+						durham.payForBuybacks(adjustedbuybackpayment);
+						raleigh.acceptBuybackPayment(adjustedbuybackpayment);
+					}
+					
+					if (week == 1)
+					{
+						raleigh.payForReleases(adjustedannualpayment, contractlength);
+						durham.acceptReleasePayment(adjustedannualpayment, contractlength);
+							// annual payment
+							// because payment type has been changed to annual type,
+							// the contract length variable is unnecessary 
+					}
+				}
+				
+				//Update reservoir storage levels
+				systemStorage.setSpillover(week-1);
+				systemStorage.updateStorage(week-1);
+					// set min releases
+			}
+			
+			createRiskOfFailure_RestrictionsTransfers(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
+				// generate the week's ROF for restrictions and transfers
+				// which are applied after releases are in a week 
+			
+			durham.fillRestrictionsArray(season);
+			owasa.fillRestrictionsArray(season);
+			cary.fillRestrictionsArray(season);
+			raleigh.fillRestrictionsArray(season);
+			
+			// Use the demand PDF to estimate uncertain demand, also finds current level of restrictions (and revenue losses from them)
+			// Raleigh uses Durham's data for the inflow-demand PDF
+			durham.calculateDemand(realization, week, numdays, year);
+			owasa.calculateDemand(realization, week, numdays, year);
+			cary.calculateDemand(realization, week, numdays, year);
+			raleigh.calculateDemand(realization, week, numdays, year);
+                // give unrestricted demand in each week
+				
+			durham.calculateRestrictions(year, week, numdays, month, realization);
+			owasa.calculateRestrictions(year, week, numdays, month, realization);
+			cary.calculateRestrictions(year, week, numdays, month, realization);
+			raleigh.calculateRestrictions(year, week, numdays, month, realization);
+                // is ROF high enough to implement restrictions?
+
+			systemStorage.setDemands(durham.weeklyDemand, owasa.weeklyDemand, raleigh.weeklyDemand, cary.weeklyDemand, numdays);
+				//pass weekly demand values to reservoir storage update function
+
+			//Translate inflows and evap from weekly variations to a physical volume
+			durhamActualInflow = durhamInflows.synthetic[realization][syntheticIndex];
+			owasaActualInflow = owasaInflows.synthetic[realization][syntheticIndex];
+			fallsActualInflow = fallsInflows.synthetic[realization][syntheticIndex];
+			wbActualInflow = wheelerInflows.synthetic[realization][syntheticIndex];
+			claytonActualInflow = claytonInflows.synthetic[realization][syntheticIndex];
+			crabtreeActualInflow = crabtreeInflows.synthetic[realization][syntheticIndex];
+			jordanActualInflow = jordanInflows.synthetic[realization][syntheticIndex];
+			lillingtonActualInflow = lillingtonInflows.synthetic[realization][syntheticIndex];
+			littleRiverRaleighActualInflow = littleRiverRaleighInflows.synthetic[realization][syntheticIndex];
+
+			actualEvap = durhamOwasaEvap.synthetic[realization][syntheticIndex];
+			actualFallsEvap = fallsEvap.synthetic[realization][syntheticIndex];
+			actualWBEvap = wheelerEvap.synthetic[realization][syntheticIndex];
+                // real inflow and evap records
+
+			//Pass along inflow values
+			systemStorage.setInflow(durhamActualInflow, 31.4*owasaActualInflow,
+				28.7*owasaActualInflow, 1.2*owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow, crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,
+							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
+							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
+			
+			if (formulation > 0)
+			{
+				//Transfer requests are granted based on the limitations of infrastructure
+				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand);
+                    // who gets transfers based on want and availability
+
+				durham.weeklyTransferVolume = systemStorage.getDurhamTransfers();
+				owasa.weeklyTransferVolume = systemStorage.getOWASATransfers();
+				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
+                    // each utility assigned the costs of the transfers they get
+					
+				if (allowReleases == 1)
+				{
+					if (week == 1)
+					{
+						raleigh.TransferHistory[contractriskyearcounter]   = 0.0;
+						raleigh.TransferFrequency[contractriskyearcounter] = 0.0;
+						
+						durham.TransferHistory[contractriskyearcounter]   = 0.0;
+						durham.TransferFrequency[contractriskyearcounter] = 0.0;
+					}
+					
+					if (raleigh.weeklyTransferVolume > 0)
+					{
+						raleigh.TransferHistory[contractriskyearcounter]   += raleigh.weeklyTransferVolume;
+						raleigh.TransferFrequency[contractriskyearcounter] += 1;
+					}
+					
+					if (durham.weeklyTransferVolume > 0)
+					{
+						durham.TransferHistory[contractriskyearcounter]   += durham.weeklyTransferVolume;
+						durham.TransferFrequency[contractriskyearcounter] += 1;
+					}
+
+					if (currentcontract == contractcount)
+					{
+						contracttransfersD += durham.weeklyTransferVolume;
+					}
+					else 
+					{
+						contracttransfersD = 0.0;
+						contracttransfersD += durham.weeklyTransferVolume;
+						
+						currentcontract = contractcount;
+					}					
+				}
+					// collect transfer information of most recent 20 years for release contract negotiation 
+				
+				if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
+				{
+					out100 << rank << "," << realization << "," << year << "," << week << ",";
+					out100 << systemStorage.raleighDirect << "," << systemStorage.durhamDirect << ",";
+					out100 << systemStorage.raleighIndirect << "," << systemStorage.durhamIndirect << ",";
+					out100 << systemStorage.owasaDirect << "," << systemStorage.extraCap << ",";
+					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << "," << owasa.riskOfFailure << endl;
+				}
+				
+				durham.payForTransfers(transferCosts);
+				owasa.payForTransfers(transferCosts);
+				raleigh.payForTransfers(transferCosts);
+					
+				if((durham.weeklyTransferVolume+owasa.weeklyTransferVolume+raleigh.weeklyTransferVolume)>0.0)
+				{
+					cary.Fund.add((durham.weeklyTransferVolume + owasa.weeklyTransferVolume + raleigh.weeklyTransferVolume)*transferCosts);
+						// Use the mitigation fund to calculate water transfer payments (sent to Cary)
+				}
+				
+				//Update reservoir storage levels
+				systemStorage.setSpillover(week-1);
+				systemStorage.updateStorage(week-1);
+					// set min releases
+				
+				weekcounter += 1;
+			}
+			
+			//Update reservoir storage levels
+			systemStorage.setSpillover(week-1);
+			systemStorage.updateStorage(week-1);
+                // set min releases
+
+			//Retrieve the weekly transfers
+			// Get current weekly demand baseline values for each utility
+			durhamFlowWeekBaseline = durham.demandBaseline[year-1][week-1] - durhamReclaimedInsuranceTrigger*durhamReclaimedCap*numdays - wwWTPInsuranceTrigger*durhamTreatmentCap*numdays;
+			owasaFlowWeekBaseline = owasa.demandBaseline[year-1][week-1]  - wwWTPInsuranceTrigger*owasaTreatmentCap*numdays;
+			raleighFlowWeekBaseline = raleigh.demandBaseline[year-1][week-1] + fallsEvap.averages[week-1]*raleigh.Fund.insuranceStorage*raleighBaselineMultiplier - wwWTPInsuranceTrigger*raleighTreatmentCap*numdays - ralIntakeInsuranceTrigger*raleighIntakeCap*numdays;
+			caryFlowWeekBaseline = cary.demandBaseline[year-1][week-1];
+                // expect withdrawal from reservoirs, corrected for reclaimed water or treatment at JL
+
+			durhamSpill = systemStorage.getDurhamSpillage();
+			OWASASpill = systemStorage.getOWASASpillage();
+			insuranceFallsInflow = (fallsActualInflow + durhamSpill + durham.weeklyDemand*returnRatio[0][week-1]-systemStorage.fallsArea*actualFallsEvap)*(falls_lake_supply_capacity/34700.0) + raleigh.weeklyTransferVolume;
+			insuranceJordanInflow = (OWASASpill + owasa.weeklyDemand*returnRatio[1][week-1] + durham.weeklyDemand*(returnRatio[1][week-1] - returnRatio[0][week-1]) +
+					jordanActualInflow-actualEvap*13900)*cary.jordanLakeAlloc*(45800.0/(94600.0+45800.0));
+
+			//Determine insurance payout (goes directly to the mitigation fund)
+			durham.setInsurancePayment(durhamFlowWeekBaseline, durhamActualInflow + durham.weeklyTransferVolume, week);
+			owasa.setInsurancePayment(owasaFlowWeekBaseline, owasaActualInflow*61.3 + owasa.weeklyTransferVolume, week);
+			raleigh.setInsurancePayment(raleighFlowWeekBaseline, insuranceFallsInflow + littleRiverRalInsuranceTrigger*littleRiverRaleighActualInflow, week);
+			cary.setInsurancePayment(caryFlowWeekBaseline, insuranceJordanInflow, week);
+
+			//retrieve updated storage levels
+			owasa.storageFraction = systemStorage.getOWASAStorage();
+			durham.storageFraction = systemStorage.getDurhamStorage();
+			raleigh.storageFraction = systemStorage.getRaleighStorage();
+			cary.storageFraction = systemStorage.getCaryStorage();
+
+			//update timestep
+			simDates.increase();
+			year = simDates.getYear();
+			month = simDates.getMonth();
+			week = simDates.getWeek();
+			numdays = simDates.getDays();
+			durham.weeklyUpdate();
+			owasa.weeklyUpdate();
+			raleigh.weeklyUpdate();
+			cary.weeklyUpdate();
+			updateFallsQuality();
+			
+			if (week == 1)
+                // if on a new year...
+			{
+				createInfrastructure(realization);
+				createInfrastructureRisk(realization, year-1, durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
+					// infrastructure risk is also used for renegotiating release contracts 
+					
+				raleigh.SpinupRisk[contractriskyearcounter] = raleigh.infRisk;
+				durham.SpinupRisk[contractriskyearcounter]  = durham.infRisk;
+					// store the most recent 20 years of annual baseline ROF 
+				
+				if (printDetailedOutput)
+				{
+					if (spotPricing)
+					{
+						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
+						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk;
+						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << ",";
+						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
+						ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+					}
+					else 
+					{
+						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
+						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
+						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
+						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
+						ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+					}
+				}
+					
+				triggerInfrastructure(realization);
+                    // check on infra
+
+				durham.annualUpdate(year-1, realization);
+				owasa.annualUpdate(year-1, realization);
+				cary.annualUpdate(year-1, realization);
+				raleigh.annualUpdate(year-1, realization);
+                    // update of financial stuff
+
+				//Upgrade Cary WTP to 56 MGD in 2016
+				if (caryUpgrades[caryWTPcounter]<cary.averageUse&&caryBuild[caryWTPcounter]==0)
+                    // thresholds based on annual demand
+				{
+					cary.addDebt(year, realization, caryWTPcosts[caryWTPcounter], bondLength, bondRate);
+					caryBuild[caryWTPcounter] += 1;
+					caryWTPcounter++;
+				}
+				for(int x = 0; x<3; x++)
+				{
+					if(caryBuild[x]>0&&caryBuild[x]<4)
+					{
+						caryBuild[x] += 1;
+						if(caryBuild[x]==4)
+						{
+							systemStorage.upgradeCaryTreatmentPlant(x);
+						}
+					}
+				}
+				if(thisYearFalls == 1)
+				{
+					totalFallsFailure[year-2] += 1.0/double(numRealizations);
+                        // failure for falls lake WQ pool
+				}
+				thisYearFalls = 0;
+				durhamReclaimedCap = systemStorage.getDurhamReclaimedCap();
+				durhamTreatmentCap = systemStorage.getDurhamTreatment();
+				owasaTreatmentCap = systemStorage.getOWASATreatment();
+				raleighTreatmentCap = systemStorage.getRaleighTreatment();
+				raleighIntakeCap = systemStorage.getRaleighIntake();
+                    // all reset for the week
+			
+				if (allowReleases == 1)
+				{
+					if (spotPricing)
+					{
+						calculateSpotContract(yearcounter, LOOPCHECKER, realization, firstyear, contractcount);
+						
+						if (printDetailedOutput)
+						{
+							ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
+							ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
+							ReleaseContractData << contractcount << "," << adjustedspotpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << ",";
+							ReleaseContractData << systemStorage.ReqCount << "," << systemStorage.ReqCurtail << endl;
+						}
+					}
+					else 
+					{
+						calculateOptionContract(yearcounter, LOOPCHECKER, realization, firstyear, contractcount);
+						
+						if (printDetailedOutput)
+						{
+							ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
+							ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
+							ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
+						}
+					}
+				}
+				
+				contractriskyearcounter += 1;
+				if (contractriskyearcounter > 19)
+				{
+					contractriskyearcounter = 0;
+				}					
+					// adjust this index every 20 years to overwrite itself with new ROF data 
+			}
+
+		} // End weekly loop
+		
+		if ((realization < numRealizationsTOREAD) && printDetailedOutput)
+		{
+			outRiskParams << rank << "," << realization << ",";
+			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
+			outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
+			outRiskParams << raleigh.jordanLakeAlloc << "," << durham.jordanLakeAlloc << "," << availableJLallocation << endl;
+				// write outputs for risk and other triggers that don't change over the course of simulation
+		}
+
+	} //end realization loop
+	
+	if (printDetailedOutput)
+	{
+		out100.close();
+		outNew.close();
+		outRiskParams.close();
+		InfraBuilt.close();
+		ReleaseContractData.close();
+	}
+
+	durham.calculateObjectives();
+	owasa.calculateObjectives();
+	cary.calculateObjectives();
+	raleigh.calculateObjectives();
+        // calculate objectives once all simulations are finished
+
+	for(int x = 0; x< terminateYear; x++)
+	{
+		if(totalFallsFailure[x]>maxFallsFailure)
+		{
+			maxFallsFailure = totalFallsFailure[x];
+		}
+	}
+
+	return;
+}
+void Simulation::updateFallsQuality()
+{
+	double qualityStorage = 0.0;
+	qualityStorage = systemStorage.getFallsQuality();
+	if(qualityStorage < fallsFailurePoint)
+	{
+		thisYearFalls = 1;
+	}
+	return;
+}
+Simulation::~Simulation()
+{
+	zap(xreal);
+	zap(actualStreamflows);
+	zap(totalFallsFailure);
+}
+
+

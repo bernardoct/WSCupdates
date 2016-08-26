@@ -1885,6 +1885,165 @@ void ReservoirStorage::calcRawReleases(double DreleaseWeekCap, double DreleaseMi
 	return;
 }
 
+void ReservoirStorage::calcSpotReleases(int realization, ofstream &streamFile, bool ACTIVE, int numreal, bool writefiles, 
+										double ReleaseCap, int rank, int year, int week, double Rtrigger, double Dtrigger,
+										double FLSPsize, double Rcutoff, double Dcutoff)
+{
+	// This function will assume that Durham is under no obligation to release water (unlike in an option contract)
+	// and all releases will be paid for on the spot by Raleigh, based on some price per unit of water agreed upon
+	// in contract negotiations between the cities (which will factor in risk aversion). Releases will be determined
+	// based on a few bounding contstraints (how much water is available to move, what ROF each city feels in a week). 
+	
+	// Because Durham is not obligated to release water, there is no punishment for denying release requests by Raleigh.
+	// However, the number of times requests are denied will be stored and used in contract negotiations in the future.
+	
+	if (ACTIVE)
+		// if the release contract is allowed
+	{
+		RreleaseRequest  = 0.0;
+		DbuybackQuantity = 0.0;
+		DbuybackStorageLevel = 0.0;
+			// initially zero
+			// FOR THIS FUNCTION, BUYBACKS WILL ALWAYS BE 0 BECAUSE 
+			// THIS IS NOT AN OPTION CONTRACT 
+			// (must be set here because it is declared in simulation.cpp so it can't be unset)
+			
+		DreleaseMax = durhamStorage / 5.0;
+			// releases can only be up to 20% of Durham's current supply storage
+			// or capped at another arbitrary limit of 2000 MGW (LMreleaseCap)
+		
+		if (DreleaseMax > ReleaseCap)
+		{
+			DreleaseMax = ReleaseCap;
+				// if this is set to 0, no releases will occur 
+		}
+			
+		if (week < 21 || week > 47)
+			// Spillage rules for Durham Reservoir at Little River
+		{
+			DminEnvSpill = 3.877 * numdays;
+				// determine minimum environmental release from Durham to Falls Lake
+		}
+		else
+		{
+			DminEnvSpill = 9.05;
+		}
+		
+		if (Rtrigger > (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity))
+			// Raleigh requests a release if their current storage is below their target levels, determined by ROF 
+		{
+			ReqCount += 1;
+			
+			///////// ROF Constraints //////////
+			
+			if (Dtrigger >= durhamStorage/durhamCapacity)
+			{
+				RreleaseRequest = 0.0;
+				ReqCurtail += 1;
+			}
+			else if (Rtrigger <= (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity))
+			{
+				RreleaseRequest = 0.0;
+			}
+			else 
+				// here, Durham's storage is above their ROF trigger level, Raleigh's is below theirs, and Durham's ROF < Raleigh's ROF 
+				// now, must locate the storages for each city which have the same ROF (equal marginal benefit for either city)
+			{
+				RreleaseRequest = ((Rtrigger * (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) - (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)) / FLSPsize;
+					// 1: Determine what Raleigh requires to meet ROF target storage 
+				
+				if (RreleaseRequest > (durhamStorage - Dtrigger*durhamCapacity))
+				{
+					RreleaseRequest = (durhamStorage - Dtrigger*durhamCapacity);
+					ReqCurtail += 1;
+				}
+					// 2: Check if the request overwhelms Durham, and adjust if so
+			}
+			
+			//////// General Bounding Constraints ////////
+			
+			if (durhamSpillage > DminEnvSpill)
+			{
+				RreleaseRequest -= (durhamSpillage - DminEnvSpill);
+					// if Durham is spilling water beyond minimum requirements, no need to "release"
+			}
+			
+			if (RreleaseRequest > DreleaseMax)
+			{
+				RreleaseRequest = DreleaseMax;
+					// this represents the size of the release in MG in the given WEEK
+			} 
+			
+			if (fallsLakeSupplyStorage + (RreleaseRequest * FLSPsize) > Rcutoff*fallsLakeSupplyCapacity)
+			{
+				RreleaseRequest = (Rcutoff * fallsLakeSupplyCapacity - fallsLakeSupplyStorage) / FLSPsize;
+					// if Falls Lake is too full to accept all requested water up to critical level
+			}
+			
+			if ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) >= Rcutoff)	
+			{
+				RreleaseRequest = 0.0;
+					// if raleigh already has storage at a given level, no releases requested
+			}
+			
+			if (durhamStorage/durhamCapacity <= Dcutoff)
+				// if durham's storage is too low, they can deny releases
+			{
+				RreleaseRequest = 0.0;
+				ReqCurtail += 1;
+			}
+			
+			if (RreleaseRequest < 0.0)
+			{
+				RreleaseRequest = 0.0;
+					// ensure non-negative value (possibly introduced when accounting for spillage)
+			}
+			
+		}
+		
+		durhamStorage           -= RreleaseRequest;
+		fallsLakeSupplyStorage  += RreleaseRequest * FLSPsize;
+		
+		if (fallsLakeQualityStorage + (RreleaseRequest * (1-FLSPsize)) > fallsLakeQualityCapacity)
+			// because the only objective of releases is to fill the water supply pool, release requests are made
+			// without consideration of whether or not the water quality pool will overrun.  if the water supply request 
+			// is met, and the water allocated to the WQ pool overruns the WQ pool capacity, the request will be curtailed
+			// but this reduction WILL NOT affect the amount of water that goes to water supply (calculated already)
+		{
+			RreleaseRequest -= ((fallsLakeQualityStorage + (RreleaseRequest * (1-FLSPsize))) - fallsLakeQualityCapacity);
+				// if Falls Lake quality pool is too full to accept all requested water up to critical level
+			fallsLakeQualityStorage = fallsLakeQualityCapacity;
+			requestadjusted = 1;
+		}
+		else
+		{
+			fallsLakeQualityStorage += RreleaseRequest * (1 - FLSPsize);
+			requestadjusted = 0;
+		}
+	}
+	else 
+	{
+		RreleaseRequest = 0.0;
+		DbuybackQuantity = 0.0;
+		DbuybackStorageLevel = 0.0;
+	}
+	
+	if ((realization < numreal) && writefiles)
+		// for each week, output all this info to a csv
+	{
+		streamFile << rank << "," << realization << "," << year << "," << week << ",";
+		streamFile << ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity)) << ",";
+		streamFile << (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage) << "," << (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity) << ",";
+		streamFile << (durhamStorage/durhamCapacity) << "," << durhamSpillage << ",";
+		streamFile << RreleaseRequest << "," << fallsLakeSupplyStorage << "," << durhamStorage << ",";
+		streamFile << Rtrigger << "," << Dtrigger << ",";
+		streamFile << DreleaseMax << "," << requestadjusted << ","<< DminEnvSpill << ",";
+		streamFile << fallsLakeQualityStorage << "," << fallsLakeQualityCapacity << "," << fallsLakeSupplyCapacity << "," << durhamCapacity << "," << FLSPsize << endl;
+	}	
+	
+	return;
+}
+
 double ReservoirStorage::getRaleighReleases()
 {
 	return RreleaseRequest;

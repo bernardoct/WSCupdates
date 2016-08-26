@@ -24,6 +24,10 @@ public:
 	void calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
 						 double RstorageTarget, double DstorageTarget, double FallsSupplyFraction, double DbuybackLevel,
 						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput);
+	void calcSpotReleases(int realization, ofstream &streamFile, bool ACTIVE, int numreal, bool writefiles, 
+						  double ReleaseCap, int rank, int year, int week, double Rtrigger, double Dtrigger,
+						  double FLSPsize, double Rcutoff, double Dcutoff);
+	
 	double getRaleighReleases();
 	double getDurhamBuybackRequest();
 	
@@ -101,6 +105,9 @@ public:
 	double getOWASAJordanStorageVol();
 	double getLittleRiverRalStorageVol();
 	double getRaleighQuarryStorageVol();
+	
+	int ReqCount;
+	int ReqCurtail;
 
 private:
 	

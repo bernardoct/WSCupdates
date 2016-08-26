@@ -170,7 +170,7 @@ int main (int argc, char *argv[])
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 71;
+	int c_num_dec = 74;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
@@ -340,6 +340,12 @@ int main (int argc, char *argv[])
 			// if true, read from folder extension bernardo uses 
 		simulation.printDetailedOutput = true;
 			// determines whether to write all the output csvs that I want 
+		simulation.spotPricing = true;
+			// determines whether releases are controlled with spot agreements
+			// or with an option contract 
+		simulation.tieredSpotPricing = false;
+			// says whether or not spot pricing is tiered or 
+			// a flat rate 
 		simulation.indepReleaseAlloc = false;
 			// this determines whether release allocation into FL conservation pool
 			// is based on the input parameter file or based on the current week's

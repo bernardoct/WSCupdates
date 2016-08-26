@@ -144,6 +144,8 @@ class WaterUtility
 	void acceptReleasePayment(double contractValue, double contractLengthWeeks);
 	void payForBuybacks(double buybackratePerMG);
 	void acceptBuybackPayment(double buybackratePerMG);
+	void ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor);
+	void ReleaseSpotAccept(bool tiered, double floorRate, double tiersize, double tierFactor);
 	
 	//~~~~~~~~~~~~~~~~ Private class members ~~~~~~~~~~~~~~~~~~~~~~~
 	private:
