@@ -7,11 +7,11 @@ public:
 	//ReservoirStorage();
 	double fallsArea;
 	
-	void initializeReservoirStorage(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin);
+	void initializeReservoirStorage(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin, double RaleighLMCap);
 	
-	void initializeReservoirStorageROF(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin);
+	void initializeReservoirStorageROF(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin, double RaleighLMCap);
 	
-	void updateReservoirStorageROF(double durhamS, double teerS, double CCRS, double ULS, double STQS, double owasaS, double lakeWBS, double flSS, double flQS, double jlSS, double jlQS, double caryJordanS, double raleighJordanS, double durhamJordanS, double owasaJordanS, double littleRiverRalS, double raleighQS);
+	void updateReservoirStorageROF(double durhamS, double teerS, double CCRS, double ULS, double STQS, double owasaS, double lakeWBS, double flSS, double flQS, double jlSS, double jlQS, double caryJordanS, double raleighJordanS, double durhamJordanS, double owasaJordanS, double littleRiverRalS, double raleighQS, double RLMstor);
 	void updateReservoirStorageROF();
 	
 	void setDemands(double durham, double owasa, double cary, double raleigh, int numberOfDaysInWeek);
@@ -23,7 +23,8 @@ public:
 	
 	void calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
 						 double RstorageTarget, double DstorageTarget, double FallsSupplyFraction, double DbuybackLevel,
-						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput);
+						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput,
+						 bool ACTIVE);
 	void calcSpotReleases(int realization, ofstream &streamFile, bool ACTIVE, int numreal, bool writefiles, 
 						  double ReleaseCap, int rank, int year, int week, double Rtrigger, double Dtrigger,
 						  double FLSPsize, double Rcutoff, double Dcutoff);
@@ -52,6 +53,10 @@ public:
 	double getRaleighTreatment();
 	double getRaleighIntake();
 	double getFallsQuality();
+	double getRaleighLMStorage();
+	double getRaleighLMCapacity();
+	double getRaleighCapacity();
+	double getDurhamCapacity();
 	
 	double getFallsSupplyStorage();
 	double getFallsSupplyAllocFrac();
@@ -63,6 +68,11 @@ public:
 	double durhamIndirect;
 	double extraCap;
 	double owasaDirect;
+	double LMRaleighCapacity;
+	double raleighMichieStorage;
+	
+	void buildMichieSharedLow(double ratio);
+	void buildMichieSharedHigh(double ratio);
 	
 	void upgradeCaryTreatmentPlant(int counter);
 	void upgradeCaryTreatmentPlant2();

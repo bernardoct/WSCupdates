@@ -57,10 +57,10 @@ void usage(int argc, char* argv[])
 // Global simulation object
 Simulation simulation;
 
-//void calculationWrapperFunction(double *xreal, double *obj, double *constr)
-//{
-//	simulation.calculation(xreal, obj, constr);
-//}
+void calculationWrapperFunction(double *xreal, double *obj, double *constr)
+{
+	simulation.calculation(xreal, obj, constr);
+}
 	// THIS IS DIFFERENT BECAUSE I ADDED AN OUTPUT.  NEED TO UNCOMMENT THIS WHEN OPTIMIZING
 	// DONT FORGET ABOUT THIS
 	// everything related to using the moea is commented out to let me create some outputs
@@ -87,12 +87,14 @@ int main (int argc, char *argv[])
 			case 'r':
 				numRealizations = atoi(optarg);
 				break;
+					// r has to be <= t (below)
 			case 'u':
 				nDeeplyUncertainSets = atoi(optarg);
 				break;
 			case 't':
 				simulation.numRecords = atoi(optarg);
 				break;
+					// number of synthetic records to read in 
 			case 'c':
 				simulation.formulation = atoi(optarg);
 				break;
@@ -145,6 +147,8 @@ int main (int argc, char *argv[])
 		// used for insurance payouts and for 
 		// setting the "GUIDE curve" for raleigh
 		// and durham water supply for release determination
+	simulation.discountrate = 0.05;
+		// discount rate on present value calculations 
 	simulation.numContractRiskYears = 20;
 		// the number of years of baseline ROF that will be stored
 		// for use in release contract determination 
@@ -170,7 +174,7 @@ int main (int argc, char *argv[])
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 74;
+	int c_num_dec = 75;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
@@ -183,7 +187,7 @@ int main (int argc, char *argv[])
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
 	
-	simulation.runHistoric = true;
+	simulation.runHistoric = false;
 		// determines whether to use fake historic streamflows
 		// in place of synthetic flows 
 		// these flows still won't be read until the fixRDMFactors function runs 
@@ -231,6 +235,7 @@ int main (int argc, char *argv[])
 	//Generates synthetic streamflows using the autocorrelated bootstrap technique.
 	//Streamflows records have weekly values with a length of 52*(terminateYear)
 	//there are a number of streamflow records generated equal to (numRealizations)
+	
 	//cout << "generate streamflows" << endl;
 	
 	
@@ -242,6 +247,30 @@ int main (int argc, char *argv[])
 
 	//Function not needed - data is inputted from file
 	//simulation.createRiskOfFailure();
+	
+	simulation.use_RDM_ext = false;
+		// determines how to read synthetic flows
+		// if true, read from folder extension bernardo uses 
+	simulation.printDetailedOutput = false;
+		// determines whether to write all the output csvs that I want 
+	simulation.spotPricing = true;
+		// determines whether releases are controlled with spot agreements
+		// or with an option contract 
+	simulation.tieredSpotPricing = false;
+		// says whether or not spot pricing is tiered or 
+		// a flat rate 
+	simulation.sharedLM = true;
+		// an indicator as to whether Lake Michie expansion is shared
+		// between Raleigh and Durham to allow Raleigh some capacity
+		// in LM 
+	simulation.indepReleaseAlloc = false;
+		// this determines whether release allocation into FL conservation pool
+		// is based on the input parameter file or based on the current week's
+		// supply pool to water quality pool ratio 
+	simulation.numRealizationsTOREAD = numRealizations;
+		// read all realizations in current mode
+		// sets the number of realizations for which data
+		// will be added to output files 
 
 
 	double *c_obj = NULL, *c_constr = NULL;
@@ -250,71 +279,71 @@ int main (int argc, char *argv[])
 
 	if (simulation.borgToggle < 3)
 	{
+		c_num_obj = 5;//Number of objective variables
 
-		// c_num_obj = 6;//Number of objective variables
+		// JDH 11/12: Turning off constraints for now (below here, only for parallel version)
+		
+		c_num_constr = 0;
+		general_1d_allocate(c_obj, c_num_obj);
+		//general_1d_allocate(c_constr, c_num_constr);
 
-		// // JDH 11/12: Turning off constraints for now (below here, only for parallel version)
-		// c_num_constr = 0;
-		// general_1d_allocate(c_obj, c_num_obj);
-		// //general_1d_allocate(c_constr, c_num_constr);
+		simulation.initializeFormulation(c_num_obj, c_num_constr); // number of decisions, objectives, constraints
 
-		// simulation.initializeFormulation(c_num_obj, c_num_constr); // number of decisions, objectives, constraints
+		// Interface with Borg-MS (parallel)
+		#ifdef PARALLEL
 
-		// // Interface with Borg-MS (parallel)
-		// #ifdef PARALLEL
+			// BORG_Debug_on();
+			// BORG_Algorithm_ms_max_time(0.008);
+			// BORG_Algorithm_output_aerovis();
 
-			// // BORG_Debug_on();
-			// // BORG_Algorithm_ms_max_time(0.008);
-			// // BORG_Algorithm_output_aerovis();
+			char runtime[256];
+			char outputFilename[256];
+			FILE* outputFile = NULL;
 
-			// char runtime[256];
-			// char outputFilename[256];
-			// FILE* outputFile = NULL;
+			BORG_Algorithm_ms_startup(&argc, &argv);
+			BORG_Algorithm_ms_max_evaluations(5);
+			BORG_Algorithm_output_frequency(1);
+			BORG_Problem problem = BORG_Problem_create(c_num_dec, c_num_obj, c_num_constr, calculationWrapperFunction);
 
-			// BORG_Algorithm_ms_startup(&argc, &argv);
-			// BORG_Algorithm_ms_max_evaluations(10000);
-			// BORG_Algorithm_output_frequency(10);
-			// BORG_Problem problem = BORG_Problem_create(c_num_dec, c_num_obj, c_num_constr, calculationWrapperFunction);
+			// Set all the parameter bounds and epsilons
+			setProblemDefinition(problem, simulation.formulation);
 
-			// // Set all the parameter bounds and epsilons
-			// setProblemDefinition(problem, simulation.formulation);
+			// This is set up to run only one seed at a time.
 
-			// // This is set up to run only one seed at a time.
+			sprintf(runtime, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.runtime", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
+			sprintf(outputFilename, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.set", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
+			BORG_Algorithm_output_runtime(runtime);
 
-			// sprintf(runtime, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.runtime", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
-			// sprintf(outputFilename, "./output/O%d_F%d/CBorg_NCTriangle_O%d_F%d_S%d.set", simulation.borgToggle, simulation.formulation, simulation.borgToggle, simulation.formulation, seed);
-			// BORG_Algorithm_output_runtime(runtime);
+			BORG_Random_seed(seed);
+			BORG_Archive result = BORG_Algorithm_ms_run(problem);
+				// segmentation fault here?
 
-			// BORG_Random_seed(seed);
-			// BORG_Archive result = BORG_Algorithm_ms_run(problem);
+			// If this is the master node, print out the final archive
+			if (result != NULL) {
+				outputFile = fopen(outputFilename, "w");
+				if (!outputFile) {
+					BORG_Debug("Unable to open final output file\n");
+				}
+				BORG_Archive_print(result, outputFile);
+				BORG_Archive_destroy(result);
+				fclose(outputFile);
+			}
 
-			// // If this is the master node, print out the final archive
-			// if (result != NULL) {
-				// outputFile = fopen(outputFilename, "w");
-				// if (!outputFile) {
-					// BORG_Debug("Unable to open final output file\n");
-				// }
-				// BORG_Archive_print(result, outputFile);
-				// BORG_Archive_destroy(result);
-				// fclose(outputFile);
-			// }
+			BORG_Algorithm_ms_shutdown();
+			BORG_Problem_destroy(problem);
 
-			// BORG_Algorithm_ms_shutdown();
-			// BORG_Problem_destroy(problem);
+		#else // Interface with MOEA Framework
 
-		// #else // Interface with MOEA Framework
+			MOEA_Init(c_num_obj, c_num_constr); // pass number of objectives and formulation to MOEA
 
-			// MOEA_Init(c_num_obj, c_num_constr); // pass number of objectives and formulation to MOEA
+			while (MOEA_Next_solution() == MOEA_SUCCESS)
+			{
+				MOEA_Read_doubles(c_num_dec, c_xreal);//Input decision variables
+				simulation.calculation(c_xreal, c_obj, c_constr); // Run simulation iteration
+				MOEA_Write(c_obj, c_constr);//write new objective functions
+			}
 
-			// while (MOEA_Next_solution() == MOEA_SUCCESS)
-			// {
-				// MOEA_Read_doubles(c_num_dec, c_xreal);//Input decision variables
-				// simulation.calculation(c_xreal, c_obj, c_constr); // Run simulation iteration
-				// MOEA_Write(c_obj, c_constr);//write new objective functions
-			// }
-
-		// #endif
-
+		#endif
 	}
 	else // If running from parameter input file (no constraints here)
         // RUNNING FROM AN INPUT FILE... now just looking at
@@ -332,28 +361,7 @@ int main (int argc, char *argv[])
 		general_1d_allocate(c_obj, c_num_obj);
 		simulation.initializeFormulation(c_num_obj, 0);
 		simulation.directoryName = "./inputfiles/";
-
-		// cout << "running simulations" << endl;
 		
-		simulation.use_RDM_ext = false;
-			// determines how to read synthetic flows
-			// if true, read from folder extension bernardo uses 
-		simulation.printDetailedOutput = true;
-			// determines whether to write all the output csvs that I want 
-		simulation.spotPricing = true;
-			// determines whether releases are controlled with spot agreements
-			// or with an option contract 
-		simulation.tieredSpotPricing = false;
-			// says whether or not spot pricing is tiered or 
-			// a flat rate 
-		simulation.indepReleaseAlloc = false;
-			// this determines whether release allocation into FL conservation pool
-			// is based on the input parameter file or based on the current week's
-			// supply pool to water quality pool ratio 
-		simulation.numRealizationsTOREAD = numRealizations;
-			// read all realizations in current mode
-			// sets the number of realizations for which data
-			// will be added to output files 
 		//readFile(simulation.parameterInput, "./CBorg_NCTriangle_O0_F2_S1epsilon.set", numSolutions, c_num_dec);
 			// use this one for Bernardo's input file 
 		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);
@@ -381,7 +389,7 @@ int main (int argc, char *argv[])
 			// the solution is equal to the rank
 			// without the RDM loop 
 		
-		cout << rdmNumber << " " << solutionNumber << endl;
+		//cout << rdmNumber << " " << solutionNumber << endl;
 		
 		//int solutionNumber = rank2;
 		simulation.solutionNumber = rank;
@@ -407,21 +415,21 @@ int main (int argc, char *argv[])
 		// RDM LOOP
 		//for (int i = 0; i < nDeeplyUncertainSets; i++)
 		//{
- 		    cout << "Setting up solution number " << solutionNumber << " RDM number " << rdmNumber << " rank number " << rank2 << endl;
+ 		    //cout << "Setting up solution number " << solutionNumber << " RDM number " << rdmNumber << " rank number " << rank2 << endl;
 			time_t start = time(0);
 			
 			simulation.fixRDMFactors(rdmNumber);
 			simulation.correlateDemandVariations(1.0); 
 				// 1.0 reflects no scaling
 			
-			cout << "Solution " << solutionNumber << " rdmNumber " << rdmNumber << " took " << difftime( time(0), start) << " seconds to set up data." << endl;
+			//cout << "Solution " << solutionNumber << " rdmNumber " << rdmNumber << " took " << difftime( time(0), start) << " seconds to set up data." << endl;
 
  	        simulation.solutionNumber = rank;
             // cout << "Calculating solution number " << solutionNumber << " RDM number " << rdmNumber << endl;
 			
 			calculation_time = simulation.calculation(c_xreal, c_obj, c_constr);
 			
-            cout << "Solution number " << solutionNumber << " RDM number " << rdmNumber << " took " << calculation_time << " seconds." << endl;
+            //cout << "Solution number " << solutionNumber << " RDM number " << rdmNumber << " took " << calculation_time << " seconds." << endl;
 			
 			for (int x = 0; x< c_num_dec; x++)
 			{

@@ -50,6 +50,9 @@ WaterUtility::~WaterUtility()
 	zap(CurrentRisk);
 	zap(TransferHistory);
 	zap(TransferFrequency);
+	
+	zap(annualTTmag, terminateYear);
+	zap(annualTTfreq, terminateYear);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
@@ -130,6 +133,9 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	general_1d_allocate(CurrentRisk, nContractRiskYears, 0.0);
 	general_1d_allocate(TransferHistory, nContractRiskYears, 0.0);
 	general_1d_allocate(TransferFrequency, nContractRiskYears, 0.0);
+	
+	general_2d_allocate(annualTTmag, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualTTfreq, terminateYear, numRealizations, 0.0);
 	
 	usesROF = true;
 
@@ -432,6 +438,8 @@ void WaterUtility::clearVariablesForSimulation()
 	peakDebt = 0.0;
 	peakInsurance = 0.0;
 	expectedNPC = 0.0;
+	TTfreqObj = 0.0;
+	TTmagObj = 0.0;
 
 
 	annualCosts.clear();
@@ -482,6 +490,8 @@ void WaterUtility::clearVariablesForRealization(int year)
 	Fund.initializeRealization();
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	annualTransfers = 0;
+	annualTransferFrequency = 0;
 
         // reset infrastructure counters, so that nothing has been built yet
         // reset restriction counter, storage is full, average demand, revenue to 0
@@ -562,8 +572,14 @@ void WaterUtility::annualUpdate(int year, int realization)
 	{
 		restrictionFreq[year-1] += 1.0/(double(numRealizations));
 	}
+	
+	annualTTmag[year-1][realization]  = annualTransfers;
+	annualTTfreq[year-1][realization] = annualTransferFrequency;
+	
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	annualTransfers = 0;
+	annualTransferFrequency = 0;
         // reset
 
 }
@@ -596,10 +612,13 @@ void WaterUtility::calculateObjectives()
 			maxRestrictions = restrictionFreq[year];
 		}
 	}
+	
 	for (int realization = 0; realization< numRealizations; realization++)
 	{
 		double maxPayment = 0.0;
 		double maxInsurance = 0.0;
+		double maxTTmag = 0.0;
+		double maxTTfreq = 0.0;
 		for (int year = 0; year< terminateYear; year++)
             // year with highest insurance payment in this given realization
 		{
@@ -611,11 +630,22 @@ void WaterUtility::calculateObjectives()
 			{
 				maxInsurance = annualInsurance[year][realization];
 			}
+			if(annualTTmag[year][realization] > maxTTmag)
+			{
+				maxTTmag = annualTTmag[year][realization];
+			}
+			if(annualTTfreq[year][realization] > maxTTfreq)
+			{
+				maxTTfreq = annualTTfreq[year][realization];
+			}
 		}
 
 		peakDebt += maxPayment/double(numRealizations);
 		peakInsurance += maxInsurance/double(numRealizations);
 		expectedNPC += netPresentCostInfrastructure[realization]/double(numRealizations);
+		
+		TTmagObj  += maxTTmag/double(numRealizations);
+		TTfreqObj += maxTTfreq/double(numRealizations);
 	}
 
 	//Average utility costs, including mitigation costs
@@ -1154,7 +1184,7 @@ int WaterUtility::startNewInfrastructure(int year)
 	}
 	return indexValue;
 }
-void WaterUtility::addDebt(int year, int realization, double amount, int repaymentYears, double rate)
+void WaterUtility::addDebt(int year, int realization, double amount, int repaymentYears, double rate, double drate)
 {
 	int endYear;
 	if((year + repaymentYears - 1)>terminateYear)
@@ -1172,7 +1202,7 @@ void WaterUtility::addDebt(int year, int realization, double amount, int repayme
 	}
 	if(year < terminateYear)
 	{
-		netPresentCostInfrastructure[realization]+= amount/(pow(1.05,(double(year-3))));
+		netPresentCostInfrastructure[realization]+= amount/(pow((1 + drate),(double(year-3))));
 	}
 }
 void WaterUtility::priceInsurance(int year, int realization)

@@ -46,7 +46,7 @@ void Simulation::writeDataLists()
 	numFutureYears = 51;
 	general_1d_allocate(xreal, num_dec);
 		//Decision variables
-	general_1d_allocate(actualStreamflows,numRealizations);
+	//general_1d_allocate(actualStreamflows,numRealizations);
 	general_1d_allocate(totalFallsFailure, terminateYear, 0.0);
 	
 	durham.name = "Durham";
@@ -607,11 +607,13 @@ void Simulation::preconditionData(double unit_demand_multiplier, double future_d
 }
 void Simulation::chooseStreamflows()
 {
+	//cout << "the code makes it here 1" << endl; 
+	
 	//openFile(out1,"raleighDemand.csv");
-	zeroes(actualStreamflows, numRealizations);
+	//zeroes(actualStreamflows, numRealizations);
 	int x;
-	int counter;
-	for (int row = 0; row<numRealizations;row++)
+	//int counter;
+	for (int row = 0; row < numRealizations; row++)
 	{
 		//counter = 0;
 		//while (counter == 0)
@@ -628,12 +630,16 @@ void Simulation::chooseStreamflows()
 
 		//}
 		//x = streamflowIndex[row][0] - 1;
+		
 		x = row;
+			// if I want to use all realizations, not just the worst 100,
+			// change x to row in all of these indicies
+			
+		//cout << "what about here 2" << endl;
+			
 		for (int col = 0; col < terminateYear*52; col++)
 		{
 			durhamInflows.synthetic[row][col] 	= michieInflowSYN[x][col]+littleRiverInflowSYN[x][col];
-				// if I want to use all realizations, not just the worst 100,
-				// change x to row in all of these indicies
 			owasaInflows.synthetic[row][col] 	= owasaInflowSYN[x][col];
 			fallsInflows.synthetic[row][col]	= fallsLakeInflowSYN[x][col];
 			wheelerInflows.synthetic[row][col]	= lakeWBInflowSYN[x][col];
@@ -903,15 +909,15 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 
 	time_t start = time(0);
 	// Decision variable
-	if (borgToggle ==3)
+	if (borgToggle == 3)
         // doesnt happen if using the MOEA
         // MAKE SURE IM USING 3 WHEN LOOKING AT not the MOEA
 	{
-		cout << "Setting up deccision vars sol. " << solutionNumber << endl;
+		//cout << "Setting up deccision vars sol. " << solutionNumber << endl;
 		for (int i = 0; i < num_dec; i++)
 		{
-			cout << "Dec var " << solutionNumber << " ";
-			cout << i << " " << xreal[i] << endl;
+			//cout << "Dec var " << solutionNumber << " ";
+			//cout << i << " " << xreal[i] << endl;
 			xreal[i] = parameterInput[solutionNumber][i];
 
                 // solutionNumber is defined in triangleSimulation.cpp
@@ -978,16 +984,17 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		}
 	}
 
-	// cout << "calculating water prices and surcharges sol " << solutionNumber << endl;
+	//cout << "calculating water prices and surcharges sol " << solutionNumber << endl;
 	calculateWaterPrices();
 	calculateWaterSurcharges();
 		// unnecessary now
 		
-	cout << "Choosing streamflows sol " << solutionNumber << endl;
+	//cout << "Choosing streamflows sol " << solutionNumber << endl;
 	chooseStreamflows();
-		// right now, picks 100 worst years
+		// segmentation fault in borg is caused here?
 		
-	// cout << "Setting up triggers, restrictions, and other data." << endl;
+	//cout << "Setting up triggers, restrictions, and other data." << endl;
+	
 	durham.insurancePremium = 1.2;
 	cary.insurancePremium = 1.2;
 	raleigh.insurancePremium = 1.2;
@@ -1512,6 +1519,10 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	tierPriceInc = xreal[73];
 		// a fractional (0 to 1) rate for how much the tieredFloorPrice 
 		// is adjusted upward as the number of tiers increases 
+	storageratio = xreal[74];
+		// the fraction of Lake Michie that will be for durham water supply
+		// if LM is expanded and Raleigh pays for part of the capacity 
+		// 1-storageratio = raleigh's stake of LM 
 		
 	if (durham.RRtrigger - BuybackROFZone < 0)
 	{
@@ -1583,23 +1594,41 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	// to this point, only assigned decision variables to their model variables,
 	// now we are actually running the model.
 
-	cout << "Beginning realization loop sol " << solutionNumber << endl;
+	//cout << "Beginning realization loop sol " << solutionNumber << endl;
 	realizationLoop();
         // reservoir simulation done here
 
 	//Writing objective variables
-	if(borgToggle == 0)//Using MOEA, with overall objectives determined by the largest individual utility value for the given objective
+	if(borgToggle < 3)
+		//Using MOEA, with overall objectives determined by the largest individual utility value for the given objective
 	{
 		// The first three objectives (reliability, restriction frequency, and total cost) are used in all formulations
+		// c_obj[0] = maxValue(durham.maxFailures, owasa.maxFailures, raleigh.maxFailures, cary.maxFailures, maxFallsFailure);
+		// c_obj[1] = durham.expectedNPC + owasa.expectedNPC + raleigh.expectedNPC + cary.expectedNPC;
+		// c_obj[2] = maxValue(durham.peakDebt, owasa.peakDebt, raleigh.peakDebt, cary.peakDebt);
+		// c_obj[3] = maxValue(durham.totalLosses, owasa.totalLosses, raleigh.totalLosses, cary.totalLosses);
+		// c_obj[4] = maxValue(durham.maxRestrictions, owasa.maxRestrictions, raleigh.maxRestrictions, cary.maxRestrictions);
+		// c_obj[5] = xreal[7] + xreal[8] + xreal[9] + xreal[10];
+		
+		// ABOVE: most recent objectives used by HB
+		// BELOW: David Gorelick (Oct 2016) new objectives:
+		
 		c_obj[0] = maxValue(durham.maxFailures, owasa.maxFailures, raleigh.maxFailures, cary.maxFailures, maxFallsFailure);
+			// reliability objective (MINIMIZE FAILURES)
 		c_obj[1] = durham.expectedNPC + owasa.expectedNPC + raleigh.expectedNPC + cary.expectedNPC;
-		c_obj[2] = maxValue(durham.peakDebt, owasa.peakDebt, raleigh.peakDebt, cary.peakDebt);
-		c_obj[3] = maxValue(durham.totalLosses, owasa.totalLosses, raleigh.totalLosses, cary.totalLosses);
-		c_obj[4] = maxValue(durham.maxRestrictions, owasa.maxRestrictions, raleigh.maxRestrictions, cary.maxRestrictions);
-		c_obj[5] = xreal[7] + xreal[8] + xreal[9] + xreal[10];
+			// long-term infrastructure costs (MINIMIZE LONG TERM COSTS)
+		c_obj[2] = raleigh.TTmagObj;
+			// treated, inter-basin transfers to Raleigh (MINIMIZE TREATED TRANSFERS TO RALEIGH)
+			// variables exist to return either the average raw magnitude of annual transfers or average frequency (weeks/year) across realizations 
+			// code is set up to allow for transfers to owasa and durham to be included as well here 
+		c_obj[3] = xreal[7] + xreal[8] + xreal[9] + xreal[10];
+			// total triangle jordan lake allocation (MINIMIZE JL ALLOCATION)
+		c_obj[4] = maxValue(durham.peakDebt, owasa.peakDebt, raleigh.peakDebt, cary.peakDebt);
+			// peak annual infrastructure costs (MINIMIZE PEAK DEBT)
 	}
 
-	else if(borgToggle == 3) //Mode to allow for manual input of parameters and individual objective function evaluation
+	else if(borgToggle == 3) 
+		// Mode to allow for manual input of parameters and individual objective function evaluation
 	{
 		// RefSet Reruns - want the 6 objectives from O0
 
@@ -1649,37 +1678,38 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 
 	// If optimizing, also calculate the constraints
 	// JDH 11/12: Turning off constraints for now
-	/*
-	if(borgToggle == 0 || borgToggle == 1)
+	// DAVID GORELICK 10/16: constraints back on?
+	
+	if(borgToggle < 3)
 	{
-		if(num_constr >= 3)
-		{
-			c_constr[0] = -1*c_obj[0]/.02 + 1;
-			c_constr[1] = -1*c_obj[1]/.50 + 1;
-			c_constr[2] = -1*c_obj[2]/.25 + 1;
-		}
-		if(num_constr >= 4)
-		{
-			c_constr[3] = -1*c_obj[3] + 1;
-		}
-		if(num_constr >= 5)
-		{
-			if (c_obj[2]>0)
-				c_constr[4] = -1*c_obj[4]/c_obj[2] + 2;
-			else
-				c_constr[4] = 0;
-		}
-		if(num_constr >= 6)
-		{
-			c_constr[5] = 0;
-		}
+		// if(num_constr >= 3)
+		// {
+			// c_constr[0] = -1*c_obj[0]/.02 + 1;
+			// c_constr[1] = -1*c_obj[1]/.50 + 1;
+			// c_constr[2] = -1*c_obj[2]/.25 + 1;
+		// }
+		// if(num_constr >= 4)
+		// {
+			// c_constr[3] = -1*c_obj[3] + 1;
+		// }
+		// if(num_constr >= 5)
+		// {
+			// if (c_obj[2]>0)
+				// c_constr[4] = -1*c_obj[4]/c_obj[2] + 2;
+			// else
+				// c_constr[4] = 0;
+		// }
+		// if(num_constr >= 6)
+		// {
+			// c_constr[5] = 0;
+		// }
 
-		for (int x = 0; x < num_constr;x++)
-		{
-			if (c_constr[x] > 0)
-				c_constr[x] = 0;
-		}
-	}*/
+		// for (int x = 0; x < num_constr;x++)
+		// {
+			// if (c_constr[x] > 0)
+				// c_constr[x] = 0;
+		// }
+	}
 
 	return difftime( time(0), start);
 }
@@ -1787,6 +1817,7 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 	double owasaJordanS = systemStorage.getOWASAJordanStorageVol();
 	double littleRiverRalS = systemStorage.getLittleRiverRalStorageVol();
 	double raleighQS = systemStorage.getRaleighQuarryStorageVol();
+	double RLMS = systemStorage.getRaleighLMStorage();
 	
 	int numRiskYears = 50;
 	int startingHistoricalYear = 80 - (numRiskYears - synthYear + 1);
@@ -1825,7 +1856,7 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 		
 		riskOfFailureDates.initializeDates(startSimulationYear,1,week,7,0);
 			//each simulation is run independently (52 week intervals, then the slate is cleaned)
-		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
             // sets initial ROF storage to current storage levels
 		riskOfFailureStorageIP.updateReservoirStorageROF();
             // sets initial IP storage to full
@@ -2114,7 +2145,7 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 		
 		riskOfFailureDates.initializeDates(synthRealizations,1,week,7,0);//each simulation is run independently (52 week intervals, then the slate is cleaned)
 
-		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
 		riskOfFailureStorageIP.updateReservoirStorageROF();
 
 		while (counter < 52)
@@ -2573,21 +2604,47 @@ void Simulation::createInfrastructure(int realization)
 					
 					break;
 				case 3:
-					systemStorage.buildMichieLow();
-					riskOfFailureStorageROF.buildMichieLow();
-					riskOfFailureStorageIP.buildMichieLow();
-					durham.setCapacity(8849.0);
-					
-					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small)" << endl;
+					if (sharedLM)
+					{
+						systemStorage.buildMichieSharedLow(storageratio);
+						riskOfFailureStorageROF.buildMichieSharedLow(storageratio);
+						riskOfFailureStorageIP.buildMichieSharedLow(storageratio);
+						durham.setCapacity(systemStorage.getDurhamCapacity() + 2500.0 * storageratio);
+						raleigh.addCapacity(2500.0 * (1-storageratio));
+						
+						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small - SHARED)" << endl;
+					}
+					else
+					{
+						systemStorage.buildMichieLow();
+						riskOfFailureStorageROF.buildMichieLow();
+						riskOfFailureStorageIP.buildMichieLow();
+						durham.setCapacity(8849.0);
+						
+						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small)" << endl;
+					}
 					
 					break;
 				case 4:
-					systemStorage.buildMichieHigh();
-					riskOfFailureStorageROF.buildMichieHigh();
-					riskOfFailureStorageIP.buildMichieHigh();
-					durham.setCapacity(14049.0);
-					
-					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large)" << endl;
+					if (sharedLM)
+					{
+						systemStorage.buildMichieSharedHigh(storageratio);
+						riskOfFailureStorageROF.buildMichieSharedHigh(storageratio);
+						riskOfFailureStorageIP.buildMichieSharedHigh(storageratio);
+						durham.setCapacity(systemStorage.getDurhamCapacity() + 7700.0 * storageratio);
+						raleigh.addCapacity(7700.0 * (1-storageratio));
+						
+						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large - SHARED)" << endl;
+					}
+					else
+					{
+						systemStorage.buildMichieHigh();
+						riskOfFailureStorageROF.buildMichieHigh();
+						riskOfFailureStorageIP.buildMichieHigh();
+						durham.setCapacity(14049.0);
+						
+						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large)" << endl;
+					}
 					
 					break;
 				case 5:
@@ -2760,6 +2817,7 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 	double owasaJordanS = systemStorage.getOWASAJordanStorageVol();
 	double littleRiverRalS = systemStorage.getLittleRiverRalStorageVol();
 	double raleighQS = systemStorage.getRaleighQuarryStorageVol();
+	double RLMS = systemStorage.getRaleighLMStorage();
 
 
 	int numRiskYears = 50;
@@ -2777,7 +2835,7 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 		thisTimeR = 0;
 		thisTimeC = 0;
 		riskOfFailureDates.initializeDates(startSimulationYear,1,1,7,0);//each simulation is run independently (52 week intervals, then the slate is cleaned)
-		riskOfFailureStorageIP.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageIP.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
 		riskOfFailureStorageInf.updateReservoirStorageROF();
 
 		while (counter<78)
@@ -2922,7 +2980,7 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 		thisTimeC = 0;
 		riskOfFailureDates.initializeDates(synthRealizations,1,1,7,0);//each simulation is run independently (52 week intervals, then the slate is cleaned)
 		riskOfFailureStorageInf.updateReservoirStorageROF();
-		riskOfFailureStorageIP.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageIP.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
 
 		while (counter<78)
 		{
@@ -3080,28 +3138,28 @@ void Simulation::triggerInfrastructure(int realization)
 		{
 
 			case 0:
-				owasa.addDebt(year, realization, owasa.infMatrix[0][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[0][4], bondLength, bondRate, discountrate);
 				owasa.infMatrix[0][3] = 1.0;
 				riskOfFailureStorageInf.buildULexp();
 				break;
 			case 1:
-				owasa.addDebt(year, realization, owasa.infMatrix[1][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[1][4], bondLength, bondRate, discountrate);
 				owasa.infMatrix[1][3] = 1.0;
 				riskOfFailureStorageInf.buildCCexp();
 				break;
 			case 2:
-				owasa.addDebt(year, realization, owasa.infMatrix[2][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[2][4], bondLength, bondRate, discountrate);
 				owasa.infMatrix[2][3] = 1.0;
 				riskOfFailureStorageInf.buildSQlow();
 				break;
 			case 3:
 				if(owasa.infMatrix[2][1]<1.0)
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[3][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[3][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[3][4]-owasa.infMatrix[2][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[3][4]-owasa.infMatrix[2][4], bondLength, bondRate, discountrate);
 				}
 				owasa.infMatrix[3][3] = 1.0;
 				owasa.infMatrix[2][1] = 2.0;
@@ -3109,9 +3167,9 @@ void Simulation::triggerInfrastructure(int realization)
 
 				break;
 			case 4:
-				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate);
-				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate);
-				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				owasa.infMatrix[4][3] = 1.0;
 				durham.infMatrix[5][1] = 2.0;
 				raleigh.infMatrix[4][1] = 2.0;
@@ -3120,15 +3178,15 @@ void Simulation::triggerInfrastructure(int realization)
 			case 5:
 				if(owasa.infMatrix[4][1]<1.0)
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				}
 				owasa.infMatrix[5][3] = 1.0;
 				durham.infMatrix[5][1] = 2.0;
@@ -3147,50 +3205,85 @@ void Simulation::triggerInfrastructure(int realization)
 		switch(durhamIndex)
 		{
 			case 0:
-				durham.addDebt(year, realization, durham.infMatrix[0][4], bondLength, bondRate);
+				durham.addDebt(year, realization, durham.infMatrix[0][4], bondLength, bondRate, discountrate);
 				durham.infMatrix[0][3] = 1.0;
 				riskOfFailureStorageInf.buildTeerQuarry();
-				owasa.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate, discountrate);
 				break;
 			case 1:
-				durham.addDebt(year, realization, durham.infMatrix[1][4], bondLength, bondRate);
+				durham.addDebt(year, realization, durham.infMatrix[1][4], bondLength, bondRate, discountrate);
 				durham.infMatrix[1][3] = 1.0;
 				riskOfFailureStorageInf.buildReclaimedLow();
 				break;
 			case 2:
 				if(durham.infMatrix[1][1]<1.0)
 				{
-					durham.addDebt(year, realization, durham.infMatrix[2][4], bondLength, bondRate);
+					durham.addDebt(year, realization, durham.infMatrix[2][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					durham.addDebt(year, realization, durham.infMatrix[2][4] - durham.infMatrix[1][4], bondLength, bondRate);
+					durham.addDebt(year, realization, durham.infMatrix[2][4] - durham.infMatrix[1][4], bondLength, bondRate, discountrate);
 				}
 				durham.infMatrix[2][3] = 1.0;
 				durham.infMatrix[1][1] = 2.0;
 				riskOfFailureStorageInf.buildReclaimedHigh();
 				break;
 			case 3:
-				durham.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate);
-				durham.infMatrix[3][3] = 1.0;
-				riskOfFailureStorageInf.buildMichieLow();
-			case 4:
-				if(durham.infMatrix[3][1]<1.0)
+				if (sharedLM)
 				{
-					durham.addDebt(year, realization, durham.infMatrix[4][4], bondLength, bondRate);
+					durham.addDebt(year, realization, durham.infMatrix[3][4] * storageratio, bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, durham.infMatrix[3][4] * (1-storageratio), bondLength, bondRate, discountrate);
+					
+					durham.infMatrix[3][3] = 1.0;
+					riskOfFailureStorageInf.buildMichieSharedLow(storageratio);
 				}
 				else
 				{
-					durham.addDebt(year, realization, durham.infMatrix[4][4] - durham.infMatrix[3][4], bondLength, bondRate);
+					durham.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate, discountrate);
+					durham.infMatrix[3][3] = 1.0;
+					riskOfFailureStorageInf.buildMichieLow();
 				}
-				durham.infMatrix[4][3] = 1.0;
-				durham.infMatrix[3][1] = 2.0;
-				riskOfFailureStorageInf.buildMichieHigh();
+				
+				break;
+			case 4:
+				if (sharedLM)
+				{
+					if(durham.infMatrix[3][1] < 1.0)
+						// if the small LM expansion hasn't been done yet...
+					{
+						durham.addDebt(year, realization, durham.infMatrix[4][4] * storageratio, bondLength, bondRate, discountrate);
+						raleigh.addDebt(year, realization, durham.infMatrix[4][4] * (1-storageratio), bondLength, bondRate, discountrate);
+					}
+					else
+					{
+						durham.addDebt(year, realization, (durham.infMatrix[4][4] - durham.infMatrix[3][4]) * storageratio, bondLength, bondRate, discountrate);
+						raleigh.addDebt(year, realization, (durham.infMatrix[4][4] - durham.infMatrix[3][4]) * (1-storageratio), bondLength, bondRate, discountrate);
+					}
+					durham.infMatrix[4][3] = 1.0;
+					durham.infMatrix[3][1] = 2.0;
+					riskOfFailureStorageInf.buildMichieSharedHigh(storageratio);
+				}
+				else
+				{
+					if(durham.infMatrix[3][1]<1.0)
+						// if the small LM expansion hasn't been done yet...
+					{
+						durham.addDebt(year, realization, durham.infMatrix[4][4], bondLength, bondRate, discountrate);
+					}
+					else
+					{
+						durham.addDebt(year, realization, durham.infMatrix[4][4] - durham.infMatrix[3][4], bondLength, bondRate, discountrate);
+					}
+					durham.infMatrix[4][3] = 1.0;
+					durham.infMatrix[3][1] = 2.0;
+					riskOfFailureStorageInf.buildMichieHigh();
+				}
+				
 				break;
 			case 5:
-				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate);
-				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate);
-				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				durham.infMatrix[5][3] = 1.0;
 				owasa.infMatrix[4][1] = 2.0;
 				raleigh.infMatrix[4][1] = 2.0;
@@ -3199,15 +3292,15 @@ void Simulation::triggerInfrastructure(int realization)
 			case 6:
 				if(owasa.infMatrix[4][1]<1.0)
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				}
 				durham.infMatrix[6][3] = 1.0;
 				durham.infMatrix[5][1] = 2.0;
@@ -3226,29 +3319,29 @@ void Simulation::triggerInfrastructure(int realization)
 		switch(raleighIndex)
 		{
 			case 0:
-				raleigh.addDebt(year, realization, raleigh.infMatrix[0][4], bondLength, bondRate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[0][4], bondLength, bondRate, discountrate);
 				raleigh.infMatrix[0][3] = 1.0;
 				riskOfFailureStorageInf.buildLittleRiverRal();
 				break;
 			case 1:
-				raleigh.addDebt(year, realization, raleigh.infMatrix[1][4], bondLength, bondRate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[1][4], bondLength, bondRate, discountrate);
 				raleigh.infMatrix[1][3] = 1.0;
 				riskOfFailureStorageInf.buildRalQuarry();
 				break;
 			case 2:
-				raleigh.addDebt(year, realization, raleigh.infMatrix[2][4], bondLength, bondRate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[2][4], bondLength, bondRate, discountrate);
 				raleigh.infMatrix[2][3] = 1.0;
 				riskOfFailureStorageInf.buildNeuseIntake();
 				break;
 			case 3:
-				raleigh.addDebt(year, realization, raleigh.infMatrix[3][4], bondLength, bondRate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[3][4], bondLength, bondRate, discountrate);
 				raleigh.infMatrix[3][3] = 1.0;
 				riskOfFailureStorageInf.reallocateFallsLake(fallsLakeReallocation);
 				break;
 			case 4:
-				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate);
-				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate);
-				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate);
+				owasa.addDebt(year, realization, owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+				durham.addDebt(year, realization, durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+				raleigh.addDebt(year, realization, raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				raleigh.infMatrix[4][3] = 1.0;
 				owasa.infMatrix[4][1] = 2.0;
 				durham.infMatrix[5][1] = 2.0;
@@ -3257,15 +3350,15 @@ void Simulation::triggerInfrastructure(int realization)
 			case 5:
 				if(owasa.infMatrix[4][1]<1.0)
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate);
-					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate);
-					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate);
+					owasa.addDebt(year, realization, owasa.infMatrix[5][4] - owasa.infMatrix[4][4], bondLength, bondRate, discountrate);
+					durham.addDebt(year, realization, durham.infMatrix[6][4] - durham.infMatrix[5][4], bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, raleigh.infMatrix[5][4] - raleigh.infMatrix[4][4], bondLength, bondRate, discountrate);
 				}
 				raleigh.infMatrix[5][3] = 1.0;
 				durham.infMatrix[5][1] = 2.0;
@@ -3361,6 +3454,7 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 	double owasaJordanS = systemStorage.getOWASAJordanStorageVol();
 	double littleRiverRalS = systemStorage.getLittleRiverRalStorageVol();
 	double raleighQS = systemStorage.getRaleighQuarryStorageVol();
+	double RLMS = systemStorage.getRaleighLMStorage();
 	
 	int numRiskYears = 50;
 	int startingHistoricalYear = 80 - (numRiskYears - synthYear + 1);
@@ -3952,6 +4046,7 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 	double owasaJordanS = systemStorage.getOWASAJordanStorageVol();
 	double littleRiverRalS = systemStorage.getLittleRiverRalStorageVol();
 	double raleighQS = systemStorage.getRaleighQuarryStorageVol();
+	double RLMS = systemStorage.getRaleighLMStorage();
 	
 	int numRiskYears = 50;
 	int startingHistoricalYear = 80 - (numRiskYears - synthYear + 1);
@@ -3977,7 +4072,7 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 		
 		riskOfFailureDates.initializeDates(startSimulationYear,1,week,7,0);
 			//each simulation is run independently (52 week intervals, then the slate is cleaned)
-		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
             // sets initial ROF storage to current storage levels
 
 		while (counter < 52)
@@ -4102,7 +4197,7 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 		thisTimeC = 0;
 		
 		riskOfFailureDates.initializeDates(synthRealizations,1,week,7,0);//each simulation is run independently (52 week intervals, then the slate is cleaned)
-		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS);
+		riskOfFailureStorageROF.updateReservoirStorageROF(durhamS, teerS, CCRS, ULS, STQS, owasaS, lakeWBS, flSS, flQS, jlSS, jlQS, caryJordanS,  raleighJordanS,  durhamJordanS, owasaJordanS, littleRiverRalS, raleighQS, RLMS);
 
 		while (counter < 52)
 		{
@@ -4348,7 +4443,11 @@ void Simulation::createInfrastructureRisk_spinup(int realization, int synthYear,
 	return;
 }
 
-void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount)
+void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount,
+									     int currentYear, int startYear, int numContractRiskYears, 
+									     double Duse, double Dusebuffer, double Ouse, double Ousebuffer, double Ruse, double Rusebuffer, double Cuse, double Cusebuffer,
+									     bool allowReleaseContract, bool previousContract, double annualpayment, double buybackratePerMG,
+									     ofstream &outfile, bool printDetailedOutput)
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////// CALCULATE SPINUP RISK ///////////////////////////////////////////////////////
@@ -4383,14 +4482,7 @@ void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int r
 	//	2.	the size annual payments to Durham and spot price of buybacks by Durham 
 	//	3.	constraints upon the frequency and magnitude of releases 
 	
-	if (contractlength < firstyear)
-	{
-		firstyear += contractlength;
-			// this ensures the next if statement modulus works properly
-	}
-	
-	
-	if (year % contractlength == firstyear)
+	if (((year-1) - firstyear) % contractlength == 0)
 		// contract re-negotiated in the first week of the first year and every 10 years afterward
 	{
 		RtriggerDiff = 0.0;
@@ -4509,13 +4601,13 @@ void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int r
 		else
 			// the scenario of any contract negotiation after year 0 
 		{
-			if ((year - firstyear) > (numContractRiskYears - 1))
+			if (((year-1) - firstyear) > (numContractRiskYears - 1))
 			{
 				transferRiskYears = numContractRiskYears;
 			}
 			else
 			{
-				transferRiskYears = year - firstyear;
+				transferRiskYears = (year-1) - firstyear;
 			}
 				// check how many years have passed and the record that will be used 
 				// for contract determination 
@@ -4637,9 +4729,19 @@ void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int r
 			contractcount += 1;
 		}
 	}
+	
+	if (printDetailedOutput)
+	{
+		outfile << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
+		outfile << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
+		outfile << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
+	}
+	
+	return;
 }
 
-void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount)
+void Simulation::calculateSpotContract(int realization, int numContractRiskYears, 
+									   double tieredFloorPrice, ofstream &outfile)
 	// This function adjusts parameters of the spot purchasing of releases by Raleigh,
 	// specifically the floor price per volume of water released, whether or not to 
 	// renew the contract itself, and if tiered pricing is used, the price increase
@@ -4655,6 +4757,10 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 		
 		for (int yr = 1; yr < numContractRiskYears; yr++)
 		{
+//			createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
+//											Duse + Dusebuffer, Ouse + Ousebuffer, 
+//											Ruse + Rusebuffer, Cuse + Cusebuffer);
+											
 			createInfrastructureRisk_spinup(realization, ((currentYear - startYear + 1) - (numContractRiskYears - yr)), 
 											durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, 
 											raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
@@ -4679,14 +4785,10 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 	//	2.	the rate per MG for spot payments 
 	//	3.	if tiered pricing is used, the price increase per rise in tier 
 	
-	if (contractlength < firstyear)
-	{
-		firstyear += contractlength;
-			// this ensures the next if statement modulus works properly
-	}
-	
-	if (year % contractlength == firstyear)
-		// contract re-negotiated in the first week of the first year and every 10 years afterward
+	if (((year-1) - firstyear) % contractlength == 0)
+		// contract re-negotiated in the first week of the first year and every x years afterward
+		// YEAR HAS TO BE REDUCED BY 1 BECAUSE THIS FUNCTION IS CALLED AFTER THE ANNUAL INDEX IS UPDATED
+		// IN THE REALIZATION LOOP
 	{
 		adjustedspotpayment = 0.0;
 				
@@ -4756,13 +4858,13 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 		}
 		else
 		{
-			if ((year - firstyear) > (numContractRiskYears - 1))
+			if (((year-1) - firstyear) > (numContractRiskYears - 1))
 			{
 				transferRiskYears = numContractRiskYears;
 			}
 			else
 			{
-				transferRiskYears = year - firstyear;
+				transferRiskYears = (year-1) - firstyear;
 			}
 				// check how many years have passed and the record that will be used 
 				// for contract determination 
@@ -4781,7 +4883,7 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 					// it can be judged based on how often Raleigh
 					// asked for releases and was denied or given less than requested.
 				{
-					if (RequestMade < 1)
+					if (systemStorage.ReqCount < 1)
 					{
 						contractSplits = 0.5;
 					}
@@ -4810,15 +4912,25 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 					// how different ROF was from each city's trigger 
 					// if positive, Durham wants more expensive spot price but Raleigh doesn't
 					
-				if (RtriggerDiff < 0)
+				if (raleigh.RRcontractTrigger == 0.0)
 				{
 					RtriggerDiff = 0.0;
 				}
-				
-				if (DtriggerDiff < 0)
+				if (durham.RRcontractTrigger == 0.0)
 				{
 					DtriggerDiff = 0.0;
 				}
+					// if this is set to 0 for some reason, make sure infinites are avoided
+				
+				// if (RtriggerDiff < 0)
+				// {
+					// RtriggerDiff = 0.0;
+				// }
+				
+				// if (DtriggerDiff < 0)
+				// {
+					// DtriggerDiff = 0.0;
+				// }
 				
 				triggerDiff = (DtriggerDiff - RtriggerDiff);
 				
@@ -4837,8 +4949,18 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 					// if RTTmagnitudeDiff > 0, Raleigh wants more releases, pays more 
 					// if DTTmagnitudeDiff < 0, Durham has room for releases, less annual payment needs
 					// similarly, if contract negotiations are triggered and RTTmagnitudeDiff < 0, Raleigh doesn't need releases as badly
-					// this difference is normalized by the average transfer magnitude record 
-
+					// this difference is normalized by the average transfer magnitude record
+					
+				if (average_array(raleigh.TransferHistory, transferRiskYears) == 0)
+				{
+					RTTmagnitudeDiff = 0.0;
+				}
+				if (average_array(durham.TransferHistory, transferRiskYears) == 0)
+				{
+					DTTmagnitudeDiff = 0.0;
+				}
+					// infinites introduced here 
+				
 				magDiff = (RTTmagnitudeDiff + DTTmagnitudeDiff);
 				
 				if (magDiff > 0.2)
@@ -4858,6 +4980,16 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 					// if RTTfrequencyDiff < 0, less transfer requests, so less buyback requests, Raleigh doesn't mind if buyback price drops 
 					// if DTTfrequencyDiff > 0, often transfers to Durham, they need water more, lower buyback price wanted 
 					// if DTTfrequencyDiff < 0, fewer transfers, Durham will be ok with greater buyback price
+				
+				if (average_array(raleigh.TransferFrequency, transferRiskYears) == 0)
+				{
+					RTTfrequencyDiff = 0.0;
+				}
+				if (average_array(durham.TransferFrequency, transferRiskYears) == 0)
+				{
+					DTTfrequencyDiff = 0.0;
+				}
+					// infinites introduced here
 				
 				freqDiff = (RTTfrequencyDiff - DTTfrequencyDiff);
 				
@@ -4900,6 +5032,16 @@ void Simulation::calculateSpotContract(int yearcounter, int LOOPCHECKER, int rea
 			contractcount += 1;
 		}
 	}
+	
+	if (printDetailedOutput)
+	{
+		outfile << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << ",";
+		outfile << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
+		outfile << contractcount << "," << adjustedspotpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << ",";
+		outfile << systemStorage.ReqCount << "," << systemStorage.ReqCurtail << endl;				
+	}
+	
+	return;
 }
 
 void Simulation::realizationLoop()
@@ -4928,6 +5070,9 @@ void Simulation::realizationLoop()
 	double cary_quarry_capacity = 0.0;
 	double cary_quarry_intake_capacity = 0.0;
 	double cary_quarry_outflow_capacity = 0.0;
+	
+	double raleigh_Lake_Michie_capacity = 0.0;
+		// initially, Raleigh has no capacity in Lake Michie
 	
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
@@ -5017,6 +5162,7 @@ void Simulation::realizationLoop()
 		std::string filenameD = "output/weeklyRiskParams";
 		std::string filenameG = "output/InfraBuilt"; 
 		std::string filenameZ = "output/ReleaseContract";
+		std::string filenameY = "output/LMrealloc";
 		
 		std::string filenameEND = ".csv";
 			
@@ -5025,34 +5171,43 @@ void Simulation::realizationLoop()
 		std::string completeFilenameD;
 		std::string completeFilenameG;
 		std::string completeFilenameZ;
+		std::string completeFilenameY;
 			
 		std::stringstream sstmA;
 		std::stringstream sstmC;
 		std::stringstream sstmD;
 		std::stringstream sstmG;
 		std::stringstream sstmZ;
+		std::stringstream sstmY;
 			
 		sstmA << filenameA << rank << filenameEND;
 		sstmC << filenameC << rank << filenameEND;
 		sstmD << filenameD << rank << filenameEND;
 		sstmG << filenameG << solutionNumber << "_" << rdmNumber << filenameEND;
 		sstmZ << filenameZ << solutionNumber << "_" << rdmNumber << filenameEND;
+		sstmY << filenameY << solutionNumber << "_" << rdmNumber << filenameEND;
 		
 		completeFilenameA = sstmA.str();
 		completeFilenameC = sstmC.str();
 		completeFilenameD = sstmD.str();
 		completeFilenameG = sstmG.str();
 		completeFilenameZ = sstmZ.str();
+		completeFilenameY = sstmY.str();
 		
 		openFile(out100, completeFilenameA);
 		openFile(outNew, completeFilenameC);
 		openFile(outRiskParams, completeFilenameD);
 		openFile(InfraBuilt, completeFilenameG);
 		openFile(ReleaseContractData, completeFilenameZ);
+		openFile(LMallocData, completeFilenameY);
 			// all these are defined in the header file 
 		
 		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
 			// column headers for infrastructure builds 
+			
+		LMallocData << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << ",";
+		LMallocData << "storageratio" << "," << "Rcapacity" << "," << "RLMcapacity" << "," << "Dcapacity" << endl;
+			// column headers for Lake Michie allocation to Raleigh data 
 		
 		out100 << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
 		out100 << "RaleighDirectTransferVolume" << "," << "DurhamDirectTransferVolume" << ",";
@@ -5082,7 +5237,7 @@ void Simulation::realizationLoop()
 			ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << ",";
 			ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
 			ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
-			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
+			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << ",";
 			ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
 			ReleaseContractData << "contractcount" << "," << "adjustedspotpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << ",";
 			ReleaseContractData << "RequestMade" << "," << "RequestCurtail" << endl;
@@ -5113,11 +5268,6 @@ void Simulation::realizationLoop()
 		
 	int weekcounter;
 	int contractriskyearcounter;
-	int LOOPCHECKER;
-	int contractcount;
-	int firstyear;
-	int yearcounter;
-	int currentcontract;
 	
 	fallsFailurePoint = 0.2;
 	zeroes(totalFallsFailure, terminateYear);
@@ -5140,10 +5290,14 @@ void Simulation::realizationLoop()
 		yearcounter = 0;
 		contractriskyearcounter = 0;
 		LOOPCHECKER = 0;
+		
 		allowReleaseContract = true;
+		previousContract = false;
 		contractcount = 1;
 		currentcontract = 1;
+		
 		contractbuybacks = 0.0;
+		contracttransfersD = 0.0;
 		systemStorage.ReqCount = 0;
 		systemStorage.ReqCurtail = 0;
 		
@@ -5159,9 +5313,9 @@ void Simulation::realizationLoop()
 													little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, raleigh_quarry_intake_capacity, 
 													raleigh_quarry_outflow_capacity, raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
 													owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,1,
-													LMreleaseCap, LMreleaseMin); 
+													LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity); 
 														// infrastructure included in the model
-														// MICHIE RELEASE MIN AND CAP INCLUDED HERE (BY DAVID)
+														// MICHIE RELEASE MIN AND CAP INCLUDED HERE (BY DAVID), as well as Raleigh's stake of Lake Michie 
             // actual reservoir storage
 
 		riskOfFailureStorageInf.initializeReservoirStorageROF(durham_res_supply_capacity,
@@ -5175,7 +5329,7 @@ void Simulation::realizationLoop()
 																raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
 																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
 																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
+																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // used once per year to calculate ROF
 
 		riskOfFailureStorageROF.initializeReservoirStorageROF(durham_res_supply_capacity,
@@ -5190,7 +5344,7 @@ void Simulation::realizationLoop()
 																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, 
 																raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
 																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
+																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // calculated every week using current storage
 
 		riskOfFailureStorageIP.initializeReservoirStorageROF(durham_res_supply_capacity,
@@ -5205,7 +5359,7 @@ void Simulation::realizationLoop()
 																raleigh_quarry_capacity, raleigh_quarry_intake_capacity, raleigh_quarry_outflow_capacity, raleigh_intake_capacity, 
 																cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, owasa.westernWakeTreatmentFrac, 
 																durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
-																LMreleaseCap, LMreleaseMin);
+																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // based on weekly changes this calculates insurance payouts
 
 		year = simDates.getYear();//passes the dates from the simDates class to the main simulation
@@ -5216,8 +5370,19 @@ void Simulation::realizationLoop()
 		if (yearcounter == 0)
 		{
 			firstyear = year;
-			adjustedannualpayment = annualpayment;
-			adjustedbuybackpayment = buybackratePerMG;
+			
+			if (allowReleases == 1)
+			{
+				if (spotPricing)
+				{
+					adjustedspotpayment = tieredFloorPrice;
+				}
+				else
+				{
+					adjustedannualpayment = annualpayment;
+					adjustedbuybackpayment = buybackratePerMG;
+				}
+			}
 		}
 
 		durham.clearVariablesForRealization(year);
@@ -5267,7 +5432,7 @@ void Simulation::realizationLoop()
                 // gives the ROF of this given week
 				// July 2016: this function just does ROF for insurance and releases 
 
-			if (allowReleases == 1 && allowReleaseContract)
+			if (allowReleases == 1)
 				// allow transfers, apply raw releases 
 				// in a given week, transfers calculated before transfers
 				// however, ROF is not updated.  this should work out as long as
@@ -5324,7 +5489,8 @@ void Simulation::realizationLoop()
 				{
 					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
 											  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, durham.BuybackRiskVolume[week-1],
-											  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput);
+											  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput,
+											  allowReleaseContract);
 						// AUGUST 2016: this function calculates releases and buybacks using an option system 
 						// (annual Raleigh payment, buyback payments by Durham for "breaking" the contract)
 					
@@ -5424,6 +5590,13 @@ void Simulation::realizationLoop()
 				raleigh.weeklyTransferVolume = systemStorage.getRaleighTransfers();
                     // each utility assigned the costs of the transfers they get
 					
+				raleigh.annualTransfers += systemStorage.getRaleighTransfers();
+				
+				if (systemStorage.getRaleighTransfers() > 0.0)
+				{
+					raleigh.annualTransferFrequency += 1;
+				}
+					
 				if (allowReleases == 1)
 				{
 					if (week == 1)
@@ -5455,8 +5628,6 @@ void Simulation::realizationLoop()
 					{
 						contracttransfersD = 0.0;
 						contracttransfersD += durham.weeklyTransferVolume;
-						
-						currentcontract = contractcount;
 					}					
 				}
 					// collect transfer information of most recent 20 years for release contract negotiation 
@@ -5536,25 +5707,28 @@ void Simulation::realizationLoop()
 			{
 				createInfrastructure(realization);
 				createInfrastructureRisk(realization, year-1, durham.averageUse + durham.infBuffer, owasa.averageUse + owasa.infBuffer, raleigh.averageUse + raleigh.infBuffer, cary.averageUse + cary.infBuffer);
-					// infrastructure risk is also used for renegotiating release contracts 
-					
+					// infrastructure risk is also used for renegotiating release contracts 	
+				
 				raleigh.SpinupRisk[contractriskyearcounter] = raleigh.infRisk;
 				durham.SpinupRisk[contractriskyearcounter]  = durham.infRisk;
 					// store the most recent 20 years of annual baseline ROF 
 				
 				if (printDetailedOutput)
 				{
+					LMallocData << rank << "," << rdmNumber << "," << realization << "," << year-1 << ",";
+					LMallocData << storageratio << "," << systemStorage.getRaleighCapacity() << "," << systemStorage.getRaleighLMCapacity() << "," << systemStorage.getDurhamCapacity() << endl;
+					
 					if (spotPricing)
 					{
-						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
-						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk;
+						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
+						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
 						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << ",";
 						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
 						ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
 					}
 					else 
 					{
-						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year << "," << week << ",";
+						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
 						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
 						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
 						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
@@ -5575,7 +5749,7 @@ void Simulation::realizationLoop()
 				if (caryUpgrades[caryWTPcounter]<cary.averageUse&&caryBuild[caryWTPcounter]==0)
                     // thresholds based on annual demand
 				{
-					cary.addDebt(year, realization, caryWTPcosts[caryWTPcounter], bondLength, bondRate);
+					cary.addDebt(year, realization, caryWTPcosts[caryWTPcounter], bondLength, bondRate, discountrate);
 					caryBuild[caryWTPcounter] += 1;
 					caryWTPcounter++;
 				}
@@ -5605,28 +5779,25 @@ void Simulation::realizationLoop()
 			
 				if (allowReleases == 1)
 				{
+					if (currentcontract != contractcount)
+					{
+						currentcontract = contractcount;
+							// when a new contract is made, stats above must be reset
+							// before the currentcontract is set equal to the count of contracts passed 
+					}
+					
 					if (spotPricing)
 					{
-						calculateSpotContract(yearcounter, LOOPCHECKER, realization, firstyear, contractcount);
-						
-						if (printDetailedOutput)
-						{
-							ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
-							ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
-							ReleaseContractData << contractcount << "," << adjustedspotpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << ",";
-							ReleaseContractData << systemStorage.ReqCount << "," << systemStorage.ReqCurtail << endl;
-						}
+						calculateSpotContract(realization, numContractRiskYears, 
+											  tieredFloorPrice, ReleaseContractData);
 					}
 					else 
 					{
-						calculateOptionContract(yearcounter, LOOPCHECKER, realization, firstyear, contractcount);
-						
-						if (printDetailedOutput)
-						{
-							ReleaseContractData << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
-							ReleaseContractData << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
-							ReleaseContractData << contractcount << "," << adjustedannualpayment << "," << adjustedbuybackpayment << "," << allowReleaseContract << "," << previousContract << "," << transferRiskYears << endl;
-						}
+						calculateOptionContract(yearcounter, LOOPCHECKER, realization, firstyear, contractcount,
+											    currentYear, startYear, numContractRiskYears, 
+											    durham.averageUse, durham.infBuffer, owasa.averageUse, owasa.infBuffer, raleigh.averageUse, raleigh.infBuffer, cary.averageUse, cary.infBuffer,
+											    allowReleaseContract, previousContract, annualpayment, buybackratePerMG,
+												ReleaseContractData, printDetailedOutput);
 					}
 				}
 				
@@ -5658,13 +5829,14 @@ void Simulation::realizationLoop()
 		outRiskParams.close();
 		InfraBuilt.close();
 		ReleaseContractData.close();
+		LMallocData.close();
 	}
 
 	durham.calculateObjectives();
 	owasa.calculateObjectives();
 	cary.calculateObjectives();
 	raleigh.calculateObjectives();
-        // calculate objectives once all simulations are finished
+        // calculate objectives once all realizations are finished
 
 	for(int x = 0; x< terminateYear; x++)
 	{
@@ -5689,7 +5861,7 @@ void Simulation::updateFallsQuality()
 Simulation::~Simulation()
 {
 	zap(xreal);
-	zap(actualStreamflows);
+	//zap(actualStreamflows);
 	zap(totalFallsFailure);
 }
 

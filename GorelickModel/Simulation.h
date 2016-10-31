@@ -37,8 +37,13 @@ public:
 	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
 	void createInfrastructureRisk_spinup(int realization, int synthYear, 
 										 double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue);
-	void calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount);
-	void calculateSpotContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount);
+	void calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount,
+								 int currentYear, int startYear, int numContractRiskYears, 
+								 double Duse, double Dusebuffer, double Ouse, double Ousebuffer, double Ruse, double Rusebuffer, double Cuse, double Cusebuffer,
+								 bool allowReleaseContract, bool previousContract, double annualpayment, double buybackratePerMG,
+								 ofstream &outfile, bool printDetailedOutput);
+	void calculateSpotContract(int realization, int numContractRiskYears, 
+							   double tieredFloorPrice, ofstream &outfile);
 										 
 	data_t parameterInput;
 	
@@ -59,14 +64,19 @@ public:
 	int numRealizationsTOREAD;
 	bool spotPricing;
 	bool tieredSpotPricing;
-	int RequestCurtail;
-	int RequestMade;
+	bool sharedLM;
 	
 	int startYear;
 	int endYear;
 	int currentYear;
 	int numContractRiskYears;
 	int transferRiskYears;
+	
+	int yearcounter;
+	int LOOPCHECKER;
+	int contractcount;
+	int currentcontract;
+	int firstyear;
 	
 	int contractlength;
 	double annualpayment;
@@ -93,6 +103,7 @@ public:
 	double tieredFloorPrice;
 	double tierSize;
 	double tierPriceInc;
+	double storageratio;
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
@@ -139,6 +150,7 @@ public:
 	double BuybackROFZone;
 	double RcriticalStorageLevel;
 	double DcriticalStorageLevel;
+	double discountrate;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;
@@ -223,7 +235,7 @@ private:
 	int numFutureYears;
 	int startSimulationYear;
 	int volumeIncrements, costRiskLevel;
-	double *actualStreamflows;
+	//double *actualStreamflows;
 	
 	
 	double caryUpgrades[4];
@@ -242,6 +254,7 @@ private:
 	ofstream out1;
 	ofstream out3;
 	ofstream InfraBuilt;
+	ofstream LMallocData;
 	
 };
 #endif

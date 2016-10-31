@@ -102,6 +102,8 @@ class WaterUtility
 	double peakInsurance;
 	double insuranceRevenue;
 	double infBuffer;
+	double TTmagObj;
+	double TTfreqObj;
 	
 	double weeklyReleaseVolume;
 	double weeklyBuybackVolume;
@@ -112,6 +114,10 @@ class WaterUtility
 	double *CurrentRisk;
 	double *TransferHistory;
 	double *TransferFrequency;
+	double annualTransfers;
+	double annualTransferFrequency;
+	double **annualTTmag;
+	double **annualTTfreq;
 	
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,7 +141,7 @@ class WaterUtility
 	void calculateDemand(int realizations, int week, int numdays, int year);
 	int startNewInfrastructure(int year);
 	int buildInfrastructure(int index);
-	void addDebt(int yr, int rlztn, double amt, int repayYears, double rt);
+	void addDebt(int yr, int rlztn, double amt, int repayYears, double rt, double drt);
 	void addInsStorage(double add);
 	void priceInsurance(int yr, int rlztn);
 	void payForTransfers(double tC);
