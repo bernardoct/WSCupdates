@@ -151,6 +151,7 @@ public:
 	double RcriticalStorageLevel;
 	double DcriticalStorageLevel;
 	double discountrate;
+	double contracttypetoggle;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;

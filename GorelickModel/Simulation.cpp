@@ -58,10 +58,22 @@ void Simulation::writeDataLists()
 	// Define Utility Info
 	// (months, years, types, tiers, stages, numFutureYears, failurePoint, numAnnualDecisionPeriods)
 	
-	durham.configure(billingMonths, 3, 13, 10, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 5, numContractRiskYears);
-	cary.configure(billingMonths, 1, 9, 9, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 0, numContractRiskYears);
-	owasa.configure(billingMonths, 1, 8, 8, 4, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4, numContractRiskYears);
-	raleigh.configure(billingMonths, 1, 24, 24, 5, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4, numContractRiskYears);
+	if (formulation < 3)
+		// the else statement here is for when joint LM expansion is an option 
+	{
+		durham.configure(billingMonths, 3, 13, 10, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 5, numContractRiskYears);
+		cary.configure(billingMonths, 1, 9, 9, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 0, numContractRiskYears);
+		owasa.configure(billingMonths, 1, 8, 8, 4, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4, numContractRiskYears);
+		raleigh.configure(billingMonths, 1, 24, 24, 5, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4, numContractRiskYears);
+	}
+	else 
+	{
+		durham.configure(billingMonths, 3, 13, 10, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 5 + 2, numContractRiskYears);
+		cary.configure(billingMonths, 1, 9, 9, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 0, numContractRiskYears);
+		owasa.configure(billingMonths, 1, 8, 8, 4, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4, numContractRiskYears);
+		raleigh.configure(billingMonths, 1, 24, 24, 5, numFutureYears, 0.2, 1, terminateYear, volumeIncrements, numRealizations, formulation, 4 + 2, numContractRiskYears);
+	}
+
 
 	// Utility Water Prices
 	// OWASA: 9 customer classes: 0-4, Residential volumetric tiers 1-5;
@@ -902,6 +914,15 @@ void Simulation::fixRDMFactors(int rdm_i)
 	durham.infMatrix[6][2] = rdm_factors[29];
 	raleigh.infMatrix[4][2] = rdm_factors[28];
 	raleigh.infMatrix[5][2] = rdm_factors[29];
+	
+	if (formulation > 2)
+		// joint LM expansion build start year 
+	{
+		durham.infMatrix[7][2] = rdm_factors[22];
+		durham.infMatrix[8][2] = rdm_factors[23];
+		raleigh.infMatrix[6][2] = rdm_factors[22];
+		raleigh.infMatrix[7][2] = rdm_factors[23];
+	}
 }
 
 double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
@@ -1200,7 +1221,9 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	}
 
 	//Water transfer triggers - Risk of failure, one value per utility
-	if (formulation == 0)//No transfers, triggers are set to 200% ROF
+	if (formulation > 200)
+		//No transfers, triggers are set to 200% ROF
+		// Update 11-2016: transfers in all formulations 
 	{
 		durham.TTriggerN = 2;
 		durham.TTriggerI = 2;
@@ -1402,8 +1425,6 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	raleigh.infMatrix[2][4] = 225.5;
 	raleigh.infMatrix[2][5] = 3 + rand() % 3;
 	raleigh.infMatrix[3][0] = xreal[39];////Reallocate Falls Lake
-
-
 		// May 2016: changed to 100 years, so it can't be done as a 
 		// experiment to see what happens if durham expands while raleigh
 		// doesnt.
@@ -1411,7 +1432,8 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// put back down at 12 years for some new results 
 	raleigh.infMatrix[3][4] = 68.2;
 	raleigh.infMatrix[3][5] = 3 + rand() % 3;
-	if(formulation == 2)
+	
+	if(formulation >= 0)
 	{
 	/////All utilities have the potential to trigger the Western Wake Treatment plant
 			// BY WESTERN WAKE, WE ARE REFERRING TO
@@ -1438,6 +1460,24 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		raleigh.infMatrix[5][0] = xreal[45];////Western Wake Treatment plant
 		raleigh.infMatrix[5][4] = 316.8*xreal[51];
 		raleigh.infMatrix[5][5] = 3 + rand() % 3;
+		
+		if (formulation > 2)
+			// joint LM allowed 
+		{
+			durham.infMatrix[7][0] = xreal[76];////Lake Michie expansion (low)
+			durham.infMatrix[7][4] = 158.3;
+			durham.infMatrix[7][5] = 3 + rand() % 3;
+			durham.infMatrix[8][0] = xreal[77];////Lake Michie expansion (high)
+			durham.infMatrix[8][4] = 203.3;
+			durham.infMatrix[8][5] = 3 + rand() % 3;
+			
+			raleigh.infMatrix[6][0] = xreal[78];////Lake Michie expansion (low)
+			raleigh.infMatrix[6][4] = 158.3;
+			raleigh.infMatrix[6][5] = 3 + rand() % 3;
+			raleigh.infMatrix[7][0] = xreal[79];////Lake Michie expansion (high)
+			raleigh.infMatrix[7][4] = 203.3;
+			raleigh.infMatrix[7][5] = 3 + rand() % 3;
+		}
 	}
 	caryUpgrades[0] = xreal[46];
 	caryUpgrades[1] = xreal[47];
@@ -1493,10 +1533,19 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// this is the difference in ROF trigger levels between
 		// when releases are not granted (the floor) and
 		// when buybacks are used by Durham (the ceiling)
-	contractlength = (int)(xreal[64]+1);
+	if (formulation > 1)
+	{
+		contractlength = (int)(xreal[64]+1);
+	}
+	else
+	{
+		contractlength = 1000;
+	}
 		// the length of a releases contract
 		// converting to an integer will round down the number 
 		// make sure this is greater than 1 by adding 1 to it
+		// if formulation < 2, no contract renegotiation is done
+		// so use a contract length that is longer than the realization 
 	raleigh.RRcontractTrigger = xreal[65];
 	durham.RRcontractTrigger  = xreal[66];
 		// ROF triggers used for release contract negotiation 
@@ -1523,6 +1572,9 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// the fraction of Lake Michie that will be for durham water supply
 		// if LM is expanded and Raleigh pays for part of the capacity 
 		// 1-storageratio = raleigh's stake of LM 
+	contracttypetoggle = xreal[75];
+		// within formulations 1, 2, and 3, this decision variable (range -1 to 1)
+		// will decide which type of release structure (spot or option contract) is used 
 		
 	if (durham.RRtrigger - BuybackROFZone < 0)
 	{
@@ -1532,7 +1584,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	}
 
 	//Drought surcharges - 2 variables for each utility, one for residential customers and one for commercial/industrial/irrigation customers
-	if (formulation<6)
+	if (formulation >= 0)
 	{
 		for(int x = 0; x<5; x++)
 		{
@@ -1562,8 +1614,8 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	//Takes water use distributions calculated in calc_Water_Price functions and applies drought surcharge to calculate
 	//the average revenue recieved from the sale of 1 MG of water, the consumer surplus lost from water use reductions/cost increases,
 	//and overall reductions from restrictions and price increases
-	//(Only do it once at the beginning. If formulation is 5, redo it every simulation).
-	if(formulation == 6)
+	//(Only do it once at the beginning. If formulation is more than -1, redo it every simulation).
+	if(formulation >= 0)
 	{
 		durham.calcSurchargePrice(elasticity_Of_Demand, 1);
 		owasa.calcSurchargePrice(elasticity_Of_Demand, 1);
@@ -1615,16 +1667,18 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		
 		c_obj[0] = maxValue(durham.maxFailures, owasa.maxFailures, raleigh.maxFailures, cary.maxFailures, maxFallsFailure);
 			// reliability objective (MINIMIZE FAILURES)
-		c_obj[1] = durham.expectedNPC + owasa.expectedNPC + raleigh.expectedNPC + cary.expectedNPC;
-			// long-term infrastructure costs (MINIMIZE LONG TERM COSTS)
-		c_obj[2] = raleigh.TTmagObj;
-			// treated, inter-basin transfers to Raleigh (MINIMIZE TREATED TRANSFERS TO RALEIGH)
-			// variables exist to return either the average raw magnitude of annual transfers or average frequency (weeks/year) across realizations 
-			// code is set up to allow for transfers to owasa and durham to be included as well here 
-		c_obj[3] = xreal[7] + xreal[8] + xreal[9] + xreal[10];
-			// total triangle jordan lake allocation (MINIMIZE JL ALLOCATION)
-		c_obj[4] = maxValue(durham.peakDebt, owasa.peakDebt, raleigh.peakDebt, cary.peakDebt);
+		c_obj[1] = maxValue(durham.peakDebt, owasa.peakDebt, raleigh.peakDebt, cary.peakDebt);
 			// peak annual infrastructure costs (MINIMIZE PEAK DEBT)
+			// need to adjust this to include short-term costs 
+		c_obj[2] = maxValue(durham.totalLosses, owasa.totalLosses, raleigh.totalLosses, cary.totalLosses);
+			// total utility losses (minimize financial risk objective)
+		c_obj[3] = raleigh.RRmagObj;
+			// MINIMIZE RAW RELEASES
+		c_obj[4] = maxValue(durham.maxRestrictions, owasa.maxRestrictions, raleigh.maxRestrictions, cary.maxRestrictions);
+			// MINIMIZE USE RESTRICTIONS 
+		c_obj[5] = raleigh.TTmagObj + durham.TTmagObj + owasa.TTmagObj;
+			// MINIMIZE TREATED TRANSFERS 
+			// can do this in terms of magnitude or frequency, just change variable name 
 	}
 
 	else if(borgToggle == 3) 
@@ -1641,38 +1695,34 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		c_obj[5] = maxValue(durham.consumerFractions, owasa.consumerFractions, raleigh.consumerFractions, cary.consumerFractions);*/
 
 		c_obj[0] = durham.maxFailures;
-		c_obj[1] = durham.expectedNPC;
-		c_obj[2] = durham.peakDebt;
-		c_obj[3] = durham.totalLosses;
+		c_obj[1] = durham.peakDebt;
+		c_obj[2] = durham.totalLosses;
+		c_obj[3] = 0.0;
 		c_obj[4] = durham.maxRestrictions;
-		c_obj[5] = durham.peakInsurance;
-		c_obj[6] = xreal[7];
+		c_obj[5] = durham.TTmagObj;
 
-		c_obj[7] = owasa.maxFailures;
-		c_obj[8] = owasa.expectedNPC;
-		c_obj[9] = owasa.peakDebt;
-		c_obj[10] = owasa.totalLosses;
-		c_obj[11] = owasa.maxRestrictions;
-		c_obj[12] = owasa.peakInsurance;
-		c_obj[13] = xreal[8];
+		c_obj[6] = owasa.maxFailures;
+		c_obj[7] = owasa.peakDebt;
+		c_obj[8] = owasa.totalLosses;
+		c_obj[9] = 0.0;
+		c_obj[10] = owasa.maxRestrictions;
+		c_obj[11] = owasa.TTmagObj;
 
-		c_obj[14] = raleigh.maxFailures;
-		c_obj[15] = raleigh.expectedNPC;
-		c_obj[16] = raleigh.peakDebt;
-		c_obj[17] = raleigh.totalLosses;
-		c_obj[18] = raleigh.maxRestrictions;
-		c_obj[19] = raleigh.peakInsurance;
-		c_obj[20] = xreal[9];
+		c_obj[12] = raleigh.maxFailures;
+		c_obj[13] = raleigh.peakDebt;
+		c_obj[14] = raleigh.totalLosses;
+		c_obj[15] = 0.0;
+		c_obj[16] = raleigh.maxRestrictions;
+		c_obj[17] = raleigh.TTmagObj;
 
-		c_obj[21] = cary.maxFailures;
-		c_obj[22] = cary.expectedNPC;
-		c_obj[23] = cary.peakDebt;
-		c_obj[24] = cary.totalLosses;
-		c_obj[25] = cary.maxRestrictions;
-		c_obj[26] = cary.peakInsurance;
-		c_obj[27] = xreal[10];
+		c_obj[18] = cary.maxFailures;
+		c_obj[19] = cary.peakDebt;
+		c_obj[20] = cary.totalLosses;
+		c_obj[21] = 0.0;
+		c_obj[22] = cary.maxRestrictions;
+		c_obj[23] = 0.0;
 
-		c_obj[28] = maxFallsFailure;
+		c_obj[24] = maxFallsFailure;
 
 	}
 
@@ -2492,7 +2542,7 @@ void Simulation::createInfrastructure(int realization)
 	int owasaConstruction;
 	int durhamConstruction;
 	int raleighConstruction;
-	for(int x = 0; x<owasa.infrastructureCount; x++)
+	for(int x = 0; x < owasa.infrastructureCount; x++)
 	{
 		owasaConstruction = owasa.buildInfrastructure(x);
 			// for infrastructure option x, check buildInfrastructure option
@@ -2566,7 +2616,7 @@ void Simulation::createInfrastructure(int realization)
 	// repeat for other utilities...
 
 	int constructionToggle2 = 0;
-	for(int x = 0; x<durham.infrastructureCount; x++)
+	for(int x = 0; x < durham.infrastructureCount; x++)
 	{
 		durhamConstruction = durham.buildInfrastructure(x);
 
@@ -2604,48 +2654,20 @@ void Simulation::createInfrastructure(int realization)
 					
 					break;
 				case 3:
-					if (sharedLM)
-					{
-						systemStorage.buildMichieSharedLow(storageratio);
-						riskOfFailureStorageROF.buildMichieSharedLow(storageratio);
-						riskOfFailureStorageIP.buildMichieSharedLow(storageratio);
-						durham.setCapacity(systemStorage.getDurhamCapacity() + 2500.0 * storageratio);
-						raleigh.addCapacity(2500.0 * (1-storageratio));
-						
-						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small - SHARED)" << endl;
-					}
-					else
-					{
-						systemStorage.buildMichieLow();
-						riskOfFailureStorageROF.buildMichieLow();
-						riskOfFailureStorageIP.buildMichieLow();
-						durham.setCapacity(8849.0);
-						
-						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small)" << endl;
-					}
+					systemStorage.buildMichieLow();
+					riskOfFailureStorageROF.buildMichieLow();
+					riskOfFailureStorageIP.buildMichieLow();
+					durham.setCapacity(8849.0);
 					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small)" << endl;
 					break;
 				case 4:
-					if (sharedLM)
-					{
-						systemStorage.buildMichieSharedHigh(storageratio);
-						riskOfFailureStorageROF.buildMichieSharedHigh(storageratio);
-						riskOfFailureStorageIP.buildMichieSharedHigh(storageratio);
-						durham.setCapacity(systemStorage.getDurhamCapacity() + 7700.0 * storageratio);
-						raleigh.addCapacity(7700.0 * (1-storageratio));
-						
-						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large - SHARED)" << endl;
-					}
-					else
-					{
-						systemStorage.buildMichieHigh();
-						riskOfFailureStorageROF.buildMichieHigh();
-						riskOfFailureStorageIP.buildMichieHigh();
-						durham.setCapacity(14049.0);
-						
-						InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large)" << endl;
-					}
+					systemStorage.buildMichieHigh();
+					riskOfFailureStorageROF.buildMichieHigh();
+					riskOfFailureStorageIP.buildMichieHigh();
+					durham.setCapacity(14049.0);
 					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large)" << endl;
 					break;
 				case 5:
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
@@ -2665,13 +2687,31 @@ void Simulation::createInfrastructure(int realization)
 					InfraBuilt << "Durham" << "," << "Western JL WTP (Large)" << endl;
 					
 					break;
+				case 7:
+					systemStorage.buildMichieSharedLow(storageratio);
+					riskOfFailureStorageROF.buildMichieSharedLow(storageratio);
+					riskOfFailureStorageIP.buildMichieSharedLow(storageratio);
+					durham.setCapacity(systemStorage.getDurhamCapacity() + 2500.0 * storageratio);
+					raleigh.addCapacity(2500.0 * (1-storageratio));
+					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Small - SHARED)" << endl;
+					break;
+				case 8:
+					systemStorage.buildMichieSharedHigh(storageratio);
+					riskOfFailureStorageROF.buildMichieSharedHigh(storageratio);
+					riskOfFailureStorageIP.buildMichieSharedHigh(storageratio);
+					durham.setCapacity(systemStorage.getDurhamCapacity() + 7700.0 * storageratio);
+					raleigh.addCapacity(7700.0 * (1-storageratio));
+					
+					InfraBuilt << "Durham" << "," << "Lake Michie Expansion (Large - SHARED)" << endl;
+					break;
 				default:
 					InfraBuilt << "Durham" << "," << "NO REMAINING PROJECTS" << endl;
 			}
 		}
 	}
 	int constructionToggle = 0;
-	for(int x = 0; x< raleigh.infrastructureCount; x++)
+	for(int x = 0; x < raleigh.infrastructureCount; x++)
 	{
 		raleighConstruction = raleigh.buildInfrastructure(x);
 		if(raleighConstruction == 1)
@@ -2735,6 +2775,24 @@ void Simulation::createInfrastructure(int realization)
 					
 					InfraBuilt << "Raleigh" << "," << "Western JL WTP (Large)" << endl;
 					
+					break;
+				case 6:
+					systemStorage.buildMichieSharedLow(storageratio);
+					riskOfFailureStorageROF.buildMichieSharedLow(storageratio);
+					riskOfFailureStorageIP.buildMichieSharedLow(storageratio);
+					durham.setCapacity(systemStorage.getDurhamCapacity() + 2500.0 * storageratio);
+					raleigh.addCapacity(2500.0 * (1-storageratio));
+					
+					InfraBuilt << "Raleigh" << "," << "Lake Michie Expansion (Small - SHARED)" << endl;
+					break;
+				case 7:
+					systemStorage.buildMichieSharedHigh(storageratio);
+					riskOfFailureStorageROF.buildMichieSharedHigh(storageratio);
+					riskOfFailureStorageIP.buildMichieSharedHigh(storageratio);
+					durham.setCapacity(systemStorage.getDurhamCapacity() + 7700.0 * storageratio);
+					raleigh.addCapacity(7700.0 * (1-storageratio));
+					
+					InfraBuilt << "Raleigh" << "," << "Lake Michie Expansion (Large - SHARED)" << endl;
 					break;
 				default:
 					InfraBuilt << "Raleigh" << "," << "NO REMAINING PROJECTS" << endl;
@@ -3229,55 +3287,36 @@ void Simulation::triggerInfrastructure(int realization)
 				riskOfFailureStorageInf.buildReclaimedHigh();
 				break;
 			case 3:
-				if (sharedLM)
-				{
-					durham.addDebt(year, realization, durham.infMatrix[3][4] * storageratio, bondLength, bondRate, discountrate);
-					raleigh.addDebt(year, realization, durham.infMatrix[3][4] * (1-storageratio), bondLength, bondRate, discountrate);
+				durham.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate, discountrate);
+				durham.infMatrix[3][3] = 1.0;
+				
+				durham.infMatrix[7][1]  = 2.0;
+				raleigh.infMatrix[6][1] = 2.0;
+					// dont build joint LM small expansion
 					
-					durham.infMatrix[3][3] = 1.0;
-					riskOfFailureStorageInf.buildMichieSharedLow(storageratio);
-				}
-				else
-				{
-					durham.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate, discountrate);
-					durham.infMatrix[3][3] = 1.0;
-					riskOfFailureStorageInf.buildMichieLow();
-				}
+				riskOfFailureStorageInf.buildMichieLow();
 				
 				break;
 			case 4:
-				if (sharedLM)
+				if(durham.infMatrix[3][1]<1.0)
+					// if the small LM expansion hasn't been done yet...
 				{
-					if(durham.infMatrix[3][1] < 1.0)
-						// if the small LM expansion hasn't been done yet...
-					{
-						durham.addDebt(year, realization, durham.infMatrix[4][4] * storageratio, bondLength, bondRate, discountrate);
-						raleigh.addDebt(year, realization, durham.infMatrix[4][4] * (1-storageratio), bondLength, bondRate, discountrate);
-					}
-					else
-					{
-						durham.addDebt(year, realization, (durham.infMatrix[4][4] - durham.infMatrix[3][4]) * storageratio, bondLength, bondRate, discountrate);
-						raleigh.addDebt(year, realization, (durham.infMatrix[4][4] - durham.infMatrix[3][4]) * (1-storageratio), bondLength, bondRate, discountrate);
-					}
-					durham.infMatrix[4][3] = 1.0;
-					durham.infMatrix[3][1] = 2.0;
-					riskOfFailureStorageInf.buildMichieSharedHigh(storageratio);
+					durham.addDebt(year, realization, durham.infMatrix[4][4], bondLength, bondRate, discountrate);
 				}
 				else
 				{
-					if(durham.infMatrix[3][1]<1.0)
-						// if the small LM expansion hasn't been done yet...
-					{
-						durham.addDebt(year, realization, durham.infMatrix[4][4], bondLength, bondRate, discountrate);
-					}
-					else
-					{
-						durham.addDebt(year, realization, durham.infMatrix[4][4] - durham.infMatrix[3][4], bondLength, bondRate, discountrate);
-					}
-					durham.infMatrix[4][3] = 1.0;
-					durham.infMatrix[3][1] = 2.0;
-					riskOfFailureStorageInf.buildMichieHigh();
+					durham.addDebt(year, realization, durham.infMatrix[4][4] - durham.infMatrix[3][4], bondLength, bondRate, discountrate);
 				}
+				durham.infMatrix[4][3] = 1.0;
+				
+				durham.infMatrix[3][1]  = 2.0;
+				durham.infMatrix[7][1]  = 2.0;
+				raleigh.infMatrix[6][1] = 2.0;
+				durham.infMatrix[8][1]  = 2.0;
+				raleigh.infMatrix[7][1] = 2.0;
+					// dont build any joint expansions of LM or small expansions 
+					
+				riskOfFailureStorageInf.buildMichieHigh();
 				
 				break;
 			case 5:
@@ -3309,6 +3348,43 @@ void Simulation::triggerInfrastructure(int realization)
 				owasa.infMatrix[5][1] = 2.0;
 				raleigh.infMatrix[5][1] = 2.0;
 				riskOfFailureStorageInf.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+				break;
+			case 7:
+				durham.addDebt(year, realization, durham.infMatrix[7][4] * storageratio, bondLength, bondRate, discountrate);
+				raleigh.addDebt(year, realization, durham.infMatrix[7][4] * (1-storageratio), bondLength, bondRate, discountrate);
+				
+				durham.infMatrix[7][3] = 1.0;
+				
+				durham.infMatrix[3][1]  = 2.0;
+				raleigh.infMatrix[6][1] = 2.0;
+					// dont let the non-cooperation small expansion be built
+				
+				riskOfFailureStorageInf.buildMichieSharedLow(storageratio);
+				break;
+			case 8:
+				if(durham.infMatrix[3][1] < 1.0 || durham.infMatrix[7][1] < 1.0)
+					// if the small LM expansion hasn't been done yet...
+				{
+					durham.addDebt(year, realization, durham.infMatrix[8][4] * storageratio, bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, durham.infMatrix[8][4] * (1-storageratio), bondLength, bondRate, discountrate);
+				}
+				else
+				{
+					durham.addDebt(year, realization, (durham.infMatrix[8][4] - durham.infMatrix[7][4]) * storageratio, bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, (durham.infMatrix[8][4] - durham.infMatrix[7][4]) * (1-storageratio), bondLength, bondRate, discountrate);
+				}
+				durham.infMatrix[8][3] = 1.0;
+				
+				durham.infMatrix[3][1] = 2.0;
+				durham.infMatrix[7][1] = 2.0;
+					// dont let the smaller expansion be built 
+				
+				raleigh.infMatrix[6][1] = 2.0;
+				raleigh.infMatrix[7][1] = 2.0;
+				durham.infMatrix[4][1]  = 2.0;
+					// dont let any version of LM expansion occur by raleigh's choice 
+					
+				riskOfFailureStorageInf.buildMichieSharedHigh(storageratio);
 				break;
 		}
 	}
@@ -3367,6 +3443,43 @@ void Simulation::triggerInfrastructure(int realization)
 				owasa.infMatrix[5][1] = 2.0;
 				raleigh.infMatrix[5][1] = 2.0;
 				riskOfFailureStorageInf.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+				break;
+			case 6:
+				durham.addDebt(year, realization, durham.infMatrix[7][4] * storageratio, bondLength, bondRate, discountrate);
+				raleigh.addDebt(year, realization, durham.infMatrix[7][4] * (1-storageratio), bondLength, bondRate, discountrate);
+				
+				raleigh.infMatrix[6][3] = 1.0;
+				
+				durham.infMatrix[3][1] = 2.0;
+				durham.infMatrix[7][1] = 2.0;
+					// dont let the non-cooperation small expansion be built
+				
+				riskOfFailureStorageInf.buildMichieSharedLow(storageratio);
+				break;
+			case 7:
+				if(durham.infMatrix[3][1] < 1.0 || raleigh.infMatrix[6][1] < 1.0)
+					// if the small LM expansion hasn't been done yet...
+				{
+					durham.addDebt(year, realization, durham.infMatrix[8][4] * storageratio, bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, durham.infMatrix[8][4] * (1-storageratio), bondLength, bondRate, discountrate);
+				}
+				else
+				{
+					durham.addDebt(year, realization, (durham.infMatrix[8][4] - durham.infMatrix[7][4]) * storageratio, bondLength, bondRate, discountrate);
+					raleigh.addDebt(year, realization, (durham.infMatrix[8][4] - durham.infMatrix[7][4]) * (1-storageratio), bondLength, bondRate, discountrate);
+				}
+				raleigh.infMatrix[7][3] = 1.0;
+				
+				durham.infMatrix[3][1] = 2.0;
+				durham.infMatrix[7][1] = 2.0;
+					// dont let the smaller expansion be built 
+				
+				raleigh.infMatrix[6][1] = 2.0;
+				durham.infMatrix[8][1] = 2.0;
+				durham.infMatrix[4][1] = 2.0;
+					// dont let any version of LM expansion occur by raleigh's choice 
+					
+				riskOfFailureStorageInf.buildMichieSharedHigh(storageratio);
 				break;
 		}
 	}
@@ -5091,6 +5204,19 @@ void Simulation::realizationLoop()
 	double NearFailureLimit = 0.2;
 		// if FL storage is below this, any releases 
 		// will go 100% into the water supply pool 
+		
+	if (formulation > 0 && contracttypetoggle <= 0)
+	{
+		spotPricing = true;
+		tieredSpotPricing = false;
+	}
+	else if (formulation > 0 && contracttypetoggle > 0)
+	{
+		spotPricing = false;
+		tieredSpotPricing = false;
+	}
+		// if releases are allowed, use the contract toggle decision variable
+		// to choose a contract type 
 	
 	/////////////////////////////////////////////////////////////////////////
 	///////// CONTRACT SPECIFICATIONS FOR RELEASES HERE /////////////////////
@@ -5291,8 +5417,18 @@ void Simulation::realizationLoop()
 		contractriskyearcounter = 0;
 		LOOPCHECKER = 0;
 		
-		allowReleaseContract = true;
-		previousContract = false;
+		if (formulation > 0) 
+		{
+			allowReleaseContract = true;
+			previousContract = false;
+		}
+		else
+		{
+			allowReleaseContract = false;
+			previousContract = false;
+		}
+		
+		
 		contractcount = 1;
 		currentcontract = 1;
 		
@@ -5371,7 +5507,8 @@ void Simulation::realizationLoop()
 		{
 			firstyear = year;
 			
-			if (allowReleases == 1)
+			if (formulation > 0)
+				// if releases are allowed 
 			{
 				if (spotPricing)
 				{
@@ -5432,7 +5569,7 @@ void Simulation::realizationLoop()
                 // gives the ROF of this given week
 				// July 2016: this function just does ROF for insurance and releases 
 
-			if (allowReleases == 1)
+			if (formulation > 0)
 				// allow transfers, apply raw releases 
 				// in a given week, transfers calculated before transfers
 				// however, ROF is not updated.  this should work out as long as
@@ -5482,6 +5619,13 @@ void Simulation::realizationLoop()
 					raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
 					durham.weeklyReleaseVolume  = systemStorage.getRaleighReleases();
 					
+					raleigh.annualReleases += systemStorage.getRaleighReleases();
+					
+					if raleigh.annualReleases > 0.0
+					{
+						raleigh.annualReleaseFrequency += 1;
+					}
+					
 					raleigh.ReleaseSpotPayment(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
 					durham.ReleaseSpotAccept(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
 				}
@@ -5496,6 +5640,13 @@ void Simulation::realizationLoop()
 					
 					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					
+					raleigh.annualReleases += systemStorage.getRaleighReleases();
+					
+					if raleigh.annualReleases > 0.0
+					{
+						raleigh.annualReleaseFrequency += 1;
+					}
 					
 					if (currentcontract == contractcount)
 					{
@@ -5517,8 +5668,8 @@ void Simulation::realizationLoop()
 					
 					if (week == 1)
 					{
-						raleigh.payForReleases(adjustedannualpayment, contractlength);
-						durham.acceptReleasePayment(adjustedannualpayment, contractlength);
+						raleigh.payForReleases(adjustedannualpayment);
+						durham.acceptReleasePayment(adjustedannualpayment);
 							// annual payment
 							// because payment type has been changed to annual type,
 							// the contract length variable is unnecessary 
@@ -5579,7 +5730,7 @@ void Simulation::realizationLoop()
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 			
-			if (formulation > 0)
+			if (formulation >= 0)
 			{
 				//Transfer requests are granted based on the limitations of infrastructure
 				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand);
@@ -5591,13 +5742,23 @@ void Simulation::realizationLoop()
                     // each utility assigned the costs of the transfers they get
 					
 				raleigh.annualTransfers += systemStorage.getRaleighTransfers();
+				durham.annualTransfers  += systemStorage.getDurhamTransfers();
+				owasa.annualTransfers   += systemStorage.getOWASATransfers();
 				
 				if (systemStorage.getRaleighTransfers() > 0.0)
 				{
 					raleigh.annualTransferFrequency += 1;
 				}
-					
-				if (allowReleases == 1)
+				if (systemStorage.getDurhamTransfers() > 0.0)
+				{
+					durham.annualTransferFrequency += 1;
+				}
+				if (systemStorage.getOWASATransfers() > 0.0)
+				{
+					owasa.annualTransferFrequency += 1;
+				}	
+				
+				if (formulation > 0 && formulation > 1)
 				{
 					if (week == 1)
 					{
@@ -5777,7 +5938,7 @@ void Simulation::realizationLoop()
 				raleighIntakeCap = systemStorage.getRaleighIntake();
                     // all reset for the week
 			
-				if (allowReleases == 1)
+				if (formulation > 0 && formulation > 1)
 				{
 					if (currentcontract != contractcount)
 					{

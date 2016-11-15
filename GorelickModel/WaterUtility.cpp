@@ -53,6 +53,8 @@ WaterUtility::~WaterUtility()
 	
 	zap(annualTTmag, terminateYear);
 	zap(annualTTfreq, terminateYear);
+	zap(annualRRmag, terminateYear);
+	zap(annualRRfreq, terminateYear);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
@@ -76,13 +78,13 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	volumeIncrements = volumeInc;
 	weeklyTransferTriggers = 0.0;
 	
-	if(formulation<2)
+	if (formulation >= 0)
 	{
-		infrastructureCount = infCount;
+		infrastructureCount = infCount + 2;
 	}
 	else
 	{
-		infrastructureCount = infCount + 2;
+		infrastructureCount = infCount;
 	}
 
 	// Initialize pointers to null
@@ -136,6 +138,8 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	
 	general_2d_allocate(annualTTmag, terminateYear, numRealizations, 0.0);
 	general_2d_allocate(annualTTfreq, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualRRmag, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualRRfreq, terminateYear, numRealizations, 0.0);
 	
 	usesROF = true;
 
@@ -358,14 +362,14 @@ void WaterUtility::payForTransfers(double transferCosts)
 
 /////////////////////////// pay for releases function ///////////////////////////////////////////////////////////////////////
 
-void WaterUtility::payForReleases(double contractValue, double contractLengthWeeks)
+void WaterUtility::payForReleases(double contractValue
 {
 	Fund.subtract(contractValue);
 		// DO I NEED TO PRESENT VALUE THIS NOW OR IS IT DONE LATER?
 		// THIS IS NOW AN ANNUAL PAYMENT
 }
 
-void WaterUtility::acceptReleasePayment(double contractValue, double contractLengthWeeks)
+void WaterUtility::acceptReleasePayment(double contractValue)
 {
 	Fund.add(contractValue);
 }
@@ -462,7 +466,7 @@ void WaterUtility::clearVariablesForSimulation()
 
 void WaterUtility::clearVariablesForRealization(int year)
 {
-	for(int x = 0; x< infrastructureCount; x++)
+	for(int x = 0; x < infrastructureCount; x++)
 	{
 		infMatrix[x][1] = 0.0;
 		infMatrix[x][3] = 0.0;
@@ -576,10 +580,15 @@ void WaterUtility::annualUpdate(int year, int realization)
 	annualTTmag[year-1][realization]  = annualTransfers;
 	annualTTfreq[year-1][realization] = annualTransferFrequency;
 	
+	annualRRmag[year-1][realization] = annualReleases;
+	annualRRfreq[year-1][realization] = annualReleaseFrequency;
+	
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
 	annualTransfers = 0;
 	annualTransferFrequency = 0;
+	annualReleases = 0;
+	annualReleaseFrequency = 0;
         // reset
 
 }
@@ -619,8 +628,10 @@ void WaterUtility::calculateObjectives()
 		double maxInsurance = 0.0;
 		double maxTTmag = 0.0;
 		double maxTTfreq = 0.0;
+		double maxRRmag = 0.0;
+		double maxRRfreq = 0.0;
 		for (int year = 0; year< terminateYear; year++)
-            // year with highest insurance payment in this given realization
+            // year with highest insurance payment or transfer magnitude/frequency in this given realization
 		{
 			if(annualPayments[year][realization]>maxPayment)
 			{
@@ -638,6 +649,14 @@ void WaterUtility::calculateObjectives()
 			{
 				maxTTfreq = annualTTfreq[year][realization];
 			}
+			if(annualRRmag[year][realization] > maxRRmag)
+			{
+				maxRRmag = annualRRmag[year][realization];
+			}
+			if(annualRRfreq[year][realization] > maxRRfreq)
+			{
+				maxRRfreq = annualRRfreq[year][realization];
+			}
 		}
 
 		peakDebt += maxPayment/double(numRealizations);
@@ -646,6 +665,8 @@ void WaterUtility::calculateObjectives()
 		
 		TTmagObj  += maxTTmag/double(numRealizations);
 		TTfreqObj += maxTTfreq/double(numRealizations);
+		RRmagObj  += maxRRmag/double(numRealizations);
+		RRfreqObj += maxRRfreq/double(numRealizations);
 	}
 
 	//Average utility costs, including mitigation costs
@@ -1155,7 +1176,7 @@ int WaterUtility::startNewInfrastructure(int year)
 {
 	double rankValue = 0.0;
 	int indexValue = 999;
-	for(int x = 0; x<infrastructureCount;x++)
+	for(int x = 0; x < infrastructureCount;x++)
 	{
 		if( infMatrix[x][1] < 1.0 && year >= int(infMatrix[x][2]) )
 			// the first column is either 0 or 1, 0 being this option has 
@@ -1177,7 +1198,7 @@ int WaterUtility::startNewInfrastructure(int year)
 			}
 		}
 	}
-	if(indexValue<infrastructureCount)
+	if(indexValue < infrastructureCount)
 	{
 		infMatrix[indexValue][1] = 1.0;
 			// mark the chosen option as triggered

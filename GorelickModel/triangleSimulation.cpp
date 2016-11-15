@@ -98,6 +98,13 @@ int main (int argc, char *argv[])
 			case 'c':
 				simulation.formulation = atoi(optarg);
 				break;
+					// David (11-14-2016)
+					// the following formulations to be used:
+					// 0 - No releases (but includes transfers, restrictions, standard infrastructure pathways)
+					// 1 - Releases through spot or option contracts (but no contract negotiations)
+					// 2 - Releases (with contract negotiations)
+					// 3 - Releases with Joint Lake Michie Expansion available as infrastructure option
+					 
 			case 'b':
 				simulation.borgToggle = atoi(optarg);
 				break;
@@ -157,24 +164,26 @@ int main (int argc, char *argv[])
 		// that can be divided among Cary, OWASA, Durham, and Raleigh.
 		// may be less than 1 (100%) because of allocation
 		// to Chatham County communities.
-	if (simulation.formulation > 0)
-		// in any formulation where treated transfers occur 
-	{
-		simulation.allowReleases = 1;
-			// a logical to determine whether releases will occur
-			// SET TO 0 SO RELEASES NEVER OCCUR 
-	}
-	else 
-	{
-		simulation.allowReleases = 0;
-	}
+		
+	// if (simulation.formulation > 0)
+		// // in zero formulation, no releases 
+	// {
+		// simulation.allowReleases = 1;
+			// // a logical to determine whether releases will occur
+			// // SET TO 0 SO RELEASES NEVER OCCUR 
+	// }
+	// else 
+	// {
+		// simulation.allowReleases = 0;
+	// }
+		// EVERY INSTANCE OF allowReleases WAS REPLACED WITH formulation > 0 
 	
 	//seed random number generator
 	// NOTE: for model, the seed stays the same. For Borg, the seed comes from command line argument.
 	srand(1);
 
 	//variables for interfacing with algorithm
-	int c_num_dec = 75;
+	int c_num_dec = 80;
 	double *c_xreal;
 	general_1d_allocate(c_xreal, c_num_dec);
         // c_xreal is decision vars
@@ -187,7 +196,7 @@ int main (int argc, char *argv[])
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
 	
-	simulation.runHistoric = false;
+	simulation.runHistoric = true;
 		// determines whether to use fake historic streamflows
 		// in place of synthetic flows 
 		// these flows still won't be read until the fixRDMFactors function runs 
@@ -253,13 +262,23 @@ int main (int argc, char *argv[])
 		// if true, read from folder extension bernardo uses 
 	simulation.printDetailedOutput = false;
 		// determines whether to write all the output csvs that I want 
-	simulation.spotPricing = true;
+		
+	//simulation.spotPricing = true;
 		// determines whether releases are controlled with spot agreements
 		// or with an option contract 
-	simulation.tieredSpotPricing = false;
+	//simulation.tieredSpotPricing = false;
 		// says whether or not spot pricing is tiered or 
-		// a flat rate 
-	simulation.sharedLM = true;
+		// a flat rate
+	// THESE ARE ADDRESSED IN THE SIMULATION SCRIPT 
+	
+	if (simulation.formulation > 2)
+	{
+		simulation.sharedLM = true;
+	}
+	else
+	{
+		simulation.sharedLM = false;
+	}
 		// an indicator as to whether Lake Michie expansion is shared
 		// between Raleigh and Durham to allow Raleigh some capacity
 		// in LM 
@@ -279,7 +298,8 @@ int main (int argc, char *argv[])
 
 	if (simulation.borgToggle < 3)
 	{
-		c_num_obj = 5;//Number of objective variables
+		c_num_obj = 6;
+			//Number of objective variables
 
 		// JDH 11/12: Turning off constraints for now (below here, only for parallel version)
 		
@@ -287,7 +307,8 @@ int main (int argc, char *argv[])
 		general_1d_allocate(c_obj, c_num_obj);
 		//general_1d_allocate(c_constr, c_num_constr);
 
-		simulation.initializeFormulation(c_num_obj, c_num_constr); // number of decisions, objectives, constraints
+		simulation.initializeFormulation(c_num_obj, c_num_constr); 
+			// number of decisions, objectives, constraints
 
 		// Interface with Borg-MS (parallel)
 		#ifdef PARALLEL
@@ -349,7 +370,7 @@ int main (int argc, char *argv[])
         // RUNNING FROM AN INPUT FILE... now just looking at
         // optimized outputs, not actually optimizing here
 	{
-		int c_num_obj = 29;
+		int c_num_obj = 25;
 		int nRDM = 1;
 			// Read a certain number of RDM parameter sets 
 			// when running in simulation mode without uncertain factors

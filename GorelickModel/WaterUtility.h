@@ -104,6 +104,8 @@ class WaterUtility
 	double infBuffer;
 	double TTmagObj;
 	double TTfreqObj;
+	double RRmagObj;
+	double RRfreqObj;
 	
 	double weeklyReleaseVolume;
 	double weeklyBuybackVolume;
@@ -116,8 +118,12 @@ class WaterUtility
 	double *TransferFrequency;
 	double annualTransfers;
 	double annualTransferFrequency;
+	double annualReleases;
+	double annualReleaseFrequency;
 	double **annualTTmag;
 	double **annualTTfreq;
+	double **annualRRmag;
+	double **annualRRmag;
 	
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,8 +152,8 @@ class WaterUtility
 	void priceInsurance(int yr, int rlztn);
 	void payForTransfers(double tC);
 	
-	void payForReleases(double contractValue, double contractLengthWeeks);
-	void acceptReleasePayment(double contractValue, double contractLengthWeeks);
+	void payForReleases(double contractValue);
+	void acceptReleasePayment(double contractValue);
 	void payForBuybacks(double buybackratePerMG);
 	void acceptBuybackPayment(double buybackratePerMG);
 	void ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor);
