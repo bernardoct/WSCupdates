@@ -362,7 +362,7 @@ void WaterUtility::payForTransfers(double transferCosts)
 
 /////////////////////////// pay for releases function ///////////////////////////////////////////////////////////////////////
 
-void WaterUtility::payForReleases(double contractValue
+void WaterUtility::payForReleases(double contractValue)
 {
 	Fund.subtract(contractValue);
 		// DO I NEED TO PRESENT VALUE THIS NOW OR IS IT DONE LATER?
@@ -428,6 +428,16 @@ void WaterUtility::ReleaseSpotAccept(bool tiered, double floorRate, double tiers
 	{
 		Fund.add(weeklyReleaseVolume * floorRate);
 	}
+}
+
+void WaterUtility::ReleaseSpotPayment(double floorRate)
+{
+	Fund.subtract(weeklyReleaseVolume * floorRate);
+}
+
+void WaterUtility::ReleaseSpotAccept(double floorRate)
+{
+	Fund.add(weeklyReleaseVolume * floorRate);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

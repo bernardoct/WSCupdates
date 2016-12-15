@@ -58,7 +58,7 @@ void Simulation::writeDataLists()
 	// Define Utility Info
 	// (months, years, types, tiers, stages, numFutureYears, failurePoint, numAnnualDecisionPeriods)
 	
-	if (formulation < 3)
+	if (formulation < 2)
 		// the else statement here is for when joint LM expansion is an option 
 	{
 		durham.configure(billingMonths, 3, 13, 10, 5, numFutureYears, 0.2, 2, terminateYear, volumeIncrements, numRealizations, formulation, 5, numContractRiskYears);
@@ -915,7 +915,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 	raleigh.infMatrix[4][2] = rdm_factors[28];
 	raleigh.infMatrix[5][2] = rdm_factors[29];
 	
-	if (formulation > 2)
+	if (formulation > 1)
 		// joint LM expansion build start year 
 	{
 		durham.infMatrix[7][2] = rdm_factors[22];
@@ -1461,7 +1461,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		raleigh.infMatrix[5][4] = 316.8*xreal[51];
 		raleigh.infMatrix[5][5] = 3 + rand() % 3;
 		
-		if (formulation > 2)
+		if (formulation > 1)
 			// joint LM allowed 
 		{
 			durham.infMatrix[7][0] = xreal[76];////Lake Michie expansion (low)
@@ -1533,7 +1533,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// this is the difference in ROF trigger levels between
 		// when releases are not granted (the floor) and
 		// when buybacks are used by Durham (the ceiling)
-	if (formulation > 1)
+	if (formulation > 10)
 	{
 		contractlength = (int)(xreal[64]+1);
 	}
@@ -1544,7 +1544,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// the length of a releases contract
 		// converting to an integer will round down the number 
 		// make sure this is greater than 1 by adding 1 to it
-		// if formulation < 2, no contract renegotiation is done
+		// if formulation < 20, no contract renegotiation is done
 		// so use a contract length that is longer than the realization 
 	raleigh.RRcontractTrigger = xreal[65];
 	durham.RRcontractTrigger  = xreal[66];
@@ -1573,7 +1573,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 		// if LM is expanded and Raleigh pays for part of the capacity 
 		// 1-storageratio = raleigh's stake of LM 
 	contracttypetoggle = xreal[75];
-		// within formulations 1, 2, and 3, this decision variable (range -1 to 1)
+		// within formulations 1 and 2, this decision variable (range -1 to 1)
 		// will decide which type of release structure (spot or option contract) is used 
 		
 	if (durham.RRtrigger - BuybackROFZone < 0)
@@ -1615,13 +1615,13 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	//the average revenue recieved from the sale of 1 MG of water, the consumer surplus lost from water use reductions/cost increases,
 	//and overall reductions from restrictions and price increases
 	//(Only do it once at the beginning. If formulation is more than -1, redo it every simulation).
-	if(formulation >= 0)
-	{
-		durham.calcSurchargePrice(elasticity_Of_Demand, 1);
-		owasa.calcSurchargePrice(elasticity_Of_Demand, 1);
-		cary.calcSurchargePrice(elasticity_Of_Demand, 1);
-		raleigh.calcSurchargePrice(elasticity_Of_Demand, 1);
-	}
+	// if(formulation >= 0)
+	// {
+		// durham.calcSurchargePrice(elasticity_Of_Demand, 1);
+		// owasa.calcSurchargePrice(elasticity_Of_Demand, 1);
+		// cary.calcSurchargePrice(elasticity_Of_Demand, 1);
+		// raleigh.calcSurchargePrice(elasticity_Of_Demand, 1);
+	// }
 		// nothing 
 
 
@@ -1676,7 +1676,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 			// MINIMIZE RAW RELEASES
 		c_obj[4] = maxValue(durham.maxRestrictions, owasa.maxRestrictions, raleigh.maxRestrictions, cary.maxRestrictions);
 			// MINIMIZE USE RESTRICTIONS 
-		c_obj[5] = raleigh.TTmagObj + durham.TTmagObj + owasa.TTmagObj;
+		c_obj[5] = raleigh.TTmagObj;
 			// MINIMIZE TREATED TRANSFERS 
 			// can do this in terms of magnitude or frequency, just change variable name 
 	}
@@ -3290,15 +3290,18 @@ void Simulation::triggerInfrastructure(int realization)
 				durham.addDebt(year, realization, durham.infMatrix[3][4], bondLength, bondRate, discountrate);
 				durham.infMatrix[3][3] = 1.0;
 				
-				durham.infMatrix[7][1]  = 2.0;
-				raleigh.infMatrix[6][1] = 2.0;
-					// dont build joint LM small expansion
+				if (formulation > 1)
+				{
+					durham.infMatrix[7][1]  = 2.0;
+					raleigh.infMatrix[6][1] = 2.0;
+						// dont build joint LM small expansion
+				}
 					
 				riskOfFailureStorageInf.buildMichieLow();
 				
 				break;
 			case 4:
-				if(durham.infMatrix[3][1]<1.0)
+				if(durham.infMatrix[3][1] < 1.0)
 					// if the small LM expansion hasn't been done yet...
 				{
 					durham.addDebt(year, realization, durham.infMatrix[4][4], bondLength, bondRate, discountrate);
@@ -3308,13 +3311,16 @@ void Simulation::triggerInfrastructure(int realization)
 					durham.addDebt(year, realization, durham.infMatrix[4][4] - durham.infMatrix[3][4], bondLength, bondRate, discountrate);
 				}
 				durham.infMatrix[4][3] = 1.0;
-				
 				durham.infMatrix[3][1]  = 2.0;
-				durham.infMatrix[7][1]  = 2.0;
-				raleigh.infMatrix[6][1] = 2.0;
-				durham.infMatrix[8][1]  = 2.0;
-				raleigh.infMatrix[7][1] = 2.0;
-					// dont build any joint expansions of LM or small expansions 
+				
+				if (formulation > 1)
+				{
+					durham.infMatrix[7][1]  = 2.0;
+					raleigh.infMatrix[6][1] = 2.0;
+					durham.infMatrix[8][1]  = 2.0;
+					raleigh.infMatrix[7][1] = 2.0;
+						// dont build any joint expansions of LM or small expansions 
+				}
 					
 				riskOfFailureStorageInf.buildMichieHigh();
 				
@@ -3362,7 +3368,7 @@ void Simulation::triggerInfrastructure(int realization)
 				riskOfFailureStorageInf.buildMichieSharedLow(storageratio);
 				break;
 			case 8:
-				if(durham.infMatrix[3][1] < 1.0 || durham.infMatrix[7][1] < 1.0)
+				if(durham.infMatrix[3][1] < 1.0)
 					// if the small LM expansion hasn't been done yet...
 				{
 					durham.addDebt(year, realization, durham.infMatrix[8][4] * storageratio, bondLength, bondRate, discountrate);
@@ -4843,7 +4849,7 @@ void Simulation::calculateOptionContract(int yearcounter, int LOOPCHECKER, int r
 		}
 	}
 	
-	if (printDetailedOutput)
+	if (printDetailedOutput && formulation > 10)
 	{
 		outfile << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << "," << contractbuybacks << "," << contracttransfersD << ",";
 		outfile << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
@@ -5146,7 +5152,7 @@ void Simulation::calculateSpotContract(int realization, int numContractRiskYears
 		}
 	}
 	
-	if (printDetailedOutput)
+	if (printDetailedOutput && formulation > 10)
 	{
 		outfile << RtriggerDiff << "," << DtriggerDiff << "," << triggerDiff << "," << RBBstddev << "," << DBBstddev << ",";
 		outfile << contractSplits << "," << RTTmagnitudeDiff << "," << DTTmagnitudeDiff << "," << RTTfrequencyDiff << "," << DTTfrequencyDiff << ",";
@@ -5204,13 +5210,21 @@ void Simulation::realizationLoop()
 	double NearFailureLimit = 0.2;
 		// if FL storage is below this, any releases 
 		// will go 100% into the water supply pool 
-		
-	if (formulation > 0 && contracttypetoggle <= 0)
+	
+	if (formulation > 0)
 	{
-		spotPricing = true;
-		tieredSpotPricing = false;
+		if (contracttypetoggle <= 0)
+		{
+			spotPricing = true;
+			tieredSpotPricing = false;
+		}
+		else if (contracttypetoggle > 0)
+		{
+			spotPricing = false;
+			tieredSpotPricing = false;
+		}
 	}
-	else if (formulation > 0 && contracttypetoggle > 0)
+	else
 	{
 		spotPricing = false;
 		tieredSpotPricing = false;
@@ -5358,15 +5372,18 @@ void Simulation::realizationLoop()
 			outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
 				// csv column headers for raw release output data and storage levels
 				
-			ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-			ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << ",";
-			ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << ",";
-			ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
-			ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
-			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << ",";
-			ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
-			ReleaseContractData << "contractcount" << "," << "adjustedspotpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << ",";
-			ReleaseContractData << "RequestMade" << "," << "RequestCurtail" << endl;
+			if (formulation > 10)
+			{
+				ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+				ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << ",";
+				ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << ",";
+				ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
+				ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
+				ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << ",";
+				ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
+				ReleaseContractData << "contractcount" << "," << "adjustedspotpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << ",";
+				ReleaseContractData << "RequestMade" << "," << "RequestCurtail" << endl;
+			}
 		}
 		else
 		{
@@ -5378,14 +5395,17 @@ void Simulation::realizationLoop()
 			outNew << "FLqualityStorage" << "," << "FLqualityCapacity" << "," << "FLsupplyCapacity" << "," << "DsupplyCapacity" << "," << "ReleaseToFLSupplyFraction" << endl;
 				// csv column headers for raw release output data and storage levels
 				
-			ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
-			ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << "," << "contractbuybacks" << ",";
-			ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
-			ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
-			ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
-			ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
-			ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
-			ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
+			if (formulation > 10)
+			{
+				ReleaseContractData << "Solution" << "," << "RDMnumber" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
+				ReleaseContractData << "ContractRiskYearCounter" << "," << "RinfROF" << "," << "DinfROF" << "," << "contractbuybacks" << ",";
+				ReleaseContractData << "firstyear" << "," << "loopchecker" << "," << "yearcounter" << "," << "contractlength" << "," << "annualpayment" << "," << "buybackrate" << ",";
+				ReleaseContractData << "RTTmag" << "," << "RTTfreq" << ",";
+				ReleaseContractData << "DTTmag" << "," << "DTTfreq" << ",";
+				ReleaseContractData << "RtriggerDiff" << "," << "DtriggerDiff" << "," << "triggerDiff" << "," << "RBBstddev" << "," << "DBBstddev" << "," << "contractbuybacks" << "," << "contracttransfersD" << ",";
+				ReleaseContractData << "contractSplits" << "," << "RTTmagnitudeDiff" << "," << "DTTmagnitudeDiff" << "," << "RTTfrequencyDiff" << "," << "DTTfrequencyDiff" << ",";
+				ReleaseContractData << "contractcount" << "," << "adjustedannualpayment" << "," << "adjustedbuybackpayment" << "," << "allowReleaseContract" << "," << "previousContract" << "," << "transferRiskYears" << endl;
+			}
 		}	
 	}
 	
@@ -5518,6 +5538,7 @@ void Simulation::realizationLoop()
 				{
 					adjustedannualpayment = annualpayment;
 					adjustedbuybackpayment = buybackratePerMG;
+					adjustedspotpayment = tieredFloorPrice;
 				}
 			}
 		}
@@ -5621,13 +5642,13 @@ void Simulation::realizationLoop()
 					
 					raleigh.annualReleases += systemStorage.getRaleighReleases();
 					
-					if raleigh.annualReleases > 0.0
+					if (raleigh.annualReleases > 0.0)
 					{
 						raleigh.annualReleaseFrequency += 1;
 					}
 					
-					raleigh.ReleaseSpotPayment(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
-					durham.ReleaseSpotAccept(tieredSpotPricing, tieredFloorPrice, tierSize, tierPriceInc);
+					raleigh.ReleaseSpotPayment(tieredSpotPricing, adjustedspotpayment, tierSize, tierPriceInc);
+					durham.ReleaseSpotAccept(tieredSpotPricing, adjustedspotpayment, tierSize, tierPriceInc);
 				}
 				else
 				{
@@ -5643,7 +5664,10 @@ void Simulation::realizationLoop()
 					
 					raleigh.annualReleases += systemStorage.getRaleighReleases();
 					
-					if raleigh.annualReleases > 0.0
+					raleigh.ReleaseSpotPayment(adjustedspotpayment);
+					durham.ReleaseSpotAccept(adjustedspotpayment);
+					
+					if (raleigh.annualReleases > 0.0)
 					{
 						raleigh.annualReleaseFrequency += 1;
 					}
@@ -5758,7 +5782,7 @@ void Simulation::realizationLoop()
 					owasa.annualTransferFrequency += 1;
 				}	
 				
-				if (formulation > 0 && formulation > 1)
+				if (formulation > 0)
 				{
 					if (week == 1)
 					{
@@ -5879,21 +5903,24 @@ void Simulation::realizationLoop()
 					LMallocData << rank << "," << rdmNumber << "," << realization << "," << year-1 << ",";
 					LMallocData << storageratio << "," << systemStorage.getRaleighCapacity() << "," << systemStorage.getRaleighLMCapacity() << "," << systemStorage.getDurhamCapacity() << endl;
 					
-					if (spotPricing)
+					if (formulation > 10)
 					{
-						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
-						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
-						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << ",";
-						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
-						ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
-					}
-					else 
-					{
-						ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
-						ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
-						ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
-						ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
-						ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+						if (spotPricing)
+						{
+							ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
+							ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << ",";
+							ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << ",";
+							ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
+							ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+						}
+						else 
+						{
+							ReleaseContractData << rank << "," << rdmNumber << "," << realization << "," << year-1 << "," << week << ",";
+							ReleaseContractData << contractriskyearcounter << "," << raleigh.infRisk << "," << durham.infRisk << "," << contractbuybacks << ",";
+							ReleaseContractData << firstyear << "," << LOOPCHECKER << "," << yearcounter << "," << contractlength << "," << annualpayment << "," << buybackratePerMG << ",";
+							ReleaseContractData << raleigh.TransferHistory[contractriskyearcounter] << "," << raleigh.TransferFrequency[contractriskyearcounter] << ",";
+							ReleaseContractData << durham.TransferHistory[contractriskyearcounter] << "," << durham.TransferFrequency[contractriskyearcounter] << ",";
+						}
 					}
 				}
 					
@@ -5938,7 +5965,7 @@ void Simulation::realizationLoop()
 				raleighIntakeCap = systemStorage.getRaleighIntake();
                     // all reset for the week
 			
-				if (formulation > 0 && formulation > 1)
+				if (formulation > 10)
 				{
 					if (currentcontract != contractcount)
 					{

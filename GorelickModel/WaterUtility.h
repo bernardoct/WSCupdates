@@ -123,7 +123,7 @@ class WaterUtility
 	double **annualTTmag;
 	double **annualTTfreq;
 	double **annualRRmag;
-	double **annualRRmag;
+	double **annualRRfreq;
 	
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,6 +158,8 @@ class WaterUtility
 	void acceptBuybackPayment(double buybackratePerMG);
 	void ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor);
 	void ReleaseSpotAccept(bool tiered, double floorRate, double tiersize, double tierFactor);
+	void ReleaseSpotPayment(double floorRate);
+	void ReleaseSpotAccept(double floorRate);
 	
 	//~~~~~~~~~~~~~~~~ Private class members ~~~~~~~~~~~~~~~~~~~~~~~
 	private:

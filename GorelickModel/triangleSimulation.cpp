@@ -98,12 +98,12 @@ int main (int argc, char *argv[])
 			case 'c':
 				simulation.formulation = atoi(optarg);
 				break;
-					// David (11-14-2016)
+					// David (12-12-2016)
 					// the following formulations to be used:
 					// 0 - No releases (but includes transfers, restrictions, standard infrastructure pathways)
 					// 1 - Releases through spot or option contracts (but no contract negotiations)
-					// 2 - Releases (with contract negotiations)
-					// 3 - Releases with Joint Lake Michie Expansion available as infrastructure option
+					// 2 - Releases with Joint Lake Michie Expansion available as infrastructure option
+					// for now, there will be no contract negotiations
 					 
 			case 'b':
 				simulation.borgToggle = atoi(optarg);
@@ -260,7 +260,7 @@ int main (int argc, char *argv[])
 	simulation.use_RDM_ext = false;
 		// determines how to read synthetic flows
 		// if true, read from folder extension bernardo uses 
-	simulation.printDetailedOutput = false;
+	simulation.printDetailedOutput = true;
 		// determines whether to write all the output csvs that I want 
 		
 	//simulation.spotPricing = true;
@@ -271,7 +271,7 @@ int main (int argc, char *argv[])
 		// a flat rate
 	// THESE ARE ADDRESSED IN THE SIMULATION SCRIPT 
 	
-	if (simulation.formulation > 2)
+	if (simulation.formulation > 1)
 	{
 		simulation.sharedLM = true;
 	}
