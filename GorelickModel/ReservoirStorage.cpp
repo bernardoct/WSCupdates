@@ -47,13 +47,24 @@ void ReservoirStorage::buildReclaimedHigh()
 }
 void ReservoirStorage::buildMichieLow()
 {
-	durhamCapacity = 8849.0;
+	durhamCapacity = durhamCapacity + 2500.0;
 	LMRaleighCapacity = 0.0;
 }
-void ReservoirStorage::buildMichieHigh()
+void ReservoirStorage::buildMichieHigh(double checkval)
 {
-	durhamCapacity = 14049.0;
-	LMRaleighCapacity = 0.0;
+	if (checkval == 0)
+		// skipped small expansion, direct to non-coop large exp 
+	{
+		durhamCapacity = durhamCapacity + 7700.0;
+		LMRaleighCapacity = 0.0;
+	}
+	else
+		// cooperative expansion for small expansion, but not large exp 
+		// or non-cooperative expansion for small and large exp 
+	{
+		durhamCapacity = durhamCapacity + 5200.0;
+		LMRaleighCapacity = LMRaleighCapacity;
+	}
 }
 
 ///// Raleigh Options
@@ -116,11 +127,29 @@ void ReservoirStorage::buildMichieSharedLow(double ratio)
 	LMRaleighCapacity = 2500.0 * (1-ratio);
 		// raleigh capacity given in expanded LM 
 }
-void ReservoirStorage::buildMichieSharedHigh(double ratio)
+void ReservoirStorage::buildMichieSharedHigh(double ratio, double checkval)
 {
-	durhamCapacity = durhamCapacity + 7700.0 * ratio;
-		// michie large expansion is 7700 MG 
-	LMRaleighCapacity = 7700.0 * (1-ratio);
+	if (checkval == 0)
+		// no small exp, direct to cooperative large exp 
+	{
+		durhamCapacity = durhamCapacity + 7700.0 * ratio;
+			// michie large expansion is 7700 MG 
+		LMRaleighCapacity = 7700.0 * (1-ratio);
+	}
+	else if (checkval < 1)
+		// small cooperative exp >>>> large coop exp 
+	{
+		durhamCapacity = durhamCapacity + 5200.0 * ratio;
+			// michie large expansion is 7700 MG 
+		LMRaleighCapacity = 5200.0 * (1-ratio);
+	}
+	else
+		// small non-coop expansion >>>>> large coop exp 
+	{
+		durhamCapacity = durhamCapacity + 5200.0 * ratio;
+			// michie large expansion is 7700 MG 
+		LMRaleighCapacity = 5200.0 * (1-ratio);
+	}
 }
 
 void ReservoirStorage::initializeReservoirStorage(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanSupplyCap, double jordanQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighJordanAlloc, double durhamJordanAlloc, double owasaJordanAlloc, double caryJordanAlloc, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQc, double cQIc, double cQOc, double owasaWWWTPFrac, double durhamWWWTPFrac, double raleighWWWTPFrac, int sig, double DurhamReleaseCap, double DurhamReleaseMin, double RaleighLMCap)
@@ -857,7 +886,7 @@ double ReservoirStorage::updateDurhamStorage()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	return durhamDemand2;
 }
-double ReservoirStorage::updateRaleighStorage(int week)
+double ReservoirStorage::updateRaleighStorage(int week, int formul)
 {
 	double intakeDemand;
 	if((fallsLakeSupplyStorage+fallsLakeQualityStorage)<(fallsLakeSupplyCapacity+fallsLakeQualityCapacity))
@@ -876,7 +905,8 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	double raleighDemand4 = 0.0;
 	double raleighDemand5 = 0.0;
 	double raleighDemand6 = 0.0;
-	
+		// raleighDemand6 added for LakeMichieExp
+		
 	if(fallsLakeSupplyStorage == 0.0)
 	{
 		fallsLakeSupplyStorage = 0.001;
@@ -901,9 +931,16 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	{
 		raleighMichieStorage = 0.001;
 	}
+		// ensure not dividing by zero 
+	
 	double firmDemand = intakeDemand;
-	double totalStorageRaleigh = fallsLakeSupplyStorage + lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage + raleighMichieStorage;
-
+	
+	double totalStorageRaleigh = fallsLakeSupplyStorage + lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage;
+	if (formul > 1)
+	{
+		totalStorageRaleigh = fallsLakeSupplyStorage + lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage + raleighMichieStorage;
+	}
+	
 	//////Raleigh demands from different sources are dependent on the storage available in that source.  However, Jordan Lake and the quarry
 	//////have constraints on how much can be taken out, and the WTP at Falls Lake has a minimum constraint.  It is assumed the WTP at LRR and Lake Wheeler/Benson
 	//////are big enough to meet demands that occur
@@ -953,8 +990,16 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	{
 		raleighDemand1 = 36.0*numdays;
 		firmDemand = intakeDemand + raleighDemand1;
-		totalStorageRaleigh = lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage + raleighMichieStorage;
-
+		
+		if (formul > 1)
+		{
+			totalStorageRaleigh = lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage + raleighMichieStorage;
+		}
+		else
+		{
+			totalStorageRaleigh = lakeWBStorage + littleRiverRaleighStorage + raleighJordanStorage + raleighQuarryStorage;
+		}
+		
 		raleighDemand4 = (raleighUse - firmDemand)*(raleighJordanStorage/totalStorageRaleigh);
 		if(raleighDemand4>raleighWWTPcapacity*numdays)
 		{
@@ -992,7 +1037,17 @@ double ReservoirStorage::updateRaleighStorage(int week)
 
 	raleighDemand2 = (raleighUse - firmDemand)*(lakeWBStorage/totalStorageRaleigh);
 	raleighDemand3 = (raleighUse - firmDemand)*(littleRiverRaleighStorage/totalStorageRaleigh);
-	raleighDemand6 = (raleighUse - firmDemand)*(raleighMichieStorage/totalStorageRaleigh);
+	
+	if (formul > 1)
+	{
+		raleighDemand6 = (raleighUse - firmDemand)*(raleighMichieStorage/totalStorageRaleigh);
+	}
+	else
+	{
+		raleighDemand6 = 0.0;
+	}
+		// proportional demands allocated for raleigh's LM storage
+		// if it exists, later it will be accounted for 
 
 	if(week<13||week>43)
 	{
@@ -1100,9 +1155,12 @@ double ReservoirStorage::updateRaleighStorage(int week)
 	littleRiverRaleighStorage +=littleRiverRaleighInflow - raleighDemand3 - raleighLittleRiverSpillage + evapF*(320.0+826.0*(littleRiverRaleighStorage/(.001+littleRiverRaleighCapacity)));
 	raleighQuarryStorage += raleighQuarryDiversion - evap*(20 + 30*(raleighQuarryStorage/(raleighQuarryCapacity+.001))) - raleighDemand5;
 	
-	raleighMichieStorage -= raleighDemand6;
-		// all environmental factors and releases are dealt with when this storage is 
-		// determined in the durham storage recalculation function 
+	if (formul > 1)
+	{
+		raleighMichieStorage -= raleighDemand6;
+			// all environmental factors and releases are dealt with when this storage is 
+			// determined in the durham storage recalculation function 
+	}
 	
 	raleighExcess = 0.0;
 	if(lakeWBStorage>lakeWBCapacity)
@@ -1248,7 +1306,7 @@ void ReservoirStorage::updateJordanLakeStorage(double owasaJordanDemand, double 
 		caryJordanStorage = caryJordanCapacity;
 	}
 }
-void ReservoirStorage::updateStorage(int week)
+void ReservoirStorage::updateStorage(int week, int formul)
 {
 	double oJD = 0.0;
 	double dJD = 0.0;
@@ -1256,7 +1314,7 @@ void ReservoirStorage::updateStorage(int week)
 	setSpillover(week);
 	oJD = updateOWASAStorage();
 	dJD = updateDurhamStorage();
-	rJD = updateRaleighStorage(week);
+	rJD = updateRaleighStorage(week, formul);
 	updateJordanLakeStorage(oJD, dJD, rJD);
 
 
@@ -1301,15 +1359,15 @@ double ReservoirStorage::getCaryStorage()
 }
 double ReservoirStorage::getDurhamTransfers()
 {
-	return durhamRequest;
+	return (durhamDirect + durhamIndirect);
 }
 double ReservoirStorage::getOWASATransfers()
 {
-	return owasaRequest;
+	return owasaDirect;
 }
 double ReservoirStorage::getRaleighTransfers()
 {
-	return raleighRequest;
+	return (raleighDirect + raleighIndirect);
 }
 double ReservoirStorage::getOWASASpillage()
 {
@@ -1467,7 +1525,8 @@ void ReservoirStorage::upgradeDurhamOWASAConnection()
 
 /// TREATED TRANSFER FUNCTION /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, double transferOWASA, double owasaRisk, double transferRaleigh, double raleighRisk, double OWASAD)
+void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, double transferOWASA, double owasaRisk, double transferRaleigh, double raleighRisk, double OWASAD, 
+									 ofstream &streamFile, bool printOutput, int formul)
 {
 	double durhamRequestO;
 	double owasaRequestO;
@@ -1749,6 +1808,22 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 	durhamUse  -= (durhamDirect + durhamIndirect);
 	OWASAUse   -= owasaDirect;
 	raleighUse -= (raleighDirect + raleighIndirect);
+	
+	durhamRequest  = (durhamDirect + durhamIndirect);
+	raleighRequest = (raleighDirect + raleighIndirect);
+	
+	if (printOutput && (formul < 1))
+		// for each week, output all this info to a csv only for the formulation where releases aren't used 
+	{
+		streamFile << ((fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage+raleighMichieStorage)/(fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity+LMRaleighCapacity)) << ",";
+		streamFile << (fallsLakeSupplyStorage+lakeWBStorage+littleRiverRaleighStorage+raleighMichieStorage) << "," << (fallsLakeSupplyCapacity+lakeWBCapacity+littleRiverRaleighCapacity+LMRaleighCapacity) << ",";
+		streamFile << (durhamStorage/durhamCapacity) << "," << durhamSpillage << ",";
+		
+		streamFile << fallsLakeSupplyStorage << "," << durhamStorage << ",";
+		
+		streamFile << fallsLakeQualityStorage << "," << fallsLakeQualityCapacity << "," << fallsLakeSupplyCapacity << "," << durhamCapacity << ",";
+		//streamFile << RstorageTarget << "," << DstorageTarget << endl;
+	}
 
 	return;
 }

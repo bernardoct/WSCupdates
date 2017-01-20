@@ -196,7 +196,7 @@ int main (int argc, char *argv[])
 	// Import historical demand and inflow datasets
 	//cout << "import data files" << endl;
 	
-	simulation.runHistoric = true;
+	simulation.runHistoric = false;
 		// determines whether to use fake historic streamflows
 		// in place of synthetic flows 
 		// these flows still won't be read until the fixRDMFactors function runs 
@@ -282,7 +282,7 @@ int main (int argc, char *argv[])
 		// an indicator as to whether Lake Michie expansion is shared
 		// between Raleigh and Durham to allow Raleigh some capacity
 		// in LM 
-	simulation.indepReleaseAlloc = false;
+	simulation.indepReleaseAlloc = true;
 		// this determines whether release allocation into FL conservation pool
 		// is based on the input parameter file or based on the current week's
 		// supply pool to water quality pool ratio 
@@ -423,7 +423,7 @@ int main (int argc, char *argv[])
 		std::string filename2 = ".csv";
 		std::string completeFilename;
 		std::stringstream sstm;
-		sstm << filename1 << solutionNumber << "_" << rdmNumber << filename2;
+		sstm << filename1 << solutionNumber << "_" << simulation.formulation << "_" << rdmNumber << filename2;
 		completeFilename = sstm.str();
 		
 		ofstream out1;

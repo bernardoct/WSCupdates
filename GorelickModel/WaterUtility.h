@@ -54,6 +54,7 @@ class WaterUtility
 	// Restriction stage (0 means no restrictions)
 	int restrictionStage;
 	double restrictionReduction;
+	double weekrestrictioncount;
 	
 	// Usage tier info. Cost per million gallons. Usage reductions during restrictions.
 	double **reductions;

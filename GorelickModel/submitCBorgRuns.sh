@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # How many nodes, processors, and hours to request for each seed?
-NODES=2
-PPN=2
-WALLHOURS=48
+NODES=1
+PPN=4
+WALLHOURS=2
 
 # 6 formulations (0 - 5)
-FORMULATIONS=$(seq 0 1)
-SEEDS=$(seq 0 1)
+FORMULATIONS=$(seq 0 2)
+SEEDS=$(seq 0 0)
 
 # Objective Types: 0 (Max value among utilities) or 1 (average value across utilities)
-OBJ_TYPE=0
+OBJ_TYPE=3
 
 for FORMULATION in ${FORMULATIONS}
 do

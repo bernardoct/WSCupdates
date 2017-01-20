@@ -345,6 +345,7 @@ void WaterUtility::calculateRestrictions(int year, int week, int numdays, int mo
 		weeklyDemand = restrictedDemand; // update actual demand under restrictions
 		Fund.subtract(demandDeficit/1000000.0); // dip into the insurance fund to cover demand deficit
 		thisYearRestrictions = 1;
+		weekrestrictioncount += 1;
 	}
 	else
 	{
@@ -504,6 +505,7 @@ void WaterUtility::clearVariablesForRealization(int year)
 	Fund.initializeRealization();
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	weekrestrictioncount = 0;
 	annualTransfers = 0;
 	annualTransferFrequency = 0;
 
@@ -595,6 +597,7 @@ void WaterUtility::annualUpdate(int year, int realization)
 	
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	weekrestrictioncount = 0;
 	annualTransfers = 0;
 	annualTransferFrequency = 0;
 	annualReleases = 0;

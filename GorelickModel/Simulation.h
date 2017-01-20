@@ -105,6 +105,11 @@ public:
 	double tierPriceInc;
 	double storageratio;
 	
+	double LMbuildpath;
+		// positive means non-cooperative low build
+		// negative means cooperative low build occurred
+		// zero means low build was skipped 
+	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
 	
@@ -256,6 +261,9 @@ private:
 	ofstream out3;
 	ofstream InfraBuilt;
 	ofstream LMallocData;
+	ofstream RestData;
+	ofstream ALLTdata;
+	ofstream storcheck;
 	
 };
 #endif

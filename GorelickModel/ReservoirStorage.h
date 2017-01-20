@@ -17,7 +17,8 @@ public:
 	void setDemands(double durham, double owasa, double cary, double raleigh, int numberOfDaysInWeek);
 	
 	void setSpillover(int week);
-	void calcTransfers(double transferDurham, double durhamR, double transferOWASA, double owasaR, double transferRaleigh, double raleighR, double owasaWD);		
+	void calcTransfers(double transferDurham, double durhamR, double transferOWASA, double owasaR, double transferRaleigh, double raleighR, double owasaWD, 
+					   ofstream &streamFile, bool printOutput, int formul);		
 	
 	void setInflow(double durham, double ccr, double ul, double stq, double falls, double wb, double clayton, double crabtree, double jordan, double lillington, double ralRet, double durRet, double durRet2, double owasaRet, double evaporationf, double evaporationwb, double evaporation, double lRR);
 	
@@ -33,10 +34,10 @@ public:
 	double getDurhamBuybackRequest();
 	
 	void getReturnRatios(double raleighR, double durhamR);
-	void updateStorage(int whatWeek);
+	void updateStorage(int whatWeek, int formul);
 	double updateOWASAStorage();
 	double updateDurhamStorage();
-	double updateRaleighStorage(int whatWeek);
+	double updateRaleighStorage(int whatWeek, int formul);
 	void updateJordanLakeStorage(double ow, double dur, double ral);
 	double getDurhamStorage();
 	double getOWASAStorage();
@@ -72,7 +73,7 @@ public:
 	double raleighMichieStorage;
 	
 	void buildMichieSharedLow(double ratio);
-	void buildMichieSharedHigh(double ratio);
+	void buildMichieSharedHigh(double ratio, double checkval);
 	
 	void upgradeCaryTreatmentPlant(int counter);
 	void upgradeCaryTreatmentPlant2();
@@ -87,7 +88,7 @@ public:
 	void buildReclaimedLow();
 	void buildReclaimedHigh();
 	void buildMichieLow();
-	void buildMichieHigh();
+	void buildMichieHigh(double checkval);
 	void buildLittleRiverRal();
 	void buildRalQuarry();
 	void buildNeuseIntake();
