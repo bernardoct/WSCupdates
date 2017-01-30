@@ -234,7 +234,7 @@ void WaterUtility::setInsurancePayment(double demandBaseline, double inflows, in
 {
 	Fund.getInsuranceStage(demandBaseline, inflows);
 
-	if(Fund.insuranceStorage<=riskVolume[week-1])
+	if(Fund.insuranceStorage <= riskVolume[week-1])
 	{
 		Fund.setInsurancePayment(insuranceRevenue*insurancePayment);
 	}
@@ -1191,13 +1191,13 @@ int WaterUtility::startNewInfrastructure(int year)
 	int indexValue = 999;
 	for(int x = 0; x < infrastructureCount;x++)
 	{
-		if( infMatrix[x][1] < 1.0 && year >= int(infMatrix[x][2]) )
+		if((infMatrix[x][1] < 1.0) && (year >= int(infMatrix[x][2])))
 			// the first column is either 0 or 1, 0 being this option has 
 			// not been triggered yet.  the second column is the realization year
 			// after which permitting has completed and this project is 
 			// eligible to be constructed.
 		{
-			if(infMatrix[x][0]>rankValue && infMatrix[x][0] < 1.0)
+			if(infMatrix[x][0] > rankValue && infMatrix[x][0] < 1.0)
 				// by cycling through all infrastructure options (x)
 				// the model is looking for the greatest rankValue 
 				// or the 0th column which holds a 0-to-1 value from

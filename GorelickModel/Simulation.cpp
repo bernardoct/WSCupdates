@@ -885,9 +885,9 @@ void Simulation::fixRDMFactors(int rdm_i)
 	// cout << "Financial info" << endl;
 	//MORDM EXTENSION - add bond rate and length
 	bondRate = rdm_factors[13];
-		// default is 0.04
+		// default is 0.03
 	bondLength = rdm_factors[14];
-		// default is 20 years 
+		// default is 25 years 
 
 	// cout << "Setting permiting times" << endl;
 	//MORDM EXTENSION - permiting periods
@@ -2499,11 +2499,12 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 		}
 	}
 	
+	fakebreak = 0;
 	for(int x = 0; x < discreteintervals; x++)
 	{
 		durham.ReleaseStorageRisk[x] = durham.ReleaseStorageRisk[x]/(double(numRiskYears));
 		
-		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger - BuybackROFZone)
+		if (durham.ReleaseStorageRisk[x] > (durham.RRtrigger - BuybackROFZone) && fakebreak < 1)
 			// if the risk of failure becomes greater than the ROF trigger level 
 			// for buybacks (equal to the ROF trigger for release denial - ROF buffer amount)
 		{
@@ -2515,6 +2516,8 @@ void Simulation::createRiskOfFailure(int realization, int synthYear, double durh
 			{
 				durham.BuybackRiskVolume[week-1] = 1.0;
 			}
+			
+			fakebreak = 1;
 		}
 		
 		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger)
@@ -3230,7 +3233,7 @@ void Simulation::triggerInfrastructure(int realization)
 	int owasaIndex;
 	int durhamIndex;
 	int raleighIndex;
-	if(owasa.infRisk>owasa.infTrigger)
+	if(owasa.infRisk > owasa.infTrigger)
 	{
 		owasaIndex = owasa.startNewInfrastructure(year);
 		switch(owasaIndex)
@@ -3298,7 +3301,7 @@ void Simulation::triggerInfrastructure(int realization)
 		}
 
 	}
-	if(durham.infRisk>durham.infTrigger)
+	if(durham.infRisk > durham.infTrigger)
 	{
 		durhamIndex = durham.startNewInfrastructure(year);
 		switch(durhamIndex)
@@ -3440,7 +3443,7 @@ void Simulation::triggerInfrastructure(int realization)
 				break;
 		}
 	}
-	if(raleigh.infRisk>raleigh.infTrigger)
+	if(raleigh.infRisk > raleigh.infTrigger)
 	{
 
 		raleighIndex = raleigh.startNewInfrastructure(year);
@@ -4094,11 +4097,12 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 		}
 	}
 	
+	fakebreak = 0;
 	for(int x = 0; x < discreteintervals; x++)
 	{
 		durham.ReleaseStorageRisk[x] = durham.ReleaseStorageRisk[x]/(double(numRiskYears));
 		
-		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger - BuybackROFZone)
+		if (durham.ReleaseStorageRisk[x] > (durham.RRtrigger - BuybackROFZone) && fakebreak < 1)
 			// if the risk of failure becomes greater than the ROF trigger level 
 			// for buybacks (equal to the ROF trigger for release denial - ROF buffer amount)
 		{
@@ -4110,6 +4114,8 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			{
 				durham.BuybackRiskVolume[week-1] = 1.0;
 			}
+			
+			fakebreak = 1;
 		}
 		
 		if (durham.ReleaseStorageRisk[x] > durham.RRtrigger)
@@ -5261,12 +5267,12 @@ void Simulation::realizationLoop()
 	
 	if (formulation > 0)
 	{
-		if (contracttypetoggle <= 0)
+		if (contracttypetoggle <= 0.0)
 		{
 			spotPricing = true;
 			tieredSpotPricing = false;
 		}
-		else if (contracttypetoggle > 0)
+		else if (contracttypetoggle > 0.0)
 		{
 			spotPricing = false;
 			tieredSpotPricing = false;
@@ -5683,14 +5689,14 @@ void Simulation::realizationLoop()
 			else
 				season = 1;
 			
-			if (printDetailedOutput)
-			{
-				storcheck << rank << "," << realization << "," << year << "," << week << ",";
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-					// storage check 1
-					// storage levels are different here already for formulations 0 and 1, which they should not be 
-					// discrepancies start in 5th week of timeseries for first realization
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << rank << "," << realization << "," << year << "," << week << ",";
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+					// // storage check 1
+					// // storage levels are different here already for formulations 0 and 1, which they should not be 
+					// // discrepancies start in 5th week of timeseries for first realization
+			// }
 
 
 			createRiskOfFailure_InsuranceReleases(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
@@ -5732,11 +5738,11 @@ void Simulation::realizationLoop()
 						// is overwritten to be equal to the current conservation pool ratio 
 				}
 				
-				if (printDetailedOutput)
-				{
-					storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-						// storage check 2
-				}
+				// if (printDetailedOutput)
+				// {
+					// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+						// // storage check 2
+				// }
 				
 				if (spotPricing)
 				{
@@ -5746,10 +5752,11 @@ void Simulation::realizationLoop()
 						systemStorage.ReqCurtail = 0;
 					}
 					
-					systemStorage.calcSpotReleases(realization, outNew, allowReleaseContract, numRealizationsTOREAD, printDetailedOutput, 
+					systemStorage.calcSpotReleases(realization, outNew, allowReleaseContract, numRealizationsTOREAD, 0, 
 												   LMreleaseCap, rank, year, week, raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1],
 												   FLSPreleaseFrac, RcriticalStorageLevel, DcriticalStorageLevel);
 						// function calculates releases to Raleigh when spot pricing is used 
+						// printing logical set to 0 (jan 2017)
 						
 					raleigh.weeklyReleaseVolume = systemStorage.getRaleighReleases();
 					durham.weeklyReleaseVolume  = systemStorage.getRaleighReleases();
@@ -5768,16 +5775,17 @@ void Simulation::realizationLoop()
 				{
 					systemStorage.calcRawReleases(LMreleaseCap, LMreleaseMin, RcriticalStorageLevel, DcriticalStorageLevel, 
 											  raleigh.ReleaseRiskVolume[week-1], durham.ReleaseRiskVolume[week-1], FLSPreleaseFrac, durham.BuybackRiskVolume[week-1],
-											  realization, outNew, year, week, numRealizationsTOREAD, rank, printDetailedOutput,
+											  realization, outNew, year, week, numRealizationsTOREAD, rank, 0,
 											  allowReleaseContract);
 						// AUGUST 2016: this function calculates releases and buybacks using an option system 
 						// (annual Raleigh payment, buyback payments by Durham for "breaking" the contract)
+						// printing logical set to 0 (jan 2017)
 					
-					durham.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
+					durham.weeklyBuybackVolume  = systemStorage.getDurhamBuybackRequest();
 					raleigh.weeklyBuybackVolume = systemStorage.getDurhamBuybackRequest();
 					
 					raleigh.annualReleases += systemStorage.getRaleighReleases();
-					durham.annualReleases  += systemStorage.getDurhamBuybackRequest();
+					durham.annualReleases  += durham.weeklyBuybackVolume;
 					
 					raleigh.ReleaseSpotPayment(adjustedspotpayment);
 					durham.ReleaseSpotAccept(adjustedspotpayment);
@@ -5816,11 +5824,11 @@ void Simulation::realizationLoop()
 				}	
 			}
 			
-			if (printDetailedOutput)
-			{
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-					// storage check 3
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+					// // storage check 3
+			// }
 			
 			createRiskOfFailure_RestrictionsTransfers(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse);
 				// generate the week's ROF for restrictions and transfers
@@ -5871,28 +5879,29 @@ void Simulation::realizationLoop()
 							raleigh.weeklyDemand*returnRatio[1][week-1], durham.weeklyDemand*returnRatio[0][week-1], durham.weeklyDemand*(returnRatio[1][week-1]-returnRatio[0][week-1]),
 							owasa.weeklyDemand*returnRatio[1][week-1],actualFallsEvap, actualWBEvap, actualEvap, littleRiverRaleighActualInflow);
 							
-			if (printDetailedOutput)
-			{
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-					// storage check 4
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+					// // storage check 4
+			// }
 			
 			if (formulation >= 0)
 			{
-				if (formulation < 1 && printDetailedOutput)	
-				{
-					outNew << rank << "," << realization << "," << year << "," << week << ",";
-				}
+				// if (formulation < 1 && printDetailedOutput)	
+				// {
+					// outNew << rank << "," << realization << "," << year << "," << week << ",";
+				// }
 						
 				//Transfer requests are granted based on the limitations of infrastructure
 				systemStorage.calcTransfers(durham.TTriggerN,durham.riskOfFailure, owasa.TTriggerN, owasa.riskOfFailure, raleigh.TTriggerN, raleigh.riskOfFailure, owasa.weeklyDemand, 
-											outNew, printDetailedOutput, formulation);
+											outNew, 0, formulation);
                     // who gets transfers based on want and availability
+					// print logical is 0 (jan 2017)
 					
-				if (formulation < 1 && printDetailedOutput)
-				{
-					outNew << raleigh.ReleaseRiskVolume[week-1] << "," << durham.ReleaseRiskVolume[week-1] << endl;
-				}
+				// if (formulation < 1 && printDetailedOutput)
+				// {
+					// outNew << raleigh.ReleaseRiskVolume[week-1] << "," << durham.ReleaseRiskVolume[week-1] << endl;
+				// }
 				
 				durham.weeklyTransferVolume = systemStorage.getDurhamTransfers();
 				owasa.weeklyTransferVolume = systemStorage.getOWASATransfers();
@@ -5903,11 +5912,11 @@ void Simulation::realizationLoop()
 				durham.annualTransfers  += systemStorage.getDurhamTransfers();
 				owasa.annualTransfers   += systemStorage.getOWASATransfers();
 				
-				if (printDetailedOutput)
-				{
-					storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-						// storage check 5
-				}
+				// if (printDetailedOutput)
+				// {
+					// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+						// // storage check 5
+				// }
 				
 				if (systemStorage.getRaleighTransfers() > 0.0)
 				{
@@ -5957,14 +5966,14 @@ void Simulation::realizationLoop()
 				}
 					// collect transfer information of most recent 20 years for release contract negotiation 
 				
-				if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
-				{
-					out100 << rank << "," << realization << "," << year << "," << week << ",";
-					out100 << systemStorage.raleighDirect << "," << systemStorage.durhamDirect << ",";
-					out100 << systemStorage.raleighIndirect << "," << systemStorage.durhamIndirect << ",";
-					out100 << systemStorage.owasaDirect << "," << systemStorage.extraCap << ",";
-					out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << "," << owasa.riskOfFailure << "," << contracttypetoggle << endl;
-				}
+				// if ((realization < numRealizationsTOREAD) && printDetailedOutput) 
+				// {
+					// out100 << rank << "," << realization << "," << year << "," << week << ",";
+					// out100 << systemStorage.raleighDirect << "," << systemStorage.durhamDirect << ",";
+					// out100 << systemStorage.raleighIndirect << "," << systemStorage.durhamIndirect << ",";
+					// out100 << systemStorage.owasaDirect << "," << systemStorage.extraCap << ",";
+					// out100 << raleigh.riskOfFailure << "," << durham.riskOfFailure << "," << owasa.riskOfFailure << "," << contracttypetoggle << endl;
+				// }
 				
 				durham.payForTransfers(transferCosts);
 				owasa.payForTransfers(transferCosts);
@@ -5987,11 +5996,11 @@ void Simulation::realizationLoop()
 			systemStorage.updateStorage(week-1, formulation);
                 // set min releases
 				
-			if (printDetailedOutput)
-			{
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-					// storage check 6
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+					// // storage check 6
+			// }
 				
 			if (printDetailedOutput)
 			{
@@ -6028,11 +6037,11 @@ void Simulation::realizationLoop()
 			raleigh.storageFraction = systemStorage.getRaleighStorage();
 			cary.storageFraction = systemStorage.getCaryStorage();
 			
-			if (printDetailedOutput)
-			{
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
-					// storage check 7
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
+					// // storage check 7
+			// }
 
 			//update timestep
 			simDates.increase();
@@ -6162,22 +6171,22 @@ void Simulation::realizationLoop()
 					// adjust this index every 20 years to overwrite itself with new ROF data 
 			}
 			
-			if (printDetailedOutput)
-			{
-				storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << endl;
-					// storage check 8
-			}
+			// if (printDetailedOutput)
+			// {
+				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << endl;
+					// // storage check 8
+			// }
 
 		} // End weekly loop
 		
-		if ((realization < numRealizationsTOREAD) && printDetailedOutput)
-		{
-			outRiskParams << rank << "," << realization << ",";
-			outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
-			outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
-			outRiskParams << raleigh.jordanLakeAlloc << "," << durham.jordanLakeAlloc << "," << availableJLallocation << endl;
-				// write outputs for risk and other triggers that don't change over the course of simulation
-		}
+		// if ((realization < numRealizationsTOREAD) && printDetailedOutput)
+		// {
+			// outRiskParams << rank << "," << realization << ",";
+			// outRiskParams << raleigh.RRtrigger << "," << raleigh.TTriggerN << "," << raleigh.infTrigger << ",";
+			// outRiskParams << durham.RRtrigger  << "," << durham.TTriggerN  << "," << durham.infTrigger  << ",";
+			// outRiskParams << raleigh.jordanLakeAlloc << "," << durham.jordanLakeAlloc << "," << availableJLallocation << endl;
+				// // write outputs for risk and other triggers that don't change over the course of simulation
+		// }
 
 	} //end realization loop
 	
@@ -6191,6 +6200,9 @@ void Simulation::realizationLoop()
 		LMallocData.close();
 		ALLTdata.close();
 		storcheck.close();
+		RestData.close();
+			// Jan 2017: some of these outputs have been commented or disabled with logicals in other functions...
+			// only the outputs necessary for figures are printed
 	}
 
 	durham.calculateObjectives();

@@ -256,6 +256,8 @@ private:
 	double fallsFailurePoint, maxFallsFailure;
 	double *totalFallsFailure;
 	int thisYearFalls;
+
+	int fakebreak;
 	
 	ofstream out1;
 	ofstream out3;
