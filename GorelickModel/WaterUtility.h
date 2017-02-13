@@ -146,7 +146,7 @@ class WaterUtility
 	void addCapacity(double cap);
 	void setInsurancePayment(double dB, double inflw, int wk);
 	void calculateDemand(int realizations, int week, int numdays, int year);
-	int startNewInfrastructure(int year);
+	int startNewInfrastructure(int year, ofstream &checker);
 	int buildInfrastructure(int index);
 	void addDebt(int yr, int rlztn, double amt, int repayYears, double rt, double drt);
 	void addInsStorage(double add);

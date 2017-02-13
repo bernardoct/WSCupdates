@@ -104,7 +104,7 @@ void ReservoirStorage::buildWWWTPlow(double oWTPf, double dWTPf, double rWTPf)
 	owasaWWTPcapacity = westernTreatmentCapacity*oWTPf;
 	durhamWWTPcapacity = westernTreatmentCapacity*dWTPf;
 	raleighWWTPcapacity = westernTreatmentCapacity*rWTPf;
-	if(raleighWWTPcapacity>RaleighDurhamCapacity)
+	if(raleighWWTPcapacity > RaleighDurhamCapacity)
 	{
 		raleighWWTPcapacity = RaleighDurhamCapacity;
 	}
@@ -115,7 +115,7 @@ void ReservoirStorage::buildWWWTPhigh(double oWTPf, double dWTPf, double rWTPf)
 	owasaWWTPcapacity = westernTreatmentCapacity*oWTPf;
 	durhamWWTPcapacity = westernTreatmentCapacity*dWTPf;
 	raleighWWTPcapacity = westernTreatmentCapacity*rWTPf;
-	if(raleighWWTPcapacity>RaleighDurhamCapacity)
+	if(raleighWWTPcapacity > RaleighDurhamCapacity)
 	{
 		raleighWWTPcapacity = RaleighDurhamCapacity;
 	}
@@ -202,7 +202,9 @@ void ReservoirStorage::initializeReservoirStorage(double durhamCap, double CCRCa
 
 	////Interconnections
 	DurhamCaryCapacity = DurhamCaryCap;//Capacity of the Durham Cary interconnection
-	DurhamOWASACapacity = DurhamOWASACap;//Capacity of the Durham OWASA interconnection
+	DurhamOWASACapacityToD = DurhamOWASACap;//Capacity of the Durham OWASA interconnection
+	DurhamOWASACapacityToO = DurhamOWASACap;
+		// initially the same
 	RaleighCaryCapacity = RaleighCaryCap;//Capacity of the Raleigh Cary interconnection
 	RaleighDurhamCapacity = RaleighDurhamCap;//Capacity of the Raleigh Durham interconnection
 	
@@ -309,7 +311,9 @@ void ReservoirStorage::initializeReservoirStorageROF(double durhamCap, double CC
 
 	////Interconnections
 	DurhamCaryCapacity = DurhamCaryCap;//Capacity of the Durham Cary interconnection
-	DurhamOWASACapacity = DurhamOWASACap;//Capacity of the Durham OWASA interconnection
+	DurhamOWASACapacityToD = DurhamOWASACap;//Capacity of the Durham OWASA interconnection TO DURHAM
+	DurhamOWASACapacityToO = DurhamOWASACap;
+		// initially the same
 	RaleighCaryCapacity = RaleighCaryCap;//Capacity of the Raleigh Cary interconnection
 	RaleighDurhamCapacity = RaleighDurhamCap;//Capacity of the Raleigh Durham interconnection
 	
@@ -601,10 +605,26 @@ double ReservoirStorage::updateOWASAStorage()
 			OWASADemand1 += OWASADemand2 - 3.0*numdays;
 			OWASADemand2 = 3.0*numdays;
 		}
-		if(OWASADemand1>owasaWWTPcapacity)
+		
+		double Olimiter;
+			// find the limiting factor for water movement from the joint WTP on Jordan Lake
+			// to OWASA (has to flow through Durham, and OWASA has to share the pipe capacity
+			// relative to Raleigh and Durham allocations)
+		if (owasaWWTPcapacity < WJLWTPfracO/WJLWTPfracTOT*WJLWTPinterconnectCapacity)
+			Olimiter = owasaWWTPcapacity;
+		else
+			Olimiter = WJLWTPfracO/WJLWTPfracTOT*WJLWTPinterconnectCapacity;
+		
+		if (Olimiter > DurhamOWASACapacityToO)
+			Olimiter = DurhamOWASACapacityToO;
+		
+		if (WJLWTPfracO <= 0.0)
+			Olimiter = 0.0;
+	
+		if(OWASADemand1 > Olimiter*numdays)
 		{
-			OWASADemand2 += OWASADemand1 - owasaWWTPcapacity;
-			OWASADemand1 = owasaWWTPcapacity;
+			OWASADemand2 += OWASADemand1 - Olimiter*numdays;
+			OWASADemand1 = Olimiter*numdays;
 		}
 	}
 	else
@@ -793,15 +813,28 @@ double ReservoirStorage::updateDurhamStorage()
 
 		durhamDemand3 = (durhamUse-durhamDemand1)*(durhamStorage/(durhamJordanStorage+durhamStorage));
 	}
-	if(durhamDemand2>durhamWWTPcapacity*numdays)
+	
+	double Dlimiter;
+	if (durhamWWTPcapacity < WJLWTPfracD/WJLWTPfracTOT*WJLWTPinterconnectCapacity)
+		Dlimiter = durhamWWTPcapacity;
+	else
+		Dlimiter = WJLWTPfracD/WJLWTPfracTOT*WJLWTPinterconnectCapacity;
+	
+	if (Dlimiter > WJLWTPfracD/WJLWTPfracRDonly*DurhamOWASACapacityToD)
+		Dlimiter = WJLWTPfracD/WJLWTPfracRDonly*DurhamOWASACapacityToD;
+	
+	if (WJLWTPfracD <= 0.0)
+		Dlimiter = 0.0;
+	
+	if(durhamDemand2 > Dlimiter*numdays)
 	{
-		durhamDemand2 = durhamWWTPcapacity*numdays;
+		durhamDemand2 = Dlimiter*numdays;
 
 		durhamDemand1 = (durhamUse-durhamDemand2)*(teerQuarryStorage/(teerQuarryStorage+durhamStorage));
 		if(durhamDemand1>teerQuarryOutflowCapacity*numdays)
 		{
 			durhamDemand1 = teerQuarryOutflowCapacity*numdays;
-			durhamDemand3 = durhamUse - durhamWWTPcapacity*numdays - teerQuarryOutflowCapacity*numdays;
+			durhamDemand3 = durhamUse - Dlimiter*numdays - teerQuarryOutflowCapacity*numdays;
 		}
 		else
 		{
@@ -919,10 +952,10 @@ double ReservoirStorage::updateRaleighStorage(int week, int formul)
 	{
 		littleRiverRaleighStorage = 0.001;
 	}
-	if(raleighJordanStorage == 0.0)
-	{
-		raleighJordanStorage = 0.001;
-	}
+	// if(raleighJordanStorage == 0.0)
+	// {
+		// raleighJordanStorage = 0.001;
+	// }
 	if(raleighQuarryStorage == 0.0)
 	{
 		raleighQuarryStorage = 0.001;
@@ -948,10 +981,32 @@ double ReservoirStorage::updateRaleighStorage(int week, int formul)
 	
 	raleighDemand4 = (raleighUse - firmDemand)*(raleighJordanStorage/totalStorageRaleigh);
 		// find ratio of storage to be satisfied by this source
-	if(raleighDemand4>raleighWWTPcapacity*numdays)
+	
+	if (raleighDemand4 < 0)
+		raleighDemand4 = 0;
+	
+	double Rlimiter;
+	if (raleighWWTPcapacity < WJLWTPfracR/WJLWTPfracTOT*WJLWTPinterconnectCapacity)
+		Rlimiter = raleighWWTPcapacity;
+	else
+		Rlimiter = WJLWTPfracR/WJLWTPfracTOT*WJLWTPinterconnectCapacity;
+	
+	if (Rlimiter > WJLWTPfracR/WJLWTPfracRDonly*DurhamOWASACapacityToD)
+		Rlimiter = WJLWTPfracR/WJLWTPfracRDonly*DurhamOWASACapacityToD;
+	
+	if (Rlimiter > RaleighDurhamCapacity)
+		Rlimiter = RaleighDurhamCapacity;
+	
+	if (WJLWTPfracR <= 0.0)
+		Rlimiter = 0.0;
+		
+	if(raleighDemand4 > Rlimiter*numdays)
 		// if the available treatment capacity isn't enough...
 	{
-		raleighDemand4 = raleighWWTPcapacity*numdays;
+		if (raleighDemand4 < 0)
+			raleighDemand4 = 0;
+		
+		raleighDemand4 = Rlimiter*numdays;
 		firmDemand += raleighDemand4;
 		totalStorageRaleigh -= raleighJordanStorage;
 			// adjust everything accordingly
@@ -976,9 +1031,12 @@ double ReservoirStorage::updateRaleighStorage(int week, int formul)
 			totalStorageRaleigh -= raleighQuarryStorage;
 
 			raleighDemand4 = (raleighUse - firmDemand)*(raleighJordanStorage/totalStorageRaleigh);
-			if(raleighDemand4<(raleighWWTPcapacity*numdays - .01))
+			if (raleighDemand4 < 0)
+				raleighDemand4 = 0;
+		
+			if(raleighDemand4 > (Rlimiter*numdays - .01))
 			{
-				raleighDemand4 = raleighWWTPcapacity*numdays;
+				raleighDemand4 = Rlimiter*numdays;
 				firmDemand += raleighDemand4;
 				totalStorageRaleigh -= raleighJordanStorage;
 			}
@@ -1001,9 +1059,13 @@ double ReservoirStorage::updateRaleighStorage(int week, int formul)
 		}
 		
 		raleighDemand4 = (raleighUse - firmDemand)*(raleighJordanStorage/totalStorageRaleigh);
-		if(raleighDemand4>raleighWWTPcapacity*numdays)
+		
+		if (raleighDemand4 < 0)
+			raleighDemand4 = 0;
+		
+		if(raleighDemand4 > Rlimiter*numdays)
 		{
-			raleighDemand4 = raleighWWTPcapacity*numdays;
+			raleighDemand4 = Rlimiter*numdays;
 			firmDemand += raleighDemand4;
 			totalStorageRaleigh -= raleighJordanStorage;
 
@@ -1025,9 +1087,13 @@ double ReservoirStorage::updateRaleighStorage(int week, int formul)
 				totalStorageRaleigh -= raleighQuarryStorage;
 
 				raleighDemand4 = (raleighUse - firmDemand)*(raleighJordanStorage/totalStorageRaleigh);
-				if(raleighDemand4>(raleighWWTPcapacity*numdays - .01))
+				
+				if (raleighDemand4 < 0)
+					raleighDemand4 = 0;
+		
+				if(raleighDemand4 > (Rlimiter*numdays - .01))
 				{
-					raleighDemand4 = raleighWWTPcapacity*numdays;
+					raleighDemand4 = Rlimiter*numdays;
 					firmDemand += raleighDemand4;
 					totalStorageRaleigh -= raleighJordanStorage;
 				}
@@ -1315,8 +1381,13 @@ void ReservoirStorage::updateStorage(int week, int formul)
 	oJD = updateOWASAStorage();
 	dJD = updateDurhamStorage();
 	rJD = updateRaleighStorage(week, formul);
+	
+	RJLWestWTPdem = rJD;
+	DJLWestWTPdem = dJD;
+	OJLWestWTPdem = oJD;
+		// set the transfer demands from the jointly constructed plant 
+		
 	updateJordanLakeStorage(oJD, dJD, rJD);
-
 
 	return;
 }
@@ -1359,15 +1430,15 @@ double ReservoirStorage::getCaryStorage()
 }
 double ReservoirStorage::getDurhamTransfers()
 {
-	return (durhamDirect + durhamIndirect);
+	return (durhamDirect + durhamIndirect + DJLWestWTPdem);
 }
 double ReservoirStorage::getOWASATransfers()
 {
-	return owasaDirect;
+	return (owasaDirect + OJLWestWTPdem);
 }
 double ReservoirStorage::getRaleighTransfers()
 {
-	return (raleighDirect + raleighIndirect);
+	return (raleighDirect + raleighIndirect + RJLWestWTPdem);
 }
 double ReservoirStorage::getOWASASpillage()
 {
@@ -1520,7 +1591,17 @@ void ReservoirStorage::upgradeDurhamCaryConnection()
 }
 void ReservoirStorage::upgradeDurhamOWASAConnection()
 {
-	DurhamOWASACapacity = 16;
+	DurhamOWASACapacityToD = WJLWTPinterconnectCapacity;
+		// the larger pipe (that also connects to the WJLWTP)
+		// is expanded, assume to the point that it can ferry
+		// all of the new WTP capacity 
+}
+void ReservoirStorage::upgradeDurhamOWASAConnectionTWO()
+{
+	OWASADurhamInterconnectTWO += 3.3;
+		// in 2018 a 3 MGD connection from Durham to OWASA,
+		// as well as an upgrade of the existing small interconnection
+		// that will add 0.3 MGD capacity are added 
 }
 
 /// TREATED TRANSFER FUNCTION /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1554,13 +1635,15 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 	caryTreatmentBuffer = 5.0*numdays;
 
 	////Peaking factor at the Cary WTP used to move from daily capacity to average weekly capacity
-	caryPeakingFactor = .85;
+	caryPeakingFactor = 0.85;
 
 	//Total spare capacity to sell transfers at the Cary WTP
 	caryExtraCapacity = (CaryTreatmentCapacity*numdays - caryTreatmentBuffer)*caryPeakingFactor - CaryUse;
 
-	////Capacity of the Durham/OWASA interconnection is 7 MGD
-	DurhamOWASACapacity = DurhamOWASACapacity * numdays;
+	double DOCap = OWASADurhamInterconnectTWO * numdays;
+		// all transfers from Jordan Lake coming into OWASA from Cary WTP 
+		// must come through the smaller interconnection due to the 
+		// joint WTP
 
 	//Weekly capacity of the Durham-Cary interconnection
 	double DCCap = DurhamCaryCapacity*numdays;
@@ -1578,17 +1661,39 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 	durhamIndirect = 0.0;
 	extraCap = 0.0;
 	owasaDirect = 0.0;
+	
+	double RDCap = RaleighDurhamCapacity * numdays;
+		// weekly capacity of the Raleigh-Durham interconnection 
+	
+	if (RJLWestWTPdem > 0)
+	{
+		RDCap -= RJLWestWTPdem;
+	}
+		// no water can move from Raleigh to Durham 
+		// if Raleigh is pulling from its Jordan Lake allocation 
+		// but indirect water can wheel on C-D-R route
+		// if there is interconnect capacity remaining
+		
+	if (RDCap < 0.0)
+	{
+		RDCap = 0.0;
+	}
+	if (DCCap < 0.0)
+	{
+		DCCap = 0.0;
+	}
+		// non-negativity constraints 
 
 	/////OWASA must maintain at least 3 MGD production in its own treatment plant
 	/////Transfers to OWASA cannot reduce OWASA domestic production below  3 MGD
 	double OWASAminimumUse = 3.0*numdays;
-	if (OWASAD-DurhamOWASACapacity < OWASAminimumUse)
+	if (OWASAD - DOCap < OWASAminimumUse)
 	{
-		DurhamOWASACapacity = OWASAD-OWASAminimumUse;
+		DOCap = OWASAD-OWASAminimumUse;
 	}
-	if (DurhamOWASACapacity < 0.0)
+	if (DOCap < 0.0)
 	{
-		DurhamOWASACapacity = 0.0;
+		DOCap = 0.0;
 	}
 
 	//No transfers if Cary does not have the extra treatment capacity
@@ -1697,10 +1802,10 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 		//  raleighIndirect = water taking C-D-R pathway to Raleigh 
 		
 					
-		if (owasaRequest > DurhamOWASACapacity)
+		if (owasaRequest > DOCap)
 		{
-			owasaRequest = DurhamOWASACapacity;
-			extraCap     = owasaRequest - DurhamOWASACapacity;
+			owasaRequest = DOCap;
+			extraCap     = owasaRequest - DOCap;
 			
 			durhamRequest  += (extraCap)*(durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
 			raleighRequest += (extraCap)*(raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
@@ -1756,10 +1861,10 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 				// this will only happen if requests are large enough to total more than the interconnection capacities and/or 
 				// the extra Cary capacity is larger than the interconnection capacities
 			
-			if (owasaRequest > DurhamOWASACapacity)
+			if (owasaRequest > DOCap)
 			{
-				owasaRequest = DurhamOWASACapacity;
-				extraCap     = owasaRequest - DurhamOWASACapacity;
+				owasaRequest = DOCap;
+				extraCap     = owasaRequest - DOCap;
 				
 				durhamRequest  += (extraCap)*(durhamRisk*durhamRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
 				raleighRequest += (extraCap)*(raleighRisk*raleighRequestO)/(raleighRisk*raleighRequestO + durhamRisk*durhamRequestO + 0.00001);
@@ -1790,17 +1895,22 @@ void ReservoirStorage::calcTransfers(double transferDurham, double durhamRisk, d
 			}
 		}
 		
-		if (raleighIndirect > RaleighDurhamCapacity * numdays)
+		if (raleighIndirect > RDCap)
 		{
-			raleighIndirect = RaleighDurhamCapacity * numdays;
+			raleighIndirect = RDCap;
 		}
-		if (durhamIndirect > RaleighDurhamCapacity * numdays)
+		if (durhamIndirect > RDCap)
 		{
-			durhamIndirect = RaleighDurhamCapacity * numdays;
+			durhamIndirect = RDCap;
+		}
+		if (RJLWestWTPdem > 0)
+		{
+			durhamIndirect = 0;
 		}
 			// make sure the D-R interconnect isn't over-used 
+			// and that if Raleigh is pulling water from WJLWTP
+			// that Durham cannot wheel through Raleigh 
 		
-		// CHECK IF THIS IS WORKING - IF THERE ARE ANY WEEKS WHERE BOTH DURHAM/RALEIGH INDIRECT VOLUMES > 0, IT ISN'T RIGHT
 	}
 	
 	owasaDirect = owasaRequest;

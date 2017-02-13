@@ -626,7 +626,7 @@ dev.off()
 RDMnum     = 0
 datafolder = "figure3data\\"
 allobjdata = c()
-for (RANK in 0:35)
+for (RANK in 0:9)
 {
   for (FORMULATION in 0:2)
   {
@@ -646,7 +646,7 @@ for (RANK in 0:35)
   }
 }
 
-for (RANK in 36:74)
+for (RANK in 10:83)
 {
   for (FORMULATION in 1:2)
   {

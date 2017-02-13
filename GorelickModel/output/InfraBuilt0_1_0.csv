@@ -1,0 +1,3819 @@
+Solution,RDMnum,Realization,Year,Utility,Project
+0,0,0,16,Durham,Western JL WTP (Small)
+0,0,0,23,Raleigh,Reallocate Falls Lake
+0,0,0,33,Durham,Western JL WTP (Large)
+0,0,0,48,Raleigh,Neuse River Intake
+0,0,1,16,Durham,Western JL WTP (Small)
+0,0,1,21,Raleigh,Reallocate Falls Lake
+0,0,1,33,Durham,Western JL WTP (Large)
+0,0,1,48,Raleigh,Neuse River Intake
+0,0,2,16,Durham,Western JL WTP (Small)
+0,0,2,21,Raleigh,Reallocate Falls Lake
+0,0,2,33,Durham,Western JL WTP (Large)
+0,0,2,34,Raleigh,Neuse River Intake
+0,0,3,16,Durham,Western JL WTP (Small)
+0,0,3,23,Raleigh,Reallocate Falls Lake
+0,0,3,33,Durham,Western JL WTP (Large)
+0,0,3,44,Raleigh,Neuse River Intake
+0,0,4,16,Durham,Western JL WTP (Small)
+0,0,4,23,Raleigh,Reallocate Falls Lake
+0,0,4,33,Durham,Western JL WTP (Large)
+0,0,4,44,Raleigh,Neuse River Intake
+0,0,5,16,Durham,Western JL WTP (Small)
+0,0,5,23,Raleigh,Reallocate Falls Lake
+0,0,5,33,Durham,Western JL WTP (Large)
+0,0,5,48,Raleigh,Neuse River Intake
+0,0,6,16,Durham,Western JL WTP (Small)
+0,0,6,23,Raleigh,Reallocate Falls Lake
+0,0,6,33,Durham,Western JL WTP (Large)
+0,0,7,16,Durham,Western JL WTP (Small)
+0,0,7,23,Raleigh,Reallocate Falls Lake
+0,0,7,33,Durham,Western JL WTP (Large)
+0,0,8,16,Durham,Western JL WTP (Small)
+0,0,8,23,Raleigh,Reallocate Falls Lake
+0,0,8,33,Durham,Western JL WTP (Large)
+0,0,8,42,Raleigh,Neuse River Intake
+0,0,9,16,Durham,Western JL WTP (Small)
+0,0,9,22,Raleigh,Reallocate Falls Lake
+0,0,9,33,Durham,Western JL WTP (Large)
+0,0,9,48,Raleigh,Neuse River Intake
+0,0,10,16,Durham,Western JL WTP (Small)
+0,0,10,23,Raleigh,Reallocate Falls Lake
+0,0,10,33,Durham,Western JL WTP (Large)
+0,0,10,45,Raleigh,Neuse River Intake
+0,0,11,16,Durham,Western JL WTP (Small)
+0,0,11,21,Raleigh,Reallocate Falls Lake
+0,0,11,33,Durham,Western JL WTP (Large)
+0,0,11,48,Raleigh,Neuse River Intake
+0,0,12,16,Durham,Western JL WTP (Small)
+0,0,12,18,Raleigh,Reallocate Falls Lake
+0,0,12,33,Durham,Western JL WTP (Large)
+0,0,12,36,Raleigh,Neuse River Intake
+0,0,13,16,Durham,Western JL WTP (Small)
+0,0,13,23,Raleigh,Reallocate Falls Lake
+0,0,13,33,Durham,Western JL WTP (Large)
+0,0,13,48,Raleigh,Neuse River Intake
+0,0,14,16,Durham,Western JL WTP (Small)
+0,0,14,23,Raleigh,Reallocate Falls Lake
+0,0,14,33,Durham,Western JL WTP (Large)
+0,0,14,44,Raleigh,Neuse River Intake
+0,0,15,16,Durham,Western JL WTP (Small)
+0,0,15,23,Raleigh,Reallocate Falls Lake
+0,0,15,33,Durham,Western JL WTP (Large)
+0,0,16,16,Durham,Western JL WTP (Small)
+0,0,16,23,Raleigh,Reallocate Falls Lake
+0,0,16,33,Durham,Western JL WTP (Large)
+0,0,16,48,Raleigh,Neuse River Intake
+0,0,17,16,Durham,Western JL WTP (Small)
+0,0,17,23,Raleigh,Reallocate Falls Lake
+0,0,17,33,Durham,Western JL WTP (Large)
+0,0,17,52,Raleigh,Neuse River Intake
+0,0,18,16,Durham,Western JL WTP (Small)
+0,0,18,23,Raleigh,Reallocate Falls Lake
+0,0,18,33,Durham,Western JL WTP (Large)
+0,0,18,48,Raleigh,Neuse River Intake
+0,0,19,16,Durham,Western JL WTP (Small)
+0,0,19,23,Raleigh,Reallocate Falls Lake
+0,0,19,33,Durham,Western JL WTP (Large)
+0,0,19,48,Raleigh,Neuse River Intake
+0,0,20,16,Durham,Western JL WTP (Small)
+0,0,20,23,Raleigh,Reallocate Falls Lake
+0,0,20,33,Durham,Western JL WTP (Large)
+0,0,20,50,Raleigh,Neuse River Intake
+0,0,21,16,Durham,Western JL WTP (Small)
+0,0,21,21,Raleigh,Reallocate Falls Lake
+0,0,21,33,Durham,Western JL WTP (Large)
+0,0,21,38,Raleigh,Neuse River Intake
+0,0,22,16,Durham,Western JL WTP (Small)
+0,0,22,21,Raleigh,Reallocate Falls Lake
+0,0,22,33,Durham,Western JL WTP (Large)
+0,0,22,41,Raleigh,Neuse River Intake
+0,0,23,16,Durham,Western JL WTP (Small)
+0,0,23,23,Raleigh,Reallocate Falls Lake
+0,0,23,33,Durham,Western JL WTP (Large)
+0,0,23,48,Raleigh,Neuse River Intake
+0,0,24,16,Durham,Western JL WTP (Small)
+0,0,24,22,Raleigh,Reallocate Falls Lake
+0,0,24,33,Durham,Western JL WTP (Large)
+0,0,24,42,Raleigh,Neuse River Intake
+0,0,25,16,Durham,Western JL WTP (Small)
+0,0,25,23,Raleigh,Reallocate Falls Lake
+0,0,25,33,Durham,Western JL WTP (Large)
+0,0,25,48,Raleigh,Neuse River Intake
+0,0,26,16,Durham,Western JL WTP (Small)
+0,0,26,23,Raleigh,Reallocate Falls Lake
+0,0,26,33,Durham,Western JL WTP (Large)
+0,0,27,16,Durham,Western JL WTP (Small)
+0,0,27,21,Raleigh,Reallocate Falls Lake
+0,0,27,33,Durham,Western JL WTP (Large)
+0,0,27,33,Raleigh,Neuse River Intake
+0,0,28,16,Durham,Western JL WTP (Small)
+0,0,28,23,Raleigh,Reallocate Falls Lake
+0,0,28,33,Durham,Western JL WTP (Large)
+0,0,28,48,Raleigh,Neuse River Intake
+0,0,29,16,Durham,Western JL WTP (Small)
+0,0,29,23,Raleigh,Reallocate Falls Lake
+0,0,29,33,Durham,Western JL WTP (Large)
+0,0,29,45,Raleigh,Neuse River Intake
+0,0,30,16,Durham,Western JL WTP (Small)
+0,0,30,23,Raleigh,Reallocate Falls Lake
+0,0,30,33,Durham,Western JL WTP (Large)
+0,0,30,48,Raleigh,Neuse River Intake
+0,0,31,16,Durham,Western JL WTP (Small)
+0,0,31,21,Raleigh,Reallocate Falls Lake
+0,0,31,33,Durham,Western JL WTP (Large)
+0,0,31,44,Raleigh,Neuse River Intake
+0,0,32,16,Durham,Western JL WTP (Small)
+0,0,32,23,Raleigh,Reallocate Falls Lake
+0,0,32,33,Durham,Western JL WTP (Large)
+0,0,33,16,Durham,Western JL WTP (Small)
+0,0,33,23,Raleigh,Reallocate Falls Lake
+0,0,33,33,Durham,Western JL WTP (Large)
+0,0,33,46,Raleigh,Neuse River Intake
+0,0,34,16,Durham,Western JL WTP (Small)
+0,0,34,23,Raleigh,Reallocate Falls Lake
+0,0,34,33,Durham,Western JL WTP (Large)
+0,0,34,48,Raleigh,Neuse River Intake
+0,0,35,16,Durham,Western JL WTP (Small)
+0,0,35,23,Raleigh,Reallocate Falls Lake
+0,0,35,33,Durham,Western JL WTP (Large)
+0,0,36,16,Durham,Western JL WTP (Small)
+0,0,36,23,Raleigh,Reallocate Falls Lake
+0,0,36,33,Durham,Western JL WTP (Large)
+0,0,37,16,Durham,Western JL WTP (Small)
+0,0,37,23,Raleigh,Reallocate Falls Lake
+0,0,37,33,Durham,Western JL WTP (Large)
+0,0,38,16,Durham,Western JL WTP (Small)
+0,0,38,23,Raleigh,Reallocate Falls Lake
+0,0,38,33,Durham,Western JL WTP (Large)
+0,0,38,48,Raleigh,Neuse River Intake
+0,0,39,16,Durham,Western JL WTP (Small)
+0,0,39,23,Raleigh,Reallocate Falls Lake
+0,0,39,33,Durham,Western JL WTP (Large)
+0,0,39,48,Raleigh,Neuse River Intake
+0,0,40,16,Durham,Western JL WTP (Small)
+0,0,40,21,Raleigh,Reallocate Falls Lake
+0,0,40,33,Durham,Western JL WTP (Large)
+0,0,40,48,Raleigh,Neuse River Intake
+0,0,41,16,Durham,Western JL WTP (Small)
+0,0,41,23,Raleigh,Reallocate Falls Lake
+0,0,41,33,Durham,Western JL WTP (Large)
+0,0,42,16,Durham,Western JL WTP (Small)
+0,0,42,23,Raleigh,Reallocate Falls Lake
+0,0,42,33,Durham,Western JL WTP (Large)
+0,0,42,43,Raleigh,Neuse River Intake
+0,0,43,16,Durham,Western JL WTP (Small)
+0,0,43,23,Raleigh,Reallocate Falls Lake
+0,0,43,33,Durham,Western JL WTP (Large)
+0,0,43,49,Raleigh,Neuse River Intake
+0,0,44,16,Durham,Western JL WTP (Small)
+0,0,44,23,Raleigh,Reallocate Falls Lake
+0,0,44,33,Durham,Western JL WTP (Large)
+0,0,45,16,Durham,Western JL WTP (Small)
+0,0,45,23,Raleigh,Reallocate Falls Lake
+0,0,45,33,Durham,Western JL WTP (Large)
+0,0,46,16,Durham,Western JL WTP (Small)
+0,0,46,23,Raleigh,Reallocate Falls Lake
+0,0,46,33,Durham,Western JL WTP (Large)
+0,0,46,48,Raleigh,Neuse River Intake
+0,0,47,16,Durham,Western JL WTP (Small)
+0,0,47,23,Raleigh,Reallocate Falls Lake
+0,0,47,33,Durham,Western JL WTP (Large)
+0,0,47,45,Raleigh,Neuse River Intake
+0,0,48,16,Durham,Western JL WTP (Small)
+0,0,48,21,Raleigh,Reallocate Falls Lake
+0,0,48,33,Durham,Western JL WTP (Large)
+0,0,48,48,Raleigh,Neuse River Intake
+0,0,49,16,Durham,Western JL WTP (Small)
+0,0,49,23,Raleigh,Reallocate Falls Lake
+0,0,49,33,Durham,Western JL WTP (Large)
+0,0,50,16,Durham,Western JL WTP (Small)
+0,0,50,23,Raleigh,Reallocate Falls Lake
+0,0,50,33,Durham,Western JL WTP (Large)
+0,0,50,49,Raleigh,Neuse River Intake
+0,0,51,16,Durham,Western JL WTP (Small)
+0,0,51,23,Raleigh,Reallocate Falls Lake
+0,0,51,33,Durham,Western JL WTP (Large)
+0,0,51,49,Raleigh,Neuse River Intake
+0,0,52,16,Durham,Western JL WTP (Small)
+0,0,52,23,Raleigh,Reallocate Falls Lake
+0,0,52,33,Durham,Western JL WTP (Large)
+0,0,52,48,Raleigh,Neuse River Intake
+0,0,53,16,Durham,Western JL WTP (Small)
+0,0,53,23,Raleigh,Reallocate Falls Lake
+0,0,53,33,Durham,Western JL WTP (Large)
+0,0,54,16,Durham,Western JL WTP (Small)
+0,0,54,23,Raleigh,Reallocate Falls Lake
+0,0,54,33,Durham,Western JL WTP (Large)
+0,0,54,48,Raleigh,Neuse River Intake
+0,0,55,16,Durham,Western JL WTP (Small)
+0,0,55,23,Raleigh,Reallocate Falls Lake
+0,0,55,33,Durham,Western JL WTP (Large)
+0,0,55,45,Raleigh,Neuse River Intake
+0,0,56,16,Durham,Western JL WTP (Small)
+0,0,56,23,Raleigh,Reallocate Falls Lake
+0,0,56,33,Durham,Western JL WTP (Large)
+0,0,56,48,Raleigh,Neuse River Intake
+0,0,57,16,Durham,Western JL WTP (Small)
+0,0,57,21,Raleigh,Reallocate Falls Lake
+0,0,57,33,Durham,Western JL WTP (Large)
+0,0,57,48,Raleigh,Neuse River Intake
+0,0,58,16,Durham,Western JL WTP (Small)
+0,0,58,23,Raleigh,Reallocate Falls Lake
+0,0,58,33,Durham,Western JL WTP (Large)
+0,0,58,48,Raleigh,Neuse River Intake
+0,0,59,16,Durham,Western JL WTP (Small)
+0,0,59,23,Raleigh,Reallocate Falls Lake
+0,0,59,33,Durham,Western JL WTP (Large)
+0,0,59,40,Raleigh,Neuse River Intake
+0,0,60,16,Durham,Western JL WTP (Small)
+0,0,60,23,Raleigh,Reallocate Falls Lake
+0,0,60,33,Durham,Western JL WTP (Large)
+0,0,60,48,Raleigh,Neuse River Intake
+0,0,61,16,Durham,Western JL WTP (Small)
+0,0,61,23,Raleigh,Reallocate Falls Lake
+0,0,61,33,Durham,Western JL WTP (Large)
+0,0,61,48,Raleigh,Neuse River Intake
+0,0,62,16,Durham,Western JL WTP (Small)
+0,0,62,23,Raleigh,Reallocate Falls Lake
+0,0,62,33,Durham,Western JL WTP (Large)
+0,0,62,48,Raleigh,Neuse River Intake
+0,0,63,16,Durham,Western JL WTP (Small)
+0,0,63,23,Raleigh,Reallocate Falls Lake
+0,0,63,33,Durham,Western JL WTP (Large)
+0,0,64,16,Durham,Western JL WTP (Small)
+0,0,64,21,Raleigh,Reallocate Falls Lake
+0,0,64,33,Durham,Western JL WTP (Large)
+0,0,64,47,Raleigh,Neuse River Intake
+0,0,65,16,Durham,Western JL WTP (Small)
+0,0,65,23,Raleigh,Reallocate Falls Lake
+0,0,65,33,Durham,Western JL WTP (Large)
+0,0,65,48,Raleigh,Neuse River Intake
+0,0,66,16,Durham,Western JL WTP (Small)
+0,0,66,23,Raleigh,Reallocate Falls Lake
+0,0,66,33,Durham,Western JL WTP (Large)
+0,0,67,16,Durham,Western JL WTP (Small)
+0,0,67,22,Raleigh,Reallocate Falls Lake
+0,0,67,33,Durham,Western JL WTP (Large)
+0,0,67,48,Raleigh,Neuse River Intake
+0,0,68,16,Durham,Western JL WTP (Small)
+0,0,68,23,Raleigh,Reallocate Falls Lake
+0,0,68,33,Durham,Western JL WTP (Large)
+0,0,68,48,Raleigh,Neuse River Intake
+0,0,69,16,Durham,Western JL WTP (Small)
+0,0,69,23,Raleigh,Reallocate Falls Lake
+0,0,69,33,Durham,Western JL WTP (Large)
+0,0,69,48,Raleigh,Neuse River Intake
+0,0,70,16,Durham,Western JL WTP (Small)
+0,0,70,23,Raleigh,Reallocate Falls Lake
+0,0,70,33,Durham,Western JL WTP (Large)
+0,0,71,16,Durham,Western JL WTP (Small)
+0,0,71,23,Raleigh,Reallocate Falls Lake
+0,0,71,33,Durham,Western JL WTP (Large)
+0,0,72,16,Durham,Western JL WTP (Small)
+0,0,72,23,Raleigh,Reallocate Falls Lake
+0,0,72,33,Durham,Western JL WTP (Large)
+0,0,72,48,Raleigh,Neuse River Intake
+0,0,73,16,Durham,Western JL WTP (Small)
+0,0,73,23,Raleigh,Reallocate Falls Lake
+0,0,73,33,Durham,Western JL WTP (Large)
+0,0,73,47,Raleigh,Neuse River Intake
+0,0,74,16,Durham,Western JL WTP (Small)
+0,0,74,23,Raleigh,Reallocate Falls Lake
+0,0,74,33,Durham,Western JL WTP (Large)
+0,0,74,48,Raleigh,Neuse River Intake
+0,0,75,16,Durham,Western JL WTP (Small)
+0,0,75,21,Raleigh,Reallocate Falls Lake
+0,0,75,33,Durham,Western JL WTP (Large)
+0,0,75,47,Raleigh,Neuse River Intake
+0,0,76,16,Durham,Western JL WTP (Small)
+0,0,76,23,Raleigh,Reallocate Falls Lake
+0,0,76,33,Durham,Western JL WTP (Large)
+0,0,76,46,Raleigh,Neuse River Intake
+0,0,77,16,Durham,Western JL WTP (Small)
+0,0,77,23,Raleigh,Reallocate Falls Lake
+0,0,77,33,Durham,Western JL WTP (Large)
+0,0,77,46,Raleigh,Neuse River Intake
+0,0,78,16,Durham,Western JL WTP (Small)
+0,0,78,23,Raleigh,Reallocate Falls Lake
+0,0,78,33,Durham,Western JL WTP (Large)
+0,0,78,48,Raleigh,Neuse River Intake
+0,0,79,16,Durham,Western JL WTP (Small)
+0,0,79,23,Raleigh,Reallocate Falls Lake
+0,0,79,33,Durham,Western JL WTP (Large)
+0,0,79,46,Raleigh,Neuse River Intake
+0,0,80,16,Durham,Western JL WTP (Small)
+0,0,80,23,Raleigh,Reallocate Falls Lake
+0,0,80,33,Durham,Western JL WTP (Large)
+0,0,80,48,Raleigh,Neuse River Intake
+0,0,81,16,Durham,Western JL WTP (Small)
+0,0,81,23,Raleigh,Reallocate Falls Lake
+0,0,81,33,Durham,Western JL WTP (Large)
+0,0,81,48,Raleigh,Neuse River Intake
+0,0,82,16,Durham,Western JL WTP (Small)
+0,0,82,23,Raleigh,Reallocate Falls Lake
+0,0,82,33,Durham,Western JL WTP (Large)
+0,0,83,16,Durham,Western JL WTP (Small)
+0,0,83,23,Raleigh,Reallocate Falls Lake
+0,0,83,33,Durham,Western JL WTP (Large)
+0,0,83,48,Raleigh,Neuse River Intake
+0,0,84,16,Durham,Western JL WTP (Small)
+0,0,84,23,Raleigh,Reallocate Falls Lake
+0,0,84,33,Durham,Western JL WTP (Large)
+0,0,84,43,Raleigh,Neuse River Intake
+0,0,85,16,Durham,Western JL WTP (Small)
+0,0,85,23,Raleigh,Reallocate Falls Lake
+0,0,85,33,Durham,Western JL WTP (Large)
+0,0,85,46,Raleigh,Neuse River Intake
+0,0,86,16,Durham,Western JL WTP (Small)
+0,0,86,23,Raleigh,Reallocate Falls Lake
+0,0,86,33,Durham,Western JL WTP (Large)
+0,0,86,48,Raleigh,Neuse River Intake
+0,0,87,16,Durham,Western JL WTP (Small)
+0,0,87,21,Raleigh,Reallocate Falls Lake
+0,0,87,33,Durham,Western JL WTP (Large)
+0,0,87,48,Raleigh,Neuse River Intake
+0,0,88,16,Durham,Western JL WTP (Small)
+0,0,88,23,Raleigh,Reallocate Falls Lake
+0,0,88,33,Durham,Western JL WTP (Large)
+0,0,88,47,Raleigh,Neuse River Intake
+0,0,89,16,Durham,Western JL WTP (Small)
+0,0,89,23,Raleigh,Reallocate Falls Lake
+0,0,89,33,Durham,Western JL WTP (Large)
+0,0,89,48,Raleigh,Neuse River Intake
+0,0,90,16,Durham,Western JL WTP (Small)
+0,0,90,22,Raleigh,Reallocate Falls Lake
+0,0,90,33,Durham,Western JL WTP (Large)
+0,0,90,40,Raleigh,Neuse River Intake
+0,0,91,16,Durham,Western JL WTP (Small)
+0,0,91,21,Raleigh,Reallocate Falls Lake
+0,0,91,33,Durham,Western JL WTP (Large)
+0,0,91,39,Raleigh,Neuse River Intake
+0,0,92,16,Durham,Western JL WTP (Small)
+0,0,92,23,Raleigh,Reallocate Falls Lake
+0,0,92,33,Durham,Western JL WTP (Large)
+0,0,92,49,Raleigh,Neuse River Intake
+0,0,93,16,Durham,Western JL WTP (Small)
+0,0,93,23,Raleigh,Reallocate Falls Lake
+0,0,93,33,Durham,Western JL WTP (Large)
+0,0,93,48,Raleigh,Neuse River Intake
+0,0,94,16,Durham,Western JL WTP (Small)
+0,0,94,23,Raleigh,Reallocate Falls Lake
+0,0,94,33,Durham,Western JL WTP (Large)
+0,0,94,48,Raleigh,Neuse River Intake
+0,0,95,16,Durham,Western JL WTP (Small)
+0,0,95,23,Raleigh,Reallocate Falls Lake
+0,0,95,33,Durham,Western JL WTP (Large)
+0,0,95,48,Raleigh,Neuse River Intake
+0,0,96,16,Durham,Western JL WTP (Small)
+0,0,96,23,Raleigh,Reallocate Falls Lake
+0,0,96,33,Durham,Western JL WTP (Large)
+0,0,96,48,Raleigh,Neuse River Intake
+0,0,97,16,Durham,Western JL WTP (Small)
+0,0,97,23,Raleigh,Reallocate Falls Lake
+0,0,97,33,Durham,Western JL WTP (Large)
+0,0,98,16,Durham,Western JL WTP (Small)
+0,0,98,23,Raleigh,Reallocate Falls Lake
+0,0,98,33,Durham,Western JL WTP (Large)
+0,0,98,42,Raleigh,Neuse River Intake
+0,0,99,16,Durham,Western JL WTP (Small)
+0,0,99,22,Raleigh,Reallocate Falls Lake
+0,0,99,33,Durham,Western JL WTP (Large)
+0,0,99,43,Raleigh,Neuse River Intake
+0,0,100,16,Durham,Western JL WTP (Small)
+0,0,100,23,Raleigh,Reallocate Falls Lake
+0,0,100,33,Durham,Western JL WTP (Large)
+0,0,100,47,Raleigh,Neuse River Intake
+0,0,101,16,Durham,Western JL WTP (Small)
+0,0,101,23,Raleigh,Reallocate Falls Lake
+0,0,101,33,Durham,Western JL WTP (Large)
+0,0,101,48,Raleigh,Neuse River Intake
+0,0,102,16,Durham,Western JL WTP (Small)
+0,0,102,23,Raleigh,Reallocate Falls Lake
+0,0,102,33,Durham,Western JL WTP (Large)
+0,0,102,48,Raleigh,Neuse River Intake
+0,0,103,16,Durham,Western JL WTP (Small)
+0,0,103,23,Raleigh,Reallocate Falls Lake
+0,0,103,33,Durham,Western JL WTP (Large)
+0,0,103,47,Raleigh,Neuse River Intake
+0,0,104,16,Durham,Western JL WTP (Small)
+0,0,104,23,Raleigh,Reallocate Falls Lake
+0,0,104,33,Durham,Western JL WTP (Large)
+0,0,104,44,Raleigh,Neuse River Intake
+0,0,105,16,Durham,Western JL WTP (Small)
+0,0,105,23,Raleigh,Reallocate Falls Lake
+0,0,105,33,Durham,Western JL WTP (Large)
+0,0,105,45,Raleigh,Neuse River Intake
+0,0,106,16,Durham,Western JL WTP (Small)
+0,0,106,23,Raleigh,Reallocate Falls Lake
+0,0,106,33,Durham,Western JL WTP (Large)
+0,0,106,48,Raleigh,Neuse River Intake
+0,0,107,16,Durham,Western JL WTP (Small)
+0,0,107,21,Raleigh,Reallocate Falls Lake
+0,0,107,33,Durham,Western JL WTP (Large)
+0,0,107,42,Raleigh,Neuse River Intake
+0,0,108,16,Durham,Western JL WTP (Small)
+0,0,108,23,Raleigh,Reallocate Falls Lake
+0,0,108,33,Durham,Western JL WTP (Large)
+0,0,108,48,Raleigh,Neuse River Intake
+0,0,109,16,Durham,Western JL WTP (Small)
+0,0,109,23,Raleigh,Reallocate Falls Lake
+0,0,109,33,Durham,Western JL WTP (Large)
+0,0,109,47,Raleigh,Neuse River Intake
+0,0,110,16,Durham,Western JL WTP (Small)
+0,0,110,23,Raleigh,Reallocate Falls Lake
+0,0,110,33,Durham,Western JL WTP (Large)
+0,0,110,48,Raleigh,Neuse River Intake
+0,0,111,16,Durham,Western JL WTP (Small)
+0,0,111,23,Raleigh,Reallocate Falls Lake
+0,0,111,33,Durham,Western JL WTP (Large)
+0,0,111,49,Raleigh,Neuse River Intake
+0,0,112,16,Durham,Western JL WTP (Small)
+0,0,112,23,Raleigh,Reallocate Falls Lake
+0,0,112,33,Durham,Western JL WTP (Large)
+0,0,112,50,Raleigh,Neuse River Intake
+0,0,113,16,Durham,Western JL WTP (Small)
+0,0,113,21,Raleigh,Reallocate Falls Lake
+0,0,113,33,Durham,Western JL WTP (Large)
+0,0,113,48,Raleigh,Neuse River Intake
+0,0,114,16,Durham,Western JL WTP (Small)
+0,0,114,23,Raleigh,Reallocate Falls Lake
+0,0,114,33,Durham,Western JL WTP (Large)
+0,0,114,46,Raleigh,Neuse River Intake
+0,0,115,16,Durham,Western JL WTP (Small)
+0,0,115,23,Raleigh,Reallocate Falls Lake
+0,0,115,33,Durham,Western JL WTP (Large)
+0,0,115,48,Raleigh,Neuse River Intake
+0,0,116,16,Durham,Western JL WTP (Small)
+0,0,116,23,Raleigh,Reallocate Falls Lake
+0,0,116,33,Durham,Western JL WTP (Large)
+0,0,116,48,Raleigh,Neuse River Intake
+0,0,117,16,Durham,Western JL WTP (Small)
+0,0,117,23,Raleigh,Reallocate Falls Lake
+0,0,117,33,Durham,Western JL WTP (Large)
+0,0,117,48,Raleigh,Neuse River Intake
+0,0,118,16,Durham,Western JL WTP (Small)
+0,0,118,23,Raleigh,Reallocate Falls Lake
+0,0,118,33,Durham,Western JL WTP (Large)
+0,0,118,48,Raleigh,Neuse River Intake
+0,0,119,16,Durham,Western JL WTP (Small)
+0,0,119,23,Raleigh,Reallocate Falls Lake
+0,0,119,33,Durham,Western JL WTP (Large)
+0,0,119,48,Raleigh,Neuse River Intake
+0,0,120,16,Durham,Western JL WTP (Small)
+0,0,120,23,Raleigh,Reallocate Falls Lake
+0,0,120,33,Durham,Western JL WTP (Large)
+0,0,120,50,Raleigh,Neuse River Intake
+0,0,121,16,Durham,Western JL WTP (Small)
+0,0,121,23,Raleigh,Reallocate Falls Lake
+0,0,121,33,Durham,Western JL WTP (Large)
+0,0,121,48,Raleigh,Neuse River Intake
+0,0,122,16,Durham,Western JL WTP (Small)
+0,0,122,23,Raleigh,Reallocate Falls Lake
+0,0,122,33,Durham,Western JL WTP (Large)
+0,0,122,39,Raleigh,Neuse River Intake
+0,0,123,16,Durham,Western JL WTP (Small)
+0,0,123,21,Raleigh,Reallocate Falls Lake
+0,0,123,33,Durham,Western JL WTP (Large)
+0,0,123,48,Raleigh,Neuse River Intake
+0,0,124,16,Durham,Western JL WTP (Small)
+0,0,124,23,Raleigh,Reallocate Falls Lake
+0,0,124,33,Durham,Western JL WTP (Large)
+0,0,125,16,Durham,Western JL WTP (Small)
+0,0,125,23,Raleigh,Reallocate Falls Lake
+0,0,125,33,Durham,Western JL WTP (Large)
+0,0,125,46,Raleigh,Neuse River Intake
+0,0,126,16,Durham,Western JL WTP (Small)
+0,0,126,23,Raleigh,Reallocate Falls Lake
+0,0,126,33,Durham,Western JL WTP (Large)
+0,0,126,45,Raleigh,Neuse River Intake
+0,0,127,16,Durham,Western JL WTP (Small)
+0,0,127,23,Raleigh,Reallocate Falls Lake
+0,0,127,33,Durham,Western JL WTP (Large)
+0,0,128,16,Durham,Western JL WTP (Small)
+0,0,128,23,Raleigh,Reallocate Falls Lake
+0,0,128,33,Durham,Western JL WTP (Large)
+0,0,128,48,Raleigh,Neuse River Intake
+0,0,129,16,Durham,Western JL WTP (Small)
+0,0,129,23,Raleigh,Reallocate Falls Lake
+0,0,129,33,Durham,Western JL WTP (Large)
+0,0,129,50,Raleigh,Neuse River Intake
+0,0,130,16,Durham,Western JL WTP (Small)
+0,0,130,21,Raleigh,Reallocate Falls Lake
+0,0,130,33,Durham,Western JL WTP (Large)
+0,0,130,45,Raleigh,Neuse River Intake
+0,0,131,16,Durham,Western JL WTP (Small)
+0,0,131,23,Raleigh,Reallocate Falls Lake
+0,0,131,33,Durham,Western JL WTP (Large)
+0,0,131,49,Raleigh,Neuse River Intake
+0,0,132,16,Durham,Western JL WTP (Small)
+0,0,132,23,Raleigh,Reallocate Falls Lake
+0,0,132,33,Durham,Western JL WTP (Large)
+0,0,132,46,Raleigh,Neuse River Intake
+0,0,133,16,Durham,Western JL WTP (Small)
+0,0,133,23,Raleigh,Reallocate Falls Lake
+0,0,133,33,Durham,Western JL WTP (Large)
+0,0,133,45,Raleigh,Neuse River Intake
+0,0,134,16,Durham,Western JL WTP (Small)
+0,0,134,23,Raleigh,Reallocate Falls Lake
+0,0,134,33,Durham,Western JL WTP (Large)
+0,0,134,49,Raleigh,Neuse River Intake
+0,0,135,16,Durham,Western JL WTP (Small)
+0,0,135,23,Raleigh,Reallocate Falls Lake
+0,0,135,33,Durham,Western JL WTP (Large)
+0,0,136,16,Durham,Western JL WTP (Small)
+0,0,136,23,Raleigh,Reallocate Falls Lake
+0,0,136,33,Durham,Western JL WTP (Large)
+0,0,136,50,Raleigh,Neuse River Intake
+0,0,137,16,Durham,Western JL WTP (Small)
+0,0,137,23,Raleigh,Reallocate Falls Lake
+0,0,137,33,Durham,Western JL WTP (Large)
+0,0,137,49,Raleigh,Neuse River Intake
+0,0,138,16,Durham,Western JL WTP (Small)
+0,0,138,23,Raleigh,Reallocate Falls Lake
+0,0,138,33,Durham,Western JL WTP (Large)
+0,0,138,49,Raleigh,Neuse River Intake
+0,0,139,16,Durham,Western JL WTP (Small)
+0,0,139,23,Raleigh,Reallocate Falls Lake
+0,0,139,33,Durham,Western JL WTP (Large)
+0,0,139,48,Raleigh,Neuse River Intake
+0,0,140,16,Durham,Western JL WTP (Small)
+0,0,140,23,Raleigh,Reallocate Falls Lake
+0,0,140,33,Durham,Western JL WTP (Large)
+0,0,140,52,Raleigh,Neuse River Intake
+0,0,141,16,Durham,Western JL WTP (Small)
+0,0,141,23,Raleigh,Reallocate Falls Lake
+0,0,141,33,Durham,Western JL WTP (Large)
+0,0,142,16,Durham,Western JL WTP (Small)
+0,0,142,23,Raleigh,Reallocate Falls Lake
+0,0,142,33,Durham,Western JL WTP (Large)
+0,0,142,48,Raleigh,Neuse River Intake
+0,0,143,16,Durham,Western JL WTP (Small)
+0,0,143,23,Raleigh,Reallocate Falls Lake
+0,0,143,33,Durham,Western JL WTP (Large)
+0,0,143,42,Raleigh,Neuse River Intake
+0,0,144,16,Durham,Western JL WTP (Small)
+0,0,144,23,Raleigh,Reallocate Falls Lake
+0,0,144,33,Durham,Western JL WTP (Large)
+0,0,144,41,Raleigh,Neuse River Intake
+0,0,145,16,Durham,Western JL WTP (Small)
+0,0,145,23,Raleigh,Reallocate Falls Lake
+0,0,145,33,Durham,Western JL WTP (Large)
+0,0,145,48,Raleigh,Neuse River Intake
+0,0,146,16,Durham,Western JL WTP (Small)
+0,0,146,23,Raleigh,Reallocate Falls Lake
+0,0,146,33,Durham,Western JL WTP (Large)
+0,0,146,48,Raleigh,Neuse River Intake
+0,0,147,16,Durham,Western JL WTP (Small)
+0,0,147,23,Raleigh,Reallocate Falls Lake
+0,0,147,33,Durham,Western JL WTP (Large)
+0,0,147,50,Raleigh,Neuse River Intake
+0,0,148,16,Durham,Western JL WTP (Small)
+0,0,148,23,Raleigh,Reallocate Falls Lake
+0,0,148,33,Durham,Western JL WTP (Large)
+0,0,148,48,Raleigh,Neuse River Intake
+0,0,149,16,Durham,Western JL WTP (Small)
+0,0,149,21,Raleigh,Reallocate Falls Lake
+0,0,149,33,Durham,Western JL WTP (Large)
+0,0,149,43,Raleigh,Neuse River Intake
+0,0,150,16,Durham,Western JL WTP (Small)
+0,0,150,21,Raleigh,Reallocate Falls Lake
+0,0,150,33,Durham,Western JL WTP (Large)
+0,0,150,38,Raleigh,Neuse River Intake
+0,0,151,16,Durham,Western JL WTP (Small)
+0,0,151,23,Raleigh,Reallocate Falls Lake
+0,0,151,33,Durham,Western JL WTP (Large)
+0,0,151,47,Raleigh,Neuse River Intake
+0,0,152,16,Durham,Western JL WTP (Small)
+0,0,152,21,Raleigh,Reallocate Falls Lake
+0,0,152,33,Durham,Western JL WTP (Large)
+0,0,152,42,Raleigh,Neuse River Intake
+0,0,153,16,Durham,Western JL WTP (Small)
+0,0,153,23,Raleigh,Reallocate Falls Lake
+0,0,153,33,Durham,Western JL WTP (Large)
+0,0,153,47,Raleigh,Neuse River Intake
+0,0,154,16,Durham,Western JL WTP (Small)
+0,0,154,23,Raleigh,Reallocate Falls Lake
+0,0,154,33,Durham,Western JL WTP (Large)
+0,0,155,16,Durham,Western JL WTP (Small)
+0,0,155,23,Raleigh,Reallocate Falls Lake
+0,0,155,33,Durham,Western JL WTP (Large)
+0,0,156,16,Durham,Western JL WTP (Small)
+0,0,156,23,Raleigh,Reallocate Falls Lake
+0,0,156,33,Durham,Western JL WTP (Large)
+0,0,156,50,Raleigh,Neuse River Intake
+0,0,157,16,Durham,Western JL WTP (Small)
+0,0,157,21,Raleigh,Reallocate Falls Lake
+0,0,157,33,Durham,Western JL WTP (Large)
+0,0,157,48,Raleigh,Neuse River Intake
+0,0,158,16,Durham,Western JL WTP (Small)
+0,0,158,23,Raleigh,Reallocate Falls Lake
+0,0,158,33,Durham,Western JL WTP (Large)
+0,0,159,16,Durham,Western JL WTP (Small)
+0,0,159,23,Raleigh,Reallocate Falls Lake
+0,0,159,33,Durham,Western JL WTP (Large)
+0,0,160,16,Durham,Western JL WTP (Small)
+0,0,160,23,Raleigh,Reallocate Falls Lake
+0,0,160,33,Durham,Western JL WTP (Large)
+0,0,160,48,Raleigh,Neuse River Intake
+0,0,161,16,Durham,Western JL WTP (Small)
+0,0,161,23,Raleigh,Reallocate Falls Lake
+0,0,161,33,Durham,Western JL WTP (Large)
+0,0,161,48,Raleigh,Neuse River Intake
+0,0,162,16,Durham,Western JL WTP (Small)
+0,0,162,21,Raleigh,Reallocate Falls Lake
+0,0,162,33,Durham,Western JL WTP (Large)
+0,0,162,36,Raleigh,Neuse River Intake
+0,0,163,16,Durham,Western JL WTP (Small)
+0,0,163,23,Raleigh,Reallocate Falls Lake
+0,0,163,33,Durham,Western JL WTP (Large)
+0,0,164,16,Durham,Western JL WTP (Small)
+0,0,164,23,Raleigh,Reallocate Falls Lake
+0,0,164,33,Durham,Western JL WTP (Large)
+0,0,164,47,Raleigh,Neuse River Intake
+0,0,165,16,Durham,Western JL WTP (Small)
+0,0,165,23,Raleigh,Reallocate Falls Lake
+0,0,165,33,Durham,Western JL WTP (Large)
+0,0,165,48,Raleigh,Neuse River Intake
+0,0,166,16,Durham,Western JL WTP (Small)
+0,0,166,23,Raleigh,Reallocate Falls Lake
+0,0,166,33,Durham,Western JL WTP (Large)
+0,0,166,46,Raleigh,Neuse River Intake
+0,0,167,16,Durham,Western JL WTP (Small)
+0,0,167,23,Raleigh,Reallocate Falls Lake
+0,0,167,33,Durham,Western JL WTP (Large)
+0,0,167,48,Raleigh,Neuse River Intake
+0,0,168,16,Durham,Western JL WTP (Small)
+0,0,168,21,Raleigh,Reallocate Falls Lake
+0,0,168,33,Durham,Western JL WTP (Large)
+0,0,168,48,Raleigh,Neuse River Intake
+0,0,169,16,Durham,Western JL WTP (Small)
+0,0,169,23,Raleigh,Reallocate Falls Lake
+0,0,169,33,Durham,Western JL WTP (Large)
+0,0,169,48,Raleigh,Neuse River Intake
+0,0,170,16,Durham,Western JL WTP (Small)
+0,0,170,23,Raleigh,Reallocate Falls Lake
+0,0,170,33,Durham,Western JL WTP (Large)
+0,0,170,48,Raleigh,Neuse River Intake
+0,0,171,16,Durham,Western JL WTP (Small)
+0,0,171,23,Raleigh,Reallocate Falls Lake
+0,0,171,33,Durham,Western JL WTP (Large)
+0,0,171,48,Raleigh,Neuse River Intake
+0,0,172,16,Durham,Western JL WTP (Small)
+0,0,172,22,Raleigh,Reallocate Falls Lake
+0,0,172,33,Durham,Western JL WTP (Large)
+0,0,172,43,Raleigh,Neuse River Intake
+0,0,173,16,Durham,Western JL WTP (Small)
+0,0,173,23,Raleigh,Reallocate Falls Lake
+0,0,173,33,Durham,Western JL WTP (Large)
+0,0,174,16,Durham,Western JL WTP (Small)
+0,0,174,23,Raleigh,Reallocate Falls Lake
+0,0,174,33,Durham,Western JL WTP (Large)
+0,0,174,47,Raleigh,Neuse River Intake
+0,0,175,16,Durham,Western JL WTP (Small)
+0,0,175,21,Raleigh,Reallocate Falls Lake
+0,0,175,33,Durham,Western JL WTP (Large)
+0,0,175,40,Raleigh,Neuse River Intake
+0,0,176,16,Durham,Western JL WTP (Small)
+0,0,176,21,Raleigh,Reallocate Falls Lake
+0,0,176,33,Durham,Western JL WTP (Large)
+0,0,176,40,Raleigh,Neuse River Intake
+0,0,177,16,Durham,Western JL WTP (Small)
+0,0,177,21,Raleigh,Reallocate Falls Lake
+0,0,177,33,Durham,Western JL WTP (Large)
+0,0,177,48,Raleigh,Neuse River Intake
+0,0,178,16,Durham,Western JL WTP (Small)
+0,0,178,23,Raleigh,Reallocate Falls Lake
+0,0,178,33,Durham,Western JL WTP (Large)
+0,0,178,46,Raleigh,Neuse River Intake
+0,0,179,16,Durham,Western JL WTP (Small)
+0,0,179,21,Raleigh,Reallocate Falls Lake
+0,0,179,33,Durham,Western JL WTP (Large)
+0,0,179,48,Raleigh,Neuse River Intake
+0,0,180,16,Durham,Western JL WTP (Small)
+0,0,180,23,Raleigh,Reallocate Falls Lake
+0,0,180,33,Durham,Western JL WTP (Large)
+0,0,180,46,Raleigh,Neuse River Intake
+0,0,181,16,Durham,Western JL WTP (Small)
+0,0,181,23,Raleigh,Reallocate Falls Lake
+0,0,181,33,Durham,Western JL WTP (Large)
+0,0,181,48,Raleigh,Neuse River Intake
+0,0,182,16,Durham,Western JL WTP (Small)
+0,0,182,23,Raleigh,Reallocate Falls Lake
+0,0,182,33,Durham,Western JL WTP (Large)
+0,0,183,16,Durham,Western JL WTP (Small)
+0,0,183,23,Raleigh,Reallocate Falls Lake
+0,0,183,33,Durham,Western JL WTP (Large)
+0,0,183,48,Raleigh,Neuse River Intake
+0,0,184,16,Durham,Western JL WTP (Small)
+0,0,184,23,Raleigh,Reallocate Falls Lake
+0,0,184,33,Durham,Western JL WTP (Large)
+0,0,184,48,Raleigh,Neuse River Intake
+0,0,185,16,Durham,Western JL WTP (Small)
+0,0,185,23,Raleigh,Reallocate Falls Lake
+0,0,185,33,Durham,Western JL WTP (Large)
+0,0,185,47,Raleigh,Neuse River Intake
+0,0,186,16,Durham,Western JL WTP (Small)
+0,0,186,21,Raleigh,Reallocate Falls Lake
+0,0,186,33,Durham,Western JL WTP (Large)
+0,0,186,48,Raleigh,Neuse River Intake
+0,0,187,16,Durham,Western JL WTP (Small)
+0,0,187,21,Raleigh,Reallocate Falls Lake
+0,0,187,33,Durham,Western JL WTP (Large)
+0,0,187,47,Raleigh,Neuse River Intake
+0,0,188,16,Durham,Western JL WTP (Small)
+0,0,188,23,Raleigh,Reallocate Falls Lake
+0,0,188,33,Durham,Western JL WTP (Large)
+0,0,188,45,Raleigh,Neuse River Intake
+0,0,189,16,Durham,Western JL WTP (Small)
+0,0,189,23,Raleigh,Reallocate Falls Lake
+0,0,189,33,Durham,Western JL WTP (Large)
+0,0,190,16,Durham,Western JL WTP (Small)
+0,0,190,23,Raleigh,Reallocate Falls Lake
+0,0,190,33,Durham,Western JL WTP (Large)
+0,0,190,48,Raleigh,Neuse River Intake
+0,0,191,16,Durham,Western JL WTP (Small)
+0,0,191,23,Raleigh,Reallocate Falls Lake
+0,0,191,33,Durham,Western JL WTP (Large)
+0,0,191,48,Raleigh,Neuse River Intake
+0,0,192,16,Durham,Western JL WTP (Small)
+0,0,192,23,Raleigh,Reallocate Falls Lake
+0,0,192,33,Durham,Western JL WTP (Large)
+0,0,192,48,Raleigh,Neuse River Intake
+0,0,193,16,Durham,Western JL WTP (Small)
+0,0,193,23,Raleigh,Reallocate Falls Lake
+0,0,193,33,Durham,Western JL WTP (Large)
+0,0,193,48,Raleigh,Neuse River Intake
+0,0,194,16,Durham,Western JL WTP (Small)
+0,0,194,23,Raleigh,Reallocate Falls Lake
+0,0,194,33,Durham,Western JL WTP (Large)
+0,0,195,16,Durham,Western JL WTP (Small)
+0,0,195,23,Raleigh,Reallocate Falls Lake
+0,0,195,33,Durham,Western JL WTP (Large)
+0,0,195,52,Raleigh,Neuse River Intake
+0,0,196,16,Durham,Western JL WTP (Small)
+0,0,196,23,Raleigh,Reallocate Falls Lake
+0,0,196,33,Durham,Western JL WTP (Large)
+0,0,197,16,Durham,Western JL WTP (Small)
+0,0,197,23,Raleigh,Reallocate Falls Lake
+0,0,197,33,Durham,Western JL WTP (Large)
+0,0,197,47,Raleigh,Neuse River Intake
+0,0,198,16,Durham,Western JL WTP (Small)
+0,0,198,23,Raleigh,Reallocate Falls Lake
+0,0,198,33,Durham,Western JL WTP (Large)
+0,0,198,48,Raleigh,Neuse River Intake
+0,0,199,16,Durham,Western JL WTP (Small)
+0,0,199,23,Raleigh,Reallocate Falls Lake
+0,0,199,33,Durham,Western JL WTP (Large)
+0,0,199,46,Raleigh,Neuse River Intake
+0,0,200,16,Durham,Western JL WTP (Small)
+0,0,200,23,Raleigh,Reallocate Falls Lake
+0,0,200,33,Durham,Western JL WTP (Large)
+0,0,200,45,Raleigh,Neuse River Intake
+0,0,201,16,Durham,Western JL WTP (Small)
+0,0,201,23,Raleigh,Reallocate Falls Lake
+0,0,201,33,Durham,Western JL WTP (Large)
+0,0,201,48,Raleigh,Neuse River Intake
+0,0,202,16,Durham,Western JL WTP (Small)
+0,0,202,23,Raleigh,Reallocate Falls Lake
+0,0,202,33,Durham,Western JL WTP (Large)
+0,0,202,48,Raleigh,Neuse River Intake
+0,0,203,16,Durham,Western JL WTP (Small)
+0,0,203,23,Raleigh,Reallocate Falls Lake
+0,0,203,33,Durham,Western JL WTP (Large)
+0,0,203,48,Raleigh,Neuse River Intake
+0,0,204,16,Durham,Western JL WTP (Small)
+0,0,204,23,Raleigh,Reallocate Falls Lake
+0,0,204,33,Durham,Western JL WTP (Large)
+0,0,204,48,Raleigh,Neuse River Intake
+0,0,205,16,Durham,Western JL WTP (Small)
+0,0,205,23,Raleigh,Reallocate Falls Lake
+0,0,205,33,Durham,Western JL WTP (Large)
+0,0,205,48,Raleigh,Neuse River Intake
+0,0,206,16,Durham,Western JL WTP (Small)
+0,0,206,21,Raleigh,Reallocate Falls Lake
+0,0,206,33,Durham,Western JL WTP (Large)
+0,0,206,42,Raleigh,Neuse River Intake
+0,0,207,16,Durham,Western JL WTP (Small)
+0,0,207,23,Raleigh,Reallocate Falls Lake
+0,0,207,33,Durham,Western JL WTP (Large)
+0,0,208,16,Durham,Western JL WTP (Small)
+0,0,208,21,Raleigh,Reallocate Falls Lake
+0,0,208,33,Durham,Western JL WTP (Large)
+0,0,208,46,Raleigh,Neuse River Intake
+0,0,209,16,Durham,Western JL WTP (Small)
+0,0,209,23,Raleigh,Reallocate Falls Lake
+0,0,209,33,Durham,Western JL WTP (Large)
+0,0,209,48,Raleigh,Neuse River Intake
+0,0,210,16,Durham,Western JL WTP (Small)
+0,0,210,23,Raleigh,Reallocate Falls Lake
+0,0,210,33,Durham,Western JL WTP (Large)
+0,0,210,48,Raleigh,Neuse River Intake
+0,0,211,16,Durham,Western JL WTP (Small)
+0,0,211,23,Raleigh,Reallocate Falls Lake
+0,0,211,33,Durham,Western JL WTP (Large)
+0,0,211,48,Raleigh,Neuse River Intake
+0,0,212,16,Durham,Western JL WTP (Small)
+0,0,212,23,Raleigh,Reallocate Falls Lake
+0,0,212,33,Durham,Western JL WTP (Large)
+0,0,212,48,Raleigh,Neuse River Intake
+0,0,213,16,Durham,Western JL WTP (Small)
+0,0,213,23,Raleigh,Reallocate Falls Lake
+0,0,213,33,Durham,Western JL WTP (Large)
+0,0,213,47,Raleigh,Neuse River Intake
+0,0,214,16,Durham,Western JL WTP (Small)
+0,0,214,23,Raleigh,Reallocate Falls Lake
+0,0,214,33,Durham,Western JL WTP (Large)
+0,0,214,48,Raleigh,Neuse River Intake
+0,0,215,16,Durham,Western JL WTP (Small)
+0,0,215,23,Raleigh,Reallocate Falls Lake
+0,0,215,33,Durham,Western JL WTP (Large)
+0,0,215,48,Raleigh,Neuse River Intake
+0,0,216,16,Durham,Western JL WTP (Small)
+0,0,216,23,Raleigh,Reallocate Falls Lake
+0,0,216,33,Durham,Western JL WTP (Large)
+0,0,216,47,Raleigh,Neuse River Intake
+0,0,217,16,Durham,Western JL WTP (Small)
+0,0,217,23,Raleigh,Reallocate Falls Lake
+0,0,217,33,Durham,Western JL WTP (Large)
+0,0,217,48,Raleigh,Neuse River Intake
+0,0,218,16,Durham,Western JL WTP (Small)
+0,0,218,21,Raleigh,Reallocate Falls Lake
+0,0,218,33,Durham,Western JL WTP (Large)
+0,0,218,39,Raleigh,Neuse River Intake
+0,0,219,16,Durham,Western JL WTP (Small)
+0,0,219,23,Raleigh,Reallocate Falls Lake
+0,0,219,33,Durham,Western JL WTP (Large)
+0,0,219,43,Raleigh,Neuse River Intake
+0,0,220,16,Durham,Western JL WTP (Small)
+0,0,220,21,Raleigh,Reallocate Falls Lake
+0,0,220,33,Durham,Western JL WTP (Large)
+0,0,220,45,Raleigh,Neuse River Intake
+0,0,221,16,Durham,Western JL WTP (Small)
+0,0,221,23,Raleigh,Reallocate Falls Lake
+0,0,221,33,Durham,Western JL WTP (Large)
+0,0,221,45,Raleigh,Neuse River Intake
+0,0,222,16,Durham,Western JL WTP (Small)
+0,0,222,23,Raleigh,Reallocate Falls Lake
+0,0,222,33,Durham,Western JL WTP (Large)
+0,0,223,16,Durham,Western JL WTP (Small)
+0,0,223,23,Raleigh,Reallocate Falls Lake
+0,0,223,33,Durham,Western JL WTP (Large)
+0,0,223,48,Raleigh,Neuse River Intake
+0,0,224,16,Durham,Western JL WTP (Small)
+0,0,224,23,Raleigh,Reallocate Falls Lake
+0,0,224,33,Durham,Western JL WTP (Large)
+0,0,224,48,Raleigh,Neuse River Intake
+0,0,225,16,Durham,Western JL WTP (Small)
+0,0,225,23,Raleigh,Reallocate Falls Lake
+0,0,225,33,Durham,Western JL WTP (Large)
+0,0,226,16,Durham,Western JL WTP (Small)
+0,0,226,21,Raleigh,Reallocate Falls Lake
+0,0,226,33,Durham,Western JL WTP (Large)
+0,0,226,44,Raleigh,Neuse River Intake
+0,0,227,16,Durham,Western JL WTP (Small)
+0,0,227,23,Raleigh,Reallocate Falls Lake
+0,0,227,33,Durham,Western JL WTP (Large)
+0,0,227,47,Raleigh,Neuse River Intake
+0,0,228,16,Durham,Western JL WTP (Small)
+0,0,228,22,Raleigh,Reallocate Falls Lake
+0,0,228,33,Durham,Western JL WTP (Large)
+0,0,228,43,Raleigh,Neuse River Intake
+0,0,229,16,Durham,Western JL WTP (Small)
+0,0,229,21,Raleigh,Reallocate Falls Lake
+0,0,229,33,Durham,Western JL WTP (Large)
+0,0,229,42,Raleigh,Neuse River Intake
+0,0,230,16,Durham,Western JL WTP (Small)
+0,0,230,23,Raleigh,Reallocate Falls Lake
+0,0,230,33,Durham,Western JL WTP (Large)
+0,0,230,48,Raleigh,Neuse River Intake
+0,0,231,16,Durham,Western JL WTP (Small)
+0,0,231,23,Raleigh,Reallocate Falls Lake
+0,0,231,33,Durham,Western JL WTP (Large)
+0,0,231,50,Raleigh,Neuse River Intake
+0,0,232,16,Durham,Western JL WTP (Small)
+0,0,232,23,Raleigh,Reallocate Falls Lake
+0,0,232,33,Durham,Western JL WTP (Large)
+0,0,233,16,Durham,Western JL WTP (Small)
+0,0,233,23,Raleigh,Reallocate Falls Lake
+0,0,233,33,Durham,Western JL WTP (Large)
+0,0,233,48,Raleigh,Neuse River Intake
+0,0,234,16,Durham,Western JL WTP (Small)
+0,0,234,23,Raleigh,Reallocate Falls Lake
+0,0,234,33,Durham,Western JL WTP (Large)
+0,0,234,48,Raleigh,Neuse River Intake
+0,0,235,16,Durham,Western JL WTP (Small)
+0,0,235,23,Raleigh,Reallocate Falls Lake
+0,0,235,33,Durham,Western JL WTP (Large)
+0,0,235,48,Raleigh,Neuse River Intake
+0,0,236,16,Durham,Western JL WTP (Small)
+0,0,236,23,Raleigh,Reallocate Falls Lake
+0,0,236,33,Durham,Western JL WTP (Large)
+0,0,236,48,Raleigh,Neuse River Intake
+0,0,237,16,Durham,Western JL WTP (Small)
+0,0,237,21,Raleigh,Reallocate Falls Lake
+0,0,237,33,Durham,Western JL WTP (Large)
+0,0,237,41,Raleigh,Neuse River Intake
+0,0,238,16,Durham,Western JL WTP (Small)
+0,0,238,21,Raleigh,Reallocate Falls Lake
+0,0,238,33,Durham,Western JL WTP (Large)
+0,0,238,33,Raleigh,Neuse River Intake
+0,0,239,16,Durham,Western JL WTP (Small)
+0,0,239,23,Raleigh,Reallocate Falls Lake
+0,0,239,33,Durham,Western JL WTP (Large)
+0,0,240,16,Durham,Western JL WTP (Small)
+0,0,240,23,Raleigh,Reallocate Falls Lake
+0,0,240,33,Durham,Western JL WTP (Large)
+0,0,240,48,Raleigh,Neuse River Intake
+0,0,241,16,Durham,Western JL WTP (Small)
+0,0,241,23,Raleigh,Reallocate Falls Lake
+0,0,241,33,Durham,Western JL WTP (Large)
+0,0,241,50,Raleigh,Neuse River Intake
+0,0,242,16,Durham,Western JL WTP (Small)
+0,0,242,23,Raleigh,Reallocate Falls Lake
+0,0,242,33,Durham,Western JL WTP (Large)
+0,0,242,48,Raleigh,Neuse River Intake
+0,0,243,16,Durham,Western JL WTP (Small)
+0,0,243,23,Raleigh,Reallocate Falls Lake
+0,0,243,33,Durham,Western JL WTP (Large)
+0,0,243,48,Raleigh,Neuse River Intake
+0,0,244,16,Durham,Western JL WTP (Small)
+0,0,244,23,Raleigh,Reallocate Falls Lake
+0,0,244,33,Durham,Western JL WTP (Large)
+0,0,244,45,Raleigh,Neuse River Intake
+0,0,245,16,Durham,Western JL WTP (Small)
+0,0,245,22,Raleigh,Reallocate Falls Lake
+0,0,245,33,Durham,Western JL WTP (Large)
+0,0,245,44,Raleigh,Neuse River Intake
+0,0,246,16,Durham,Western JL WTP (Small)
+0,0,246,23,Raleigh,Reallocate Falls Lake
+0,0,246,33,Durham,Western JL WTP (Large)
+0,0,246,48,Raleigh,Neuse River Intake
+0,0,247,16,Durham,Western JL WTP (Small)
+0,0,247,23,Raleigh,Reallocate Falls Lake
+0,0,247,33,Durham,Western JL WTP (Large)
+0,0,248,16,Durham,Western JL WTP (Small)
+0,0,248,23,Raleigh,Reallocate Falls Lake
+0,0,248,33,Durham,Western JL WTP (Large)
+0,0,248,48,Raleigh,Neuse River Intake
+0,0,249,16,Durham,Western JL WTP (Small)
+0,0,249,23,Raleigh,Reallocate Falls Lake
+0,0,249,33,Durham,Western JL WTP (Large)
+0,0,249,49,Raleigh,Neuse River Intake
+0,0,250,16,Durham,Western JL WTP (Small)
+0,0,250,23,Raleigh,Reallocate Falls Lake
+0,0,250,33,Durham,Western JL WTP (Large)
+0,0,250,47,Raleigh,Neuse River Intake
+0,0,251,16,Durham,Western JL WTP (Small)
+0,0,251,23,Raleigh,Reallocate Falls Lake
+0,0,251,33,Durham,Western JL WTP (Large)
+0,0,251,48,Raleigh,Neuse River Intake
+0,0,252,16,Durham,Western JL WTP (Small)
+0,0,252,23,Raleigh,Reallocate Falls Lake
+0,0,252,33,Durham,Western JL WTP (Large)
+0,0,252,42,Raleigh,Neuse River Intake
+0,0,253,16,Durham,Western JL WTP (Small)
+0,0,253,21,Raleigh,Reallocate Falls Lake
+0,0,253,33,Durham,Western JL WTP (Large)
+0,0,253,43,Raleigh,Neuse River Intake
+0,0,254,16,Durham,Western JL WTP (Small)
+0,0,254,23,Raleigh,Reallocate Falls Lake
+0,0,254,33,Durham,Western JL WTP (Large)
+0,0,254,48,Raleigh,Neuse River Intake
+0,0,255,16,Durham,Western JL WTP (Small)
+0,0,255,23,Raleigh,Reallocate Falls Lake
+0,0,255,33,Durham,Western JL WTP (Large)
+0,0,255,49,Raleigh,Neuse River Intake
+0,0,256,16,Durham,Western JL WTP (Small)
+0,0,256,23,Raleigh,Reallocate Falls Lake
+0,0,256,33,Durham,Western JL WTP (Large)
+0,0,257,16,Durham,Western JL WTP (Small)
+0,0,257,21,Raleigh,Reallocate Falls Lake
+0,0,257,33,Durham,Western JL WTP (Large)
+0,0,257,48,Raleigh,Neuse River Intake
+0,0,258,16,Durham,Western JL WTP (Small)
+0,0,258,21,Raleigh,Reallocate Falls Lake
+0,0,258,33,Durham,Western JL WTP (Large)
+0,0,258,40,Raleigh,Neuse River Intake
+0,0,259,16,Durham,Western JL WTP (Small)
+0,0,259,21,Raleigh,Reallocate Falls Lake
+0,0,259,33,Durham,Western JL WTP (Large)
+0,0,259,38,Raleigh,Neuse River Intake
+0,0,260,16,Durham,Western JL WTP (Small)
+0,0,260,23,Raleigh,Reallocate Falls Lake
+0,0,260,33,Durham,Western JL WTP (Large)
+0,0,260,48,Raleigh,Neuse River Intake
+0,0,261,16,Durham,Western JL WTP (Small)
+0,0,261,23,Raleigh,Reallocate Falls Lake
+0,0,261,33,Durham,Western JL WTP (Large)
+0,0,261,47,Raleigh,Neuse River Intake
+0,0,262,16,Durham,Western JL WTP (Small)
+0,0,262,21,Raleigh,Reallocate Falls Lake
+0,0,262,33,Durham,Western JL WTP (Large)
+0,0,262,48,Raleigh,Neuse River Intake
+0,0,263,16,Durham,Western JL WTP (Small)
+0,0,263,21,Raleigh,Reallocate Falls Lake
+0,0,263,33,Durham,Western JL WTP (Large)
+0,0,263,48,Raleigh,Neuse River Intake
+0,0,264,16,Durham,Western JL WTP (Small)
+0,0,264,23,Raleigh,Reallocate Falls Lake
+0,0,264,33,Durham,Western JL WTP (Large)
+0,0,264,48,Raleigh,Neuse River Intake
+0,0,265,16,Durham,Western JL WTP (Small)
+0,0,265,23,Raleigh,Reallocate Falls Lake
+0,0,265,33,Durham,Western JL WTP (Large)
+0,0,266,16,Durham,Western JL WTP (Small)
+0,0,266,23,Raleigh,Reallocate Falls Lake
+0,0,266,33,Durham,Western JL WTP (Large)
+0,0,266,42,Raleigh,Neuse River Intake
+0,0,267,16,Durham,Western JL WTP (Small)
+0,0,267,23,Raleigh,Reallocate Falls Lake
+0,0,267,33,Durham,Western JL WTP (Large)
+0,0,267,52,Raleigh,Neuse River Intake
+0,0,268,16,Durham,Western JL WTP (Small)
+0,0,268,23,Raleigh,Reallocate Falls Lake
+0,0,268,33,Durham,Western JL WTP (Large)
+0,0,269,16,Durham,Western JL WTP (Small)
+0,0,269,21,Raleigh,Reallocate Falls Lake
+0,0,269,33,Durham,Western JL WTP (Large)
+0,0,269,42,Raleigh,Neuse River Intake
+0,0,270,16,Durham,Western JL WTP (Small)
+0,0,270,23,Raleigh,Reallocate Falls Lake
+0,0,270,33,Durham,Western JL WTP (Large)
+0,0,270,49,Raleigh,Neuse River Intake
+0,0,271,16,Durham,Western JL WTP (Small)
+0,0,271,23,Raleigh,Reallocate Falls Lake
+0,0,271,33,Durham,Western JL WTP (Large)
+0,0,271,48,Raleigh,Neuse River Intake
+0,0,272,16,Durham,Western JL WTP (Small)
+0,0,272,23,Raleigh,Reallocate Falls Lake
+0,0,272,33,Durham,Western JL WTP (Large)
+0,0,272,52,Raleigh,Neuse River Intake
+0,0,273,16,Durham,Western JL WTP (Small)
+0,0,273,23,Raleigh,Reallocate Falls Lake
+0,0,273,33,Durham,Western JL WTP (Large)
+0,0,273,48,Raleigh,Neuse River Intake
+0,0,274,16,Durham,Western JL WTP (Small)
+0,0,274,23,Raleigh,Reallocate Falls Lake
+0,0,274,33,Durham,Western JL WTP (Large)
+0,0,274,48,Raleigh,Neuse River Intake
+0,0,275,16,Durham,Western JL WTP (Small)
+0,0,275,23,Raleigh,Reallocate Falls Lake
+0,0,275,33,Durham,Western JL WTP (Large)
+0,0,275,48,Raleigh,Neuse River Intake
+0,0,276,16,Durham,Western JL WTP (Small)
+0,0,276,23,Raleigh,Reallocate Falls Lake
+0,0,276,33,Durham,Western JL WTP (Large)
+0,0,276,48,Raleigh,Neuse River Intake
+0,0,277,16,Durham,Western JL WTP (Small)
+0,0,277,23,Raleigh,Reallocate Falls Lake
+0,0,277,33,Durham,Western JL WTP (Large)
+0,0,277,48,Raleigh,Neuse River Intake
+0,0,278,16,Durham,Western JL WTP (Small)
+0,0,278,21,Raleigh,Reallocate Falls Lake
+0,0,278,33,Durham,Western JL WTP (Large)
+0,0,278,48,Raleigh,Neuse River Intake
+0,0,279,16,Durham,Western JL WTP (Small)
+0,0,279,23,Raleigh,Reallocate Falls Lake
+0,0,279,33,Durham,Western JL WTP (Large)
+0,0,279,46,Raleigh,Neuse River Intake
+0,0,280,16,Durham,Western JL WTP (Small)
+0,0,280,23,Raleigh,Reallocate Falls Lake
+0,0,280,33,Durham,Western JL WTP (Large)
+0,0,280,48,Raleigh,Neuse River Intake
+0,0,281,16,Durham,Western JL WTP (Small)
+0,0,281,23,Raleigh,Reallocate Falls Lake
+0,0,281,33,Durham,Western JL WTP (Large)
+0,0,281,48,Raleigh,Neuse River Intake
+0,0,282,16,Durham,Western JL WTP (Small)
+0,0,282,23,Raleigh,Reallocate Falls Lake
+0,0,282,33,Durham,Western JL WTP (Large)
+0,0,282,46,Raleigh,Neuse River Intake
+0,0,283,16,Durham,Western JL WTP (Small)
+0,0,283,23,Raleigh,Reallocate Falls Lake
+0,0,283,33,Durham,Western JL WTP (Large)
+0,0,284,16,Durham,Western JL WTP (Small)
+0,0,284,21,Raleigh,Reallocate Falls Lake
+0,0,284,33,Durham,Western JL WTP (Large)
+0,0,284,35,Raleigh,Neuse River Intake
+0,0,285,16,Durham,Western JL WTP (Small)
+0,0,285,21,Raleigh,Reallocate Falls Lake
+0,0,285,33,Durham,Western JL WTP (Large)
+0,0,285,47,Raleigh,Neuse River Intake
+0,0,286,16,Durham,Western JL WTP (Small)
+0,0,286,23,Raleigh,Reallocate Falls Lake
+0,0,286,33,Durham,Western JL WTP (Large)
+0,0,286,45,Raleigh,Neuse River Intake
+0,0,287,16,Durham,Western JL WTP (Small)
+0,0,287,23,Raleigh,Reallocate Falls Lake
+0,0,287,33,Durham,Western JL WTP (Large)
+0,0,288,16,Durham,Western JL WTP (Small)
+0,0,288,23,Raleigh,Reallocate Falls Lake
+0,0,288,33,Durham,Western JL WTP (Large)
+0,0,288,48,Raleigh,Neuse River Intake
+0,0,289,16,Durham,Western JL WTP (Small)
+0,0,289,23,Raleigh,Reallocate Falls Lake
+0,0,289,33,Durham,Western JL WTP (Large)
+0,0,290,16,Durham,Western JL WTP (Small)
+0,0,290,23,Raleigh,Reallocate Falls Lake
+0,0,290,33,Durham,Western JL WTP (Large)
+0,0,290,39,Raleigh,Neuse River Intake
+0,0,291,16,Durham,Western JL WTP (Small)
+0,0,291,23,Raleigh,Reallocate Falls Lake
+0,0,291,33,Durham,Western JL WTP (Large)
+0,0,291,48,Raleigh,Neuse River Intake
+0,0,292,16,Durham,Western JL WTP (Small)
+0,0,292,23,Raleigh,Reallocate Falls Lake
+0,0,292,33,Durham,Western JL WTP (Large)
+0,0,292,48,Raleigh,Neuse River Intake
+0,0,293,16,Durham,Western JL WTP (Small)
+0,0,293,23,Raleigh,Reallocate Falls Lake
+0,0,293,33,Durham,Western JL WTP (Large)
+0,0,293,48,Raleigh,Neuse River Intake
+0,0,294,16,Durham,Western JL WTP (Small)
+0,0,294,23,Raleigh,Reallocate Falls Lake
+0,0,294,33,Durham,Western JL WTP (Large)
+0,0,294,48,Raleigh,Neuse River Intake
+0,0,295,16,Durham,Western JL WTP (Small)
+0,0,295,23,Raleigh,Reallocate Falls Lake
+0,0,295,33,Durham,Western JL WTP (Large)
+0,0,295,43,Raleigh,Neuse River Intake
+0,0,296,16,Durham,Western JL WTP (Small)
+0,0,296,23,Raleigh,Reallocate Falls Lake
+0,0,296,33,Durham,Western JL WTP (Large)
+0,0,296,50,Raleigh,Neuse River Intake
+0,0,297,16,Durham,Western JL WTP (Small)
+0,0,297,23,Raleigh,Reallocate Falls Lake
+0,0,297,33,Durham,Western JL WTP (Large)
+0,0,298,16,Durham,Western JL WTP (Small)
+0,0,298,23,Raleigh,Reallocate Falls Lake
+0,0,298,33,Durham,Western JL WTP (Large)
+0,0,298,48,Raleigh,Neuse River Intake
+0,0,299,16,Durham,Western JL WTP (Small)
+0,0,299,23,Raleigh,Reallocate Falls Lake
+0,0,299,33,Durham,Western JL WTP (Large)
+0,0,299,48,Raleigh,Neuse River Intake
+0,0,300,16,Durham,Western JL WTP (Small)
+0,0,300,23,Raleigh,Reallocate Falls Lake
+0,0,300,33,Durham,Western JL WTP (Large)
+0,0,301,16,Durham,Western JL WTP (Small)
+0,0,301,23,Raleigh,Reallocate Falls Lake
+0,0,301,33,Durham,Western JL WTP (Large)
+0,0,301,50,Raleigh,Neuse River Intake
+0,0,302,16,Durham,Western JL WTP (Small)
+0,0,302,23,Raleigh,Reallocate Falls Lake
+0,0,302,33,Durham,Western JL WTP (Large)
+0,0,303,16,Durham,Western JL WTP (Small)
+0,0,303,23,Raleigh,Reallocate Falls Lake
+0,0,303,33,Durham,Western JL WTP (Large)
+0,0,303,48,Raleigh,Neuse River Intake
+0,0,304,16,Durham,Western JL WTP (Small)
+0,0,304,23,Raleigh,Reallocate Falls Lake
+0,0,304,33,Durham,Western JL WTP (Large)
+0,0,304,45,Raleigh,Neuse River Intake
+0,0,305,16,Durham,Western JL WTP (Small)
+0,0,305,23,Raleigh,Reallocate Falls Lake
+0,0,305,33,Durham,Western JL WTP (Large)
+0,0,305,48,Raleigh,Neuse River Intake
+0,0,306,16,Durham,Western JL WTP (Small)
+0,0,306,21,Raleigh,Reallocate Falls Lake
+0,0,306,33,Durham,Western JL WTP (Large)
+0,0,306,44,Raleigh,Neuse River Intake
+0,0,307,16,Durham,Western JL WTP (Small)
+0,0,307,23,Raleigh,Reallocate Falls Lake
+0,0,307,33,Durham,Western JL WTP (Large)
+0,0,308,16,Durham,Western JL WTP (Small)
+0,0,308,23,Raleigh,Reallocate Falls Lake
+0,0,308,33,Durham,Western JL WTP (Large)
+0,0,308,48,Raleigh,Neuse River Intake
+0,0,309,16,Durham,Western JL WTP (Small)
+0,0,309,23,Raleigh,Reallocate Falls Lake
+0,0,309,33,Durham,Western JL WTP (Large)
+0,0,309,45,Raleigh,Neuse River Intake
+0,0,310,16,Durham,Western JL WTP (Small)
+0,0,310,23,Raleigh,Reallocate Falls Lake
+0,0,310,33,Durham,Western JL WTP (Large)
+0,0,310,48,Raleigh,Neuse River Intake
+0,0,311,16,Durham,Western JL WTP (Small)
+0,0,311,23,Raleigh,Reallocate Falls Lake
+0,0,311,33,Durham,Western JL WTP (Large)
+0,0,311,48,Raleigh,Neuse River Intake
+0,0,312,16,Durham,Western JL WTP (Small)
+0,0,312,23,Raleigh,Reallocate Falls Lake
+0,0,312,33,Durham,Western JL WTP (Large)
+0,0,312,45,Raleigh,Neuse River Intake
+0,0,313,16,Durham,Western JL WTP (Small)
+0,0,313,23,Raleigh,Reallocate Falls Lake
+0,0,313,33,Durham,Western JL WTP (Large)
+0,0,313,48,Raleigh,Neuse River Intake
+0,0,314,16,Durham,Western JL WTP (Small)
+0,0,314,23,Raleigh,Reallocate Falls Lake
+0,0,314,33,Durham,Western JL WTP (Large)
+0,0,314,41,Raleigh,Neuse River Intake
+0,0,315,16,Durham,Western JL WTP (Small)
+0,0,315,22,Raleigh,Reallocate Falls Lake
+0,0,315,33,Durham,Western JL WTP (Large)
+0,0,315,43,Raleigh,Neuse River Intake
+0,0,316,16,Durham,Western JL WTP (Small)
+0,0,316,22,Raleigh,Reallocate Falls Lake
+0,0,316,33,Durham,Western JL WTP (Large)
+0,0,316,48,Raleigh,Neuse River Intake
+0,0,317,16,Durham,Western JL WTP (Small)
+0,0,317,22,Raleigh,Reallocate Falls Lake
+0,0,317,33,Durham,Western JL WTP (Large)
+0,0,317,48,Raleigh,Neuse River Intake
+0,0,318,16,Durham,Western JL WTP (Small)
+0,0,318,23,Raleigh,Reallocate Falls Lake
+0,0,318,33,Durham,Western JL WTP (Large)
+0,0,318,49,Raleigh,Neuse River Intake
+0,0,319,16,Durham,Western JL WTP (Small)
+0,0,319,23,Raleigh,Reallocate Falls Lake
+0,0,319,33,Durham,Western JL WTP (Large)
+0,0,320,16,Durham,Western JL WTP (Small)
+0,0,320,23,Raleigh,Reallocate Falls Lake
+0,0,320,33,Durham,Western JL WTP (Large)
+0,0,321,16,Durham,Western JL WTP (Small)
+0,0,321,23,Raleigh,Reallocate Falls Lake
+0,0,321,33,Durham,Western JL WTP (Large)
+0,0,321,49,Raleigh,Neuse River Intake
+0,0,322,16,Durham,Western JL WTP (Small)
+0,0,322,23,Raleigh,Reallocate Falls Lake
+0,0,322,33,Durham,Western JL WTP (Large)
+0,0,322,48,Raleigh,Neuse River Intake
+0,0,323,16,Durham,Western JL WTP (Small)
+0,0,323,23,Raleigh,Reallocate Falls Lake
+0,0,323,33,Durham,Western JL WTP (Large)
+0,0,323,48,Raleigh,Neuse River Intake
+0,0,324,16,Durham,Western JL WTP (Small)
+0,0,324,23,Raleigh,Reallocate Falls Lake
+0,0,324,33,Durham,Western JL WTP (Large)
+0,0,324,35,Raleigh,Neuse River Intake
+0,0,325,16,Durham,Western JL WTP (Small)
+0,0,325,23,Raleigh,Reallocate Falls Lake
+0,0,325,33,Durham,Western JL WTP (Large)
+0,0,325,47,Raleigh,Neuse River Intake
+0,0,326,16,Durham,Western JL WTP (Small)
+0,0,326,23,Raleigh,Reallocate Falls Lake
+0,0,326,33,Durham,Western JL WTP (Large)
+0,0,326,48,Raleigh,Neuse River Intake
+0,0,327,16,Durham,Western JL WTP (Small)
+0,0,327,23,Raleigh,Reallocate Falls Lake
+0,0,327,33,Durham,Western JL WTP (Large)
+0,0,327,48,Raleigh,Neuse River Intake
+0,0,328,16,Durham,Western JL WTP (Small)
+0,0,328,23,Raleigh,Reallocate Falls Lake
+0,0,328,33,Durham,Western JL WTP (Large)
+0,0,329,16,Durham,Western JL WTP (Small)
+0,0,329,23,Raleigh,Reallocate Falls Lake
+0,0,329,33,Durham,Western JL WTP (Large)
+0,0,329,49,Raleigh,Neuse River Intake
+0,0,330,16,Durham,Western JL WTP (Small)
+0,0,330,23,Raleigh,Reallocate Falls Lake
+0,0,330,33,Durham,Western JL WTP (Large)
+0,0,330,50,Raleigh,Neuse River Intake
+0,0,331,16,Durham,Western JL WTP (Small)
+0,0,331,23,Raleigh,Reallocate Falls Lake
+0,0,331,33,Durham,Western JL WTP (Large)
+0,0,331,48,Raleigh,Neuse River Intake
+0,0,332,16,Durham,Western JL WTP (Small)
+0,0,332,21,Raleigh,Reallocate Falls Lake
+0,0,332,33,Durham,Western JL WTP (Large)
+0,0,332,48,Raleigh,Neuse River Intake
+0,0,333,16,Durham,Western JL WTP (Small)
+0,0,333,23,Raleigh,Reallocate Falls Lake
+0,0,333,33,Durham,Western JL WTP (Large)
+0,0,333,48,Raleigh,Neuse River Intake
+0,0,334,16,Durham,Western JL WTP (Small)
+0,0,334,23,Raleigh,Reallocate Falls Lake
+0,0,334,33,Durham,Western JL WTP (Large)
+0,0,334,52,Raleigh,Neuse River Intake
+0,0,335,16,Durham,Western JL WTP (Small)
+0,0,335,23,Raleigh,Reallocate Falls Lake
+0,0,335,33,Durham,Western JL WTP (Large)
+0,0,335,48,Raleigh,Neuse River Intake
+0,0,336,16,Durham,Western JL WTP (Small)
+0,0,336,23,Raleigh,Reallocate Falls Lake
+0,0,336,33,Durham,Western JL WTP (Large)
+0,0,337,16,Durham,Western JL WTP (Small)
+0,0,337,23,Raleigh,Reallocate Falls Lake
+0,0,337,33,Durham,Western JL WTP (Large)
+0,0,337,48,Raleigh,Neuse River Intake
+0,0,338,16,Durham,Western JL WTP (Small)
+0,0,338,23,Raleigh,Reallocate Falls Lake
+0,0,338,33,Durham,Western JL WTP (Large)
+0,0,338,46,Raleigh,Neuse River Intake
+0,0,339,16,Durham,Western JL WTP (Small)
+0,0,339,23,Raleigh,Reallocate Falls Lake
+0,0,339,33,Durham,Western JL WTP (Large)
+0,0,339,48,Raleigh,Neuse River Intake
+0,0,340,16,Durham,Western JL WTP (Small)
+0,0,340,23,Raleigh,Reallocate Falls Lake
+0,0,340,33,Durham,Western JL WTP (Large)
+0,0,340,48,Raleigh,Neuse River Intake
+0,0,341,16,Durham,Western JL WTP (Small)
+0,0,341,23,Raleigh,Reallocate Falls Lake
+0,0,341,33,Durham,Western JL WTP (Large)
+0,0,342,16,Durham,Western JL WTP (Small)
+0,0,342,23,Raleigh,Reallocate Falls Lake
+0,0,342,33,Durham,Western JL WTP (Large)
+0,0,342,48,Raleigh,Neuse River Intake
+0,0,343,16,Durham,Western JL WTP (Small)
+0,0,343,23,Raleigh,Reallocate Falls Lake
+0,0,343,33,Durham,Western JL WTP (Large)
+0,0,343,50,Raleigh,Neuse River Intake
+0,0,344,16,Durham,Western JL WTP (Small)
+0,0,344,23,Raleigh,Reallocate Falls Lake
+0,0,344,33,Durham,Western JL WTP (Large)
+0,0,344,48,Raleigh,Neuse River Intake
+0,0,345,16,Durham,Western JL WTP (Small)
+0,0,345,23,Raleigh,Reallocate Falls Lake
+0,0,345,33,Durham,Western JL WTP (Large)
+0,0,345,41,Raleigh,Neuse River Intake
+0,0,346,16,Durham,Western JL WTP (Small)
+0,0,346,23,Raleigh,Reallocate Falls Lake
+0,0,346,33,Durham,Western JL WTP (Large)
+0,0,346,48,Raleigh,Neuse River Intake
+0,0,347,16,Durham,Western JL WTP (Small)
+0,0,347,23,Raleigh,Reallocate Falls Lake
+0,0,347,33,Durham,Western JL WTP (Large)
+0,0,347,48,Raleigh,Neuse River Intake
+0,0,348,16,Durham,Western JL WTP (Small)
+0,0,348,21,Raleigh,Reallocate Falls Lake
+0,0,348,33,Durham,Western JL WTP (Large)
+0,0,348,48,Raleigh,Neuse River Intake
+0,0,349,16,Durham,Western JL WTP (Small)
+0,0,349,23,Raleigh,Reallocate Falls Lake
+0,0,349,33,Durham,Western JL WTP (Large)
+0,0,349,47,Raleigh,Neuse River Intake
+0,0,350,16,Durham,Western JL WTP (Small)
+0,0,350,23,Raleigh,Reallocate Falls Lake
+0,0,350,33,Durham,Western JL WTP (Large)
+0,0,350,48,Raleigh,Neuse River Intake
+0,0,351,16,Durham,Western JL WTP (Small)
+0,0,351,23,Raleigh,Reallocate Falls Lake
+0,0,351,33,Durham,Western JL WTP (Large)
+0,0,351,48,Raleigh,Neuse River Intake
+0,0,352,16,Durham,Western JL WTP (Small)
+0,0,352,23,Raleigh,Reallocate Falls Lake
+0,0,352,33,Durham,Western JL WTP (Large)
+0,0,352,47,Raleigh,Neuse River Intake
+0,0,353,16,Durham,Western JL WTP (Small)
+0,0,353,23,Raleigh,Reallocate Falls Lake
+0,0,353,33,Durham,Western JL WTP (Large)
+0,0,354,16,Durham,Western JL WTP (Small)
+0,0,354,23,Raleigh,Reallocate Falls Lake
+0,0,354,33,Durham,Western JL WTP (Large)
+0,0,354,48,Raleigh,Neuse River Intake
+0,0,355,16,Durham,Western JL WTP (Small)
+0,0,355,23,Raleigh,Reallocate Falls Lake
+0,0,355,33,Durham,Western JL WTP (Large)
+0,0,355,48,Raleigh,Neuse River Intake
+0,0,356,16,Durham,Western JL WTP (Small)
+0,0,356,23,Raleigh,Reallocate Falls Lake
+0,0,356,33,Durham,Western JL WTP (Large)
+0,0,357,16,Durham,Western JL WTP (Small)
+0,0,357,23,Raleigh,Reallocate Falls Lake
+0,0,357,33,Durham,Western JL WTP (Large)
+0,0,357,48,Raleigh,Neuse River Intake
+0,0,358,16,Durham,Western JL WTP (Small)
+0,0,358,23,Raleigh,Reallocate Falls Lake
+0,0,358,33,Durham,Western JL WTP (Large)
+0,0,358,50,Raleigh,Neuse River Intake
+0,0,359,16,Durham,Western JL WTP (Small)
+0,0,359,23,Raleigh,Reallocate Falls Lake
+0,0,359,33,Durham,Western JL WTP (Large)
+0,0,359,48,Raleigh,Neuse River Intake
+0,0,360,16,Durham,Western JL WTP (Small)
+0,0,360,23,Raleigh,Reallocate Falls Lake
+0,0,360,33,Durham,Western JL WTP (Large)
+0,0,360,48,Raleigh,Neuse River Intake
+0,0,361,16,Durham,Western JL WTP (Small)
+0,0,361,23,Raleigh,Reallocate Falls Lake
+0,0,361,33,Durham,Western JL WTP (Large)
+0,0,361,48,Raleigh,Neuse River Intake
+0,0,362,16,Durham,Western JL WTP (Small)
+0,0,362,22,Raleigh,Reallocate Falls Lake
+0,0,362,33,Durham,Western JL WTP (Large)
+0,0,362,48,Raleigh,Neuse River Intake
+0,0,363,16,Durham,Western JL WTP (Small)
+0,0,363,23,Raleigh,Reallocate Falls Lake
+0,0,363,33,Durham,Western JL WTP (Large)
+0,0,363,48,Raleigh,Neuse River Intake
+0,0,364,16,Durham,Western JL WTP (Small)
+0,0,364,23,Raleigh,Reallocate Falls Lake
+0,0,364,33,Durham,Western JL WTP (Large)
+0,0,364,49,Raleigh,Neuse River Intake
+0,0,365,16,Durham,Western JL WTP (Small)
+0,0,365,23,Raleigh,Reallocate Falls Lake
+0,0,365,33,Durham,Western JL WTP (Large)
+0,0,365,50,Raleigh,Neuse River Intake
+0,0,366,16,Durham,Western JL WTP (Small)
+0,0,366,23,Raleigh,Reallocate Falls Lake
+0,0,366,33,Durham,Western JL WTP (Large)
+0,0,367,16,Durham,Western JL WTP (Small)
+0,0,367,23,Raleigh,Reallocate Falls Lake
+0,0,367,33,Durham,Western JL WTP (Large)
+0,0,368,16,Durham,Western JL WTP (Small)
+0,0,368,23,Raleigh,Reallocate Falls Lake
+0,0,368,33,Durham,Western JL WTP (Large)
+0,0,369,16,Durham,Western JL WTP (Small)
+0,0,369,23,Raleigh,Reallocate Falls Lake
+0,0,369,33,Durham,Western JL WTP (Large)
+0,0,369,48,Raleigh,Neuse River Intake
+0,0,370,16,Durham,Western JL WTP (Small)
+0,0,370,19,Raleigh,Reallocate Falls Lake
+0,0,370,33,Durham,Western JL WTP (Large)
+0,0,370,38,Raleigh,Neuse River Intake
+0,0,371,16,Durham,Western JL WTP (Small)
+0,0,371,23,Raleigh,Reallocate Falls Lake
+0,0,371,33,Durham,Western JL WTP (Large)
+0,0,371,48,Raleigh,Neuse River Intake
+0,0,372,16,Durham,Western JL WTP (Small)
+0,0,372,23,Raleigh,Reallocate Falls Lake
+0,0,372,33,Durham,Western JL WTP (Large)
+0,0,372,48,Raleigh,Neuse River Intake
+0,0,373,16,Durham,Western JL WTP (Small)
+0,0,373,23,Raleigh,Reallocate Falls Lake
+0,0,373,33,Durham,Western JL WTP (Large)
+0,0,373,48,Raleigh,Neuse River Intake
+0,0,374,16,Durham,Western JL WTP (Small)
+0,0,374,23,Raleigh,Reallocate Falls Lake
+0,0,374,33,Durham,Western JL WTP (Large)
+0,0,374,49,Raleigh,Neuse River Intake
+0,0,375,16,Durham,Western JL WTP (Small)
+0,0,375,23,Raleigh,Reallocate Falls Lake
+0,0,375,33,Durham,Western JL WTP (Large)
+0,0,375,50,Raleigh,Neuse River Intake
+0,0,376,16,Durham,Western JL WTP (Small)
+0,0,376,22,Raleigh,Reallocate Falls Lake
+0,0,376,33,Durham,Western JL WTP (Large)
+0,0,376,48,Raleigh,Neuse River Intake
+0,0,377,16,Durham,Western JL WTP (Small)
+0,0,377,23,Raleigh,Reallocate Falls Lake
+0,0,377,33,Durham,Western JL WTP (Large)
+0,0,377,48,Raleigh,Neuse River Intake
+0,0,378,16,Durham,Western JL WTP (Small)
+0,0,378,23,Raleigh,Reallocate Falls Lake
+0,0,378,33,Durham,Western JL WTP (Large)
+0,0,378,39,Raleigh,Neuse River Intake
+0,0,379,16,Durham,Western JL WTP (Small)
+0,0,379,23,Raleigh,Reallocate Falls Lake
+0,0,379,33,Durham,Western JL WTP (Large)
+0,0,380,16,Durham,Western JL WTP (Small)
+0,0,380,23,Raleigh,Reallocate Falls Lake
+0,0,380,33,Durham,Western JL WTP (Large)
+0,0,380,49,Raleigh,Neuse River Intake
+0,0,381,16,Durham,Western JL WTP (Small)
+0,0,381,23,Raleigh,Reallocate Falls Lake
+0,0,381,33,Durham,Western JL WTP (Large)
+0,0,381,48,Raleigh,Neuse River Intake
+0,0,382,16,Durham,Western JL WTP (Small)
+0,0,382,22,Raleigh,Reallocate Falls Lake
+0,0,382,33,Durham,Western JL WTP (Large)
+0,0,382,40,Raleigh,Neuse River Intake
+0,0,383,16,Durham,Western JL WTP (Small)
+0,0,383,22,Raleigh,Reallocate Falls Lake
+0,0,383,33,Durham,Western JL WTP (Large)
+0,0,383,48,Raleigh,Neuse River Intake
+0,0,384,16,Durham,Western JL WTP (Small)
+0,0,384,23,Raleigh,Reallocate Falls Lake
+0,0,384,33,Durham,Western JL WTP (Large)
+0,0,385,16,Durham,Western JL WTP (Small)
+0,0,385,23,Raleigh,Reallocate Falls Lake
+0,0,385,33,Durham,Western JL WTP (Large)
+0,0,385,50,Raleigh,Neuse River Intake
+0,0,386,16,Durham,Western JL WTP (Small)
+0,0,386,23,Raleigh,Reallocate Falls Lake
+0,0,386,33,Durham,Western JL WTP (Large)
+0,0,387,16,Durham,Western JL WTP (Small)
+0,0,387,21,Raleigh,Reallocate Falls Lake
+0,0,387,33,Durham,Western JL WTP (Large)
+0,0,387,48,Raleigh,Neuse River Intake
+0,0,388,16,Durham,Western JL WTP (Small)
+0,0,388,23,Raleigh,Reallocate Falls Lake
+0,0,388,33,Durham,Western JL WTP (Large)
+0,0,388,48,Raleigh,Neuse River Intake
+0,0,389,16,Durham,Western JL WTP (Small)
+0,0,389,23,Raleigh,Reallocate Falls Lake
+0,0,389,33,Durham,Western JL WTP (Large)
+0,0,389,48,Raleigh,Neuse River Intake
+0,0,390,16,Durham,Western JL WTP (Small)
+0,0,390,23,Raleigh,Reallocate Falls Lake
+0,0,390,33,Durham,Western JL WTP (Large)
+0,0,390,48,Raleigh,Neuse River Intake
+0,0,391,16,Durham,Western JL WTP (Small)
+0,0,391,23,Raleigh,Reallocate Falls Lake
+0,0,391,33,Durham,Western JL WTP (Large)
+0,0,391,44,Raleigh,Neuse River Intake
+0,0,392,16,Durham,Western JL WTP (Small)
+0,0,392,23,Raleigh,Reallocate Falls Lake
+0,0,392,33,Durham,Western JL WTP (Large)
+0,0,392,45,Raleigh,Neuse River Intake
+0,0,393,16,Durham,Western JL WTP (Small)
+0,0,393,23,Raleigh,Reallocate Falls Lake
+0,0,393,33,Durham,Western JL WTP (Large)
+0,0,393,45,Raleigh,Neuse River Intake
+0,0,394,16,Durham,Western JL WTP (Small)
+0,0,394,23,Raleigh,Reallocate Falls Lake
+0,0,394,33,Durham,Western JL WTP (Large)
+0,0,394,48,Raleigh,Neuse River Intake
+0,0,395,16,Durham,Western JL WTP (Small)
+0,0,395,23,Raleigh,Reallocate Falls Lake
+0,0,395,33,Durham,Western JL WTP (Large)
+0,0,396,16,Durham,Western JL WTP (Small)
+0,0,396,21,Raleigh,Reallocate Falls Lake
+0,0,396,33,Durham,Western JL WTP (Large)
+0,0,396,48,Raleigh,Neuse River Intake
+0,0,397,16,Durham,Western JL WTP (Small)
+0,0,397,23,Raleigh,Reallocate Falls Lake
+0,0,397,33,Durham,Western JL WTP (Large)
+0,0,397,45,Raleigh,Neuse River Intake
+0,0,398,16,Durham,Western JL WTP (Small)
+0,0,398,23,Raleigh,Reallocate Falls Lake
+0,0,398,33,Durham,Western JL WTP (Large)
+0,0,398,48,Raleigh,Neuse River Intake
+0,0,399,16,Durham,Western JL WTP (Small)
+0,0,399,23,Raleigh,Reallocate Falls Lake
+0,0,399,33,Durham,Western JL WTP (Large)
+0,0,399,48,Raleigh,Neuse River Intake
+0,0,400,16,Durham,Western JL WTP (Small)
+0,0,400,23,Raleigh,Reallocate Falls Lake
+0,0,400,33,Durham,Western JL WTP (Large)
+0,0,400,48,Raleigh,Neuse River Intake
+0,0,401,16,Durham,Western JL WTP (Small)
+0,0,401,23,Raleigh,Reallocate Falls Lake
+0,0,401,33,Durham,Western JL WTP (Large)
+0,0,402,16,Durham,Western JL WTP (Small)
+0,0,402,21,Raleigh,Reallocate Falls Lake
+0,0,402,33,Durham,Western JL WTP (Large)
+0,0,402,46,Raleigh,Neuse River Intake
+0,0,403,16,Durham,Western JL WTP (Small)
+0,0,403,23,Raleigh,Reallocate Falls Lake
+0,0,403,33,Durham,Western JL WTP (Large)
+0,0,404,16,Durham,Western JL WTP (Small)
+0,0,404,23,Raleigh,Reallocate Falls Lake
+0,0,404,33,Durham,Western JL WTP (Large)
+0,0,404,50,Raleigh,Neuse River Intake
+0,0,405,16,Durham,Western JL WTP (Small)
+0,0,405,17,Raleigh,Reallocate Falls Lake
+0,0,405,33,Durham,Western JL WTP (Large)
+0,0,405,33,Raleigh,Neuse River Intake
+0,0,406,16,Durham,Western JL WTP (Small)
+0,0,406,23,Raleigh,Reallocate Falls Lake
+0,0,406,33,Durham,Western JL WTP (Large)
+0,0,406,48,Raleigh,Neuse River Intake
+0,0,407,16,Durham,Western JL WTP (Small)
+0,0,407,23,Raleigh,Reallocate Falls Lake
+0,0,407,33,Durham,Western JL WTP (Large)
+0,0,407,46,Raleigh,Neuse River Intake
+0,0,408,16,Durham,Western JL WTP (Small)
+0,0,408,23,Raleigh,Reallocate Falls Lake
+0,0,408,33,Durham,Western JL WTP (Large)
+0,0,408,50,Raleigh,Neuse River Intake
+0,0,409,16,Durham,Western JL WTP (Small)
+0,0,409,23,Raleigh,Reallocate Falls Lake
+0,0,409,33,Durham,Western JL WTP (Large)
+0,0,409,48,Raleigh,Neuse River Intake
+0,0,410,16,Durham,Western JL WTP (Small)
+0,0,410,22,Raleigh,Reallocate Falls Lake
+0,0,410,33,Durham,Western JL WTP (Large)
+0,0,410,47,Raleigh,Neuse River Intake
+0,0,411,16,Durham,Western JL WTP (Small)
+0,0,411,23,Raleigh,Reallocate Falls Lake
+0,0,411,33,Durham,Western JL WTP (Large)
+0,0,411,43,Raleigh,Neuse River Intake
+0,0,412,16,Durham,Western JL WTP (Small)
+0,0,412,23,Raleigh,Reallocate Falls Lake
+0,0,412,33,Durham,Western JL WTP (Large)
+0,0,413,16,Durham,Western JL WTP (Small)
+0,0,413,21,Raleigh,Reallocate Falls Lake
+0,0,413,33,Durham,Western JL WTP (Large)
+0,0,413,46,Raleigh,Neuse River Intake
+0,0,414,16,Durham,Western JL WTP (Small)
+0,0,414,23,Raleigh,Reallocate Falls Lake
+0,0,414,33,Durham,Western JL WTP (Large)
+0,0,415,16,Durham,Western JL WTP (Small)
+0,0,415,23,Raleigh,Reallocate Falls Lake
+0,0,415,33,Durham,Western JL WTP (Large)
+0,0,416,16,Durham,Western JL WTP (Small)
+0,0,416,21,Raleigh,Reallocate Falls Lake
+0,0,416,33,Durham,Western JL WTP (Large)
+0,0,416,45,Raleigh,Neuse River Intake
+0,0,417,16,Durham,Western JL WTP (Small)
+0,0,417,23,Raleigh,Reallocate Falls Lake
+0,0,417,33,Durham,Western JL WTP (Large)
+0,0,418,16,Durham,Western JL WTP (Small)
+0,0,418,23,Raleigh,Reallocate Falls Lake
+0,0,418,33,Durham,Western JL WTP (Large)
+0,0,418,46,Raleigh,Neuse River Intake
+0,0,419,16,Durham,Western JL WTP (Small)
+0,0,419,23,Raleigh,Reallocate Falls Lake
+0,0,419,33,Durham,Western JL WTP (Large)
+0,0,419,37,Raleigh,Neuse River Intake
+0,0,420,16,Durham,Western JL WTP (Small)
+0,0,420,23,Raleigh,Reallocate Falls Lake
+0,0,420,33,Durham,Western JL WTP (Large)
+0,0,420,46,Raleigh,Neuse River Intake
+0,0,421,16,Durham,Western JL WTP (Small)
+0,0,421,23,Raleigh,Reallocate Falls Lake
+0,0,421,33,Durham,Western JL WTP (Large)
+0,0,421,50,Raleigh,Neuse River Intake
+0,0,422,16,Durham,Western JL WTP (Small)
+0,0,422,23,Raleigh,Reallocate Falls Lake
+0,0,422,33,Durham,Western JL WTP (Large)
+0,0,422,50,Raleigh,Neuse River Intake
+0,0,423,16,Durham,Western JL WTP (Small)
+0,0,423,23,Raleigh,Reallocate Falls Lake
+0,0,423,33,Durham,Western JL WTP (Large)
+0,0,423,50,Raleigh,Neuse River Intake
+0,0,424,16,Durham,Western JL WTP (Small)
+0,0,424,23,Raleigh,Reallocate Falls Lake
+0,0,424,33,Durham,Western JL WTP (Large)
+0,0,424,51,Raleigh,Neuse River Intake
+0,0,425,16,Durham,Western JL WTP (Small)
+0,0,425,23,Raleigh,Reallocate Falls Lake
+0,0,425,33,Durham,Western JL WTP (Large)
+0,0,425,48,Raleigh,Neuse River Intake
+0,0,426,16,Durham,Western JL WTP (Small)
+0,0,426,23,Raleigh,Reallocate Falls Lake
+0,0,426,33,Durham,Western JL WTP (Large)
+0,0,426,46,Raleigh,Neuse River Intake
+0,0,427,16,Durham,Western JL WTP (Small)
+0,0,427,23,Raleigh,Reallocate Falls Lake
+0,0,427,33,Durham,Western JL WTP (Large)
+0,0,428,16,Durham,Western JL WTP (Small)
+0,0,428,21,Raleigh,Reallocate Falls Lake
+0,0,428,33,Durham,Western JL WTP (Large)
+0,0,428,37,Raleigh,Neuse River Intake
+0,0,429,16,Durham,Western JL WTP (Small)
+0,0,429,23,Raleigh,Reallocate Falls Lake
+0,0,429,33,Durham,Western JL WTP (Large)
+0,0,429,48,Raleigh,Neuse River Intake
+0,0,430,16,Durham,Western JL WTP (Small)
+0,0,430,23,Raleigh,Reallocate Falls Lake
+0,0,430,33,Durham,Western JL WTP (Large)
+0,0,430,48,Raleigh,Neuse River Intake
+0,0,431,16,Durham,Western JL WTP (Small)
+0,0,431,21,Raleigh,Reallocate Falls Lake
+0,0,431,33,Durham,Western JL WTP (Large)
+0,0,431,48,Raleigh,Neuse River Intake
+0,0,432,16,Durham,Western JL WTP (Small)
+0,0,432,23,Raleigh,Reallocate Falls Lake
+0,0,432,33,Durham,Western JL WTP (Large)
+0,0,433,16,Durham,Western JL WTP (Small)
+0,0,433,23,Raleigh,Reallocate Falls Lake
+0,0,433,33,Durham,Western JL WTP (Large)
+0,0,434,16,Durham,Western JL WTP (Small)
+0,0,434,23,Raleigh,Reallocate Falls Lake
+0,0,434,33,Durham,Western JL WTP (Large)
+0,0,434,47,Raleigh,Neuse River Intake
+0,0,435,16,Durham,Western JL WTP (Small)
+0,0,435,23,Raleigh,Reallocate Falls Lake
+0,0,435,33,Durham,Western JL WTP (Large)
+0,0,435,48,Raleigh,Neuse River Intake
+0,0,436,16,Durham,Western JL WTP (Small)
+0,0,436,23,Raleigh,Reallocate Falls Lake
+0,0,436,33,Durham,Western JL WTP (Large)
+0,0,436,46,Raleigh,Neuse River Intake
+0,0,437,16,Durham,Western JL WTP (Small)
+0,0,437,23,Raleigh,Reallocate Falls Lake
+0,0,437,33,Durham,Western JL WTP (Large)
+0,0,437,48,Raleigh,Neuse River Intake
+0,0,438,16,Durham,Western JL WTP (Small)
+0,0,438,23,Raleigh,Reallocate Falls Lake
+0,0,438,33,Durham,Western JL WTP (Large)
+0,0,439,16,Durham,Western JL WTP (Small)
+0,0,439,23,Raleigh,Reallocate Falls Lake
+0,0,439,33,Durham,Western JL WTP (Large)
+0,0,439,47,Raleigh,Neuse River Intake
+0,0,440,16,Durham,Western JL WTP (Small)
+0,0,440,21,Raleigh,Reallocate Falls Lake
+0,0,440,33,Durham,Western JL WTP (Large)
+0,0,440,48,Raleigh,Neuse River Intake
+0,0,441,16,Durham,Western JL WTP (Small)
+0,0,441,23,Raleigh,Reallocate Falls Lake
+0,0,441,33,Durham,Western JL WTP (Large)
+0,0,441,48,Raleigh,Neuse River Intake
+0,0,442,16,Durham,Western JL WTP (Small)
+0,0,442,22,Raleigh,Reallocate Falls Lake
+0,0,442,33,Durham,Western JL WTP (Large)
+0,0,442,48,Raleigh,Neuse River Intake
+0,0,443,16,Durham,Western JL WTP (Small)
+0,0,443,23,Raleigh,Reallocate Falls Lake
+0,0,443,33,Durham,Western JL WTP (Large)
+0,0,444,16,Durham,Western JL WTP (Small)
+0,0,444,23,Raleigh,Reallocate Falls Lake
+0,0,444,33,Durham,Western JL WTP (Large)
+0,0,444,48,Raleigh,Neuse River Intake
+0,0,445,16,Durham,Western JL WTP (Small)
+0,0,445,23,Raleigh,Reallocate Falls Lake
+0,0,445,33,Durham,Western JL WTP (Large)
+0,0,446,16,Durham,Western JL WTP (Small)
+0,0,446,23,Raleigh,Reallocate Falls Lake
+0,0,446,33,Durham,Western JL WTP (Large)
+0,0,446,49,Raleigh,Neuse River Intake
+0,0,447,16,Durham,Western JL WTP (Small)
+0,0,447,23,Raleigh,Reallocate Falls Lake
+0,0,447,33,Durham,Western JL WTP (Large)
+0,0,447,47,Raleigh,Neuse River Intake
+0,0,448,16,Durham,Western JL WTP (Small)
+0,0,448,23,Raleigh,Reallocate Falls Lake
+0,0,448,33,Durham,Western JL WTP (Large)
+0,0,448,50,Raleigh,Neuse River Intake
+0,0,449,16,Durham,Western JL WTP (Small)
+0,0,449,23,Raleigh,Reallocate Falls Lake
+0,0,449,33,Durham,Western JL WTP (Large)
+0,0,450,16,Durham,Western JL WTP (Small)
+0,0,450,21,Raleigh,Reallocate Falls Lake
+0,0,450,33,Durham,Western JL WTP (Large)
+0,0,450,45,Raleigh,Neuse River Intake
+0,0,451,16,Durham,Western JL WTP (Small)
+0,0,451,23,Raleigh,Reallocate Falls Lake
+0,0,451,33,Durham,Western JL WTP (Large)
+0,0,452,16,Durham,Western JL WTP (Small)
+0,0,452,23,Raleigh,Reallocate Falls Lake
+0,0,452,33,Durham,Western JL WTP (Large)
+0,0,452,43,Raleigh,Neuse River Intake
+0,0,453,16,Durham,Western JL WTP (Small)
+0,0,453,23,Raleigh,Reallocate Falls Lake
+0,0,453,33,Durham,Western JL WTP (Large)
+0,0,454,16,Durham,Western JL WTP (Small)
+0,0,454,23,Raleigh,Reallocate Falls Lake
+0,0,454,33,Durham,Western JL WTP (Large)
+0,0,454,49,Raleigh,Neuse River Intake
+0,0,455,16,Durham,Western JL WTP (Small)
+0,0,455,23,Raleigh,Reallocate Falls Lake
+0,0,455,33,Durham,Western JL WTP (Large)
+0,0,455,48,Raleigh,Neuse River Intake
+0,0,456,16,Durham,Western JL WTP (Small)
+0,0,456,23,Raleigh,Reallocate Falls Lake
+0,0,456,33,Durham,Western JL WTP (Large)
+0,0,456,47,Raleigh,Neuse River Intake
+0,0,457,16,Durham,Western JL WTP (Small)
+0,0,457,23,Raleigh,Reallocate Falls Lake
+0,0,457,33,Durham,Western JL WTP (Large)
+0,0,457,44,Raleigh,Neuse River Intake
+0,0,458,16,Durham,Western JL WTP (Small)
+0,0,458,21,Raleigh,Reallocate Falls Lake
+0,0,458,33,Durham,Western JL WTP (Large)
+0,0,458,48,Raleigh,Neuse River Intake
+0,0,459,16,Durham,Western JL WTP (Small)
+0,0,459,22,Raleigh,Reallocate Falls Lake
+0,0,459,33,Durham,Western JL WTP (Large)
+0,0,459,41,Raleigh,Neuse River Intake
+0,0,460,16,Durham,Western JL WTP (Small)
+0,0,460,23,Raleigh,Reallocate Falls Lake
+0,0,460,33,Durham,Western JL WTP (Large)
+0,0,460,49,Raleigh,Neuse River Intake
+0,0,461,16,Durham,Western JL WTP (Small)
+0,0,461,23,Raleigh,Reallocate Falls Lake
+0,0,461,33,Durham,Western JL WTP (Large)
+0,0,461,48,Raleigh,Neuse River Intake
+0,0,462,16,Durham,Western JL WTP (Small)
+0,0,462,23,Raleigh,Reallocate Falls Lake
+0,0,462,33,Durham,Western JL WTP (Large)
+0,0,463,16,Durham,Western JL WTP (Small)
+0,0,463,21,Raleigh,Reallocate Falls Lake
+0,0,463,33,Durham,Western JL WTP (Large)
+0,0,463,39,Raleigh,Neuse River Intake
+0,0,464,16,Durham,Western JL WTP (Small)
+0,0,464,23,Raleigh,Reallocate Falls Lake
+0,0,464,33,Durham,Western JL WTP (Large)
+0,0,464,46,Raleigh,Neuse River Intake
+0,0,465,16,Durham,Western JL WTP (Small)
+0,0,465,22,Raleigh,Reallocate Falls Lake
+0,0,465,33,Durham,Western JL WTP (Large)
+0,0,465,42,Raleigh,Neuse River Intake
+0,0,466,16,Durham,Western JL WTP (Small)
+0,0,466,23,Raleigh,Reallocate Falls Lake
+0,0,466,33,Durham,Western JL WTP (Large)
+0,0,466,43,Raleigh,Neuse River Intake
+0,0,467,16,Durham,Western JL WTP (Small)
+0,0,467,21,Raleigh,Reallocate Falls Lake
+0,0,467,33,Durham,Western JL WTP (Large)
+0,0,467,48,Raleigh,Neuse River Intake
+0,0,468,16,Durham,Western JL WTP (Small)
+0,0,468,23,Raleigh,Reallocate Falls Lake
+0,0,468,33,Durham,Western JL WTP (Large)
+0,0,469,16,Durham,Western JL WTP (Small)
+0,0,469,23,Raleigh,Reallocate Falls Lake
+0,0,469,33,Durham,Western JL WTP (Large)
+0,0,469,48,Raleigh,Neuse River Intake
+0,0,470,16,Durham,Western JL WTP (Small)
+0,0,470,23,Raleigh,Reallocate Falls Lake
+0,0,470,33,Durham,Western JL WTP (Large)
+0,0,470,45,Raleigh,Neuse River Intake
+0,0,471,16,Durham,Western JL WTP (Small)
+0,0,471,23,Raleigh,Reallocate Falls Lake
+0,0,471,33,Durham,Western JL WTP (Large)
+0,0,472,16,Durham,Western JL WTP (Small)
+0,0,472,23,Raleigh,Reallocate Falls Lake
+0,0,472,33,Durham,Western JL WTP (Large)
+0,0,472,49,Raleigh,Neuse River Intake
+0,0,473,16,Durham,Western JL WTP (Small)
+0,0,473,23,Raleigh,Reallocate Falls Lake
+0,0,473,33,Durham,Western JL WTP (Large)
+0,0,474,16,Durham,Western JL WTP (Small)
+0,0,474,23,Raleigh,Reallocate Falls Lake
+0,0,474,33,Durham,Western JL WTP (Large)
+0,0,474,48,Raleigh,Neuse River Intake
+0,0,475,16,Durham,Western JL WTP (Small)
+0,0,475,23,Raleigh,Reallocate Falls Lake
+0,0,475,33,Durham,Western JL WTP (Large)
+0,0,475,48,Raleigh,Neuse River Intake
+0,0,476,16,Durham,Western JL WTP (Small)
+0,0,476,23,Raleigh,Reallocate Falls Lake
+0,0,476,33,Durham,Western JL WTP (Large)
+0,0,477,16,Durham,Western JL WTP (Small)
+0,0,477,23,Raleigh,Reallocate Falls Lake
+0,0,477,33,Durham,Western JL WTP (Large)
+0,0,477,48,Raleigh,Neuse River Intake
+0,0,478,16,Durham,Western JL WTP (Small)
+0,0,478,21,Raleigh,Reallocate Falls Lake
+0,0,478,33,Durham,Western JL WTP (Large)
+0,0,478,48,Raleigh,Neuse River Intake
+0,0,479,16,Durham,Western JL WTP (Small)
+0,0,479,21,Raleigh,Reallocate Falls Lake
+0,0,479,33,Durham,Western JL WTP (Large)
+0,0,479,40,Raleigh,Neuse River Intake
+0,0,480,16,Durham,Western JL WTP (Small)
+0,0,480,23,Raleigh,Reallocate Falls Lake
+0,0,480,33,Durham,Western JL WTP (Large)
+0,0,480,48,Raleigh,Neuse River Intake
+0,0,481,16,Durham,Western JL WTP (Small)
+0,0,481,23,Raleigh,Reallocate Falls Lake
+0,0,481,33,Durham,Western JL WTP (Large)
+0,0,481,44,Raleigh,Neuse River Intake
+0,0,482,16,Durham,Western JL WTP (Small)
+0,0,482,23,Raleigh,Reallocate Falls Lake
+0,0,482,33,Durham,Western JL WTP (Large)
+0,0,482,48,Raleigh,Neuse River Intake
+0,0,483,16,Durham,Western JL WTP (Small)
+0,0,483,23,Raleigh,Reallocate Falls Lake
+0,0,483,33,Durham,Western JL WTP (Large)
+0,0,483,48,Raleigh,Neuse River Intake
+0,0,484,16,Durham,Western JL WTP (Small)
+0,0,484,23,Raleigh,Reallocate Falls Lake
+0,0,484,33,Durham,Western JL WTP (Large)
+0,0,485,16,Durham,Western JL WTP (Small)
+0,0,485,23,Raleigh,Reallocate Falls Lake
+0,0,485,33,Durham,Western JL WTP (Large)
+0,0,485,48,Raleigh,Neuse River Intake
+0,0,486,16,Durham,Western JL WTP (Small)
+0,0,486,23,Raleigh,Reallocate Falls Lake
+0,0,486,33,Durham,Western JL WTP (Large)
+0,0,486,48,Raleigh,Neuse River Intake
+0,0,487,16,Durham,Western JL WTP (Small)
+0,0,487,23,Raleigh,Reallocate Falls Lake
+0,0,487,33,Durham,Western JL WTP (Large)
+0,0,487,49,Raleigh,Neuse River Intake
+0,0,488,16,Durham,Western JL WTP (Small)
+0,0,488,23,Raleigh,Reallocate Falls Lake
+0,0,488,33,Durham,Western JL WTP (Large)
+0,0,488,48,Raleigh,Neuse River Intake
+0,0,489,16,Durham,Western JL WTP (Small)
+0,0,489,23,Raleigh,Reallocate Falls Lake
+0,0,489,33,Durham,Western JL WTP (Large)
+0,0,489,52,Raleigh,Neuse River Intake
+0,0,490,16,Durham,Western JL WTP (Small)
+0,0,490,23,Raleigh,Reallocate Falls Lake
+0,0,490,33,Durham,Western JL WTP (Large)
+0,0,490,50,Raleigh,Neuse River Intake
+0,0,491,16,Durham,Western JL WTP (Small)
+0,0,491,23,Raleigh,Reallocate Falls Lake
+0,0,491,33,Durham,Western JL WTP (Large)
+0,0,491,45,Raleigh,Neuse River Intake
+0,0,492,16,Durham,Western JL WTP (Small)
+0,0,492,23,Raleigh,Reallocate Falls Lake
+0,0,492,33,Durham,Western JL WTP (Large)
+0,0,493,16,Durham,Western JL WTP (Small)
+0,0,493,23,Raleigh,Reallocate Falls Lake
+0,0,493,33,Durham,Western JL WTP (Large)
+0,0,494,16,Durham,Western JL WTP (Small)
+0,0,494,23,Raleigh,Reallocate Falls Lake
+0,0,494,33,Durham,Western JL WTP (Large)
+0,0,494,45,Raleigh,Neuse River Intake
+0,0,495,16,Durham,Western JL WTP (Small)
+0,0,495,23,Raleigh,Reallocate Falls Lake
+0,0,495,33,Durham,Western JL WTP (Large)
+0,0,495,48,Raleigh,Neuse River Intake
+0,0,496,16,Durham,Western JL WTP (Small)
+0,0,496,23,Raleigh,Reallocate Falls Lake
+0,0,496,33,Durham,Western JL WTP (Large)
+0,0,497,16,Durham,Western JL WTP (Small)
+0,0,497,23,Raleigh,Reallocate Falls Lake
+0,0,497,33,Durham,Western JL WTP (Large)
+0,0,497,48,Raleigh,Neuse River Intake
+0,0,498,16,Durham,Western JL WTP (Small)
+0,0,498,23,Raleigh,Reallocate Falls Lake
+0,0,498,33,Durham,Western JL WTP (Large)
+0,0,498,48,Raleigh,Neuse River Intake
+0,0,499,16,Durham,Western JL WTP (Small)
+0,0,499,23,Raleigh,Reallocate Falls Lake
+0,0,499,33,Durham,Western JL WTP (Large)
+0,0,499,48,Raleigh,Neuse River Intake
+0,0,500,16,Durham,Western JL WTP (Small)
+0,0,500,23,Raleigh,Reallocate Falls Lake
+0,0,500,33,Durham,Western JL WTP (Large)
+0,0,500,48,Raleigh,Neuse River Intake
+0,0,501,16,Durham,Western JL WTP (Small)
+0,0,501,23,Raleigh,Reallocate Falls Lake
+0,0,501,33,Durham,Western JL WTP (Large)
+0,0,501,45,Raleigh,Neuse River Intake
+0,0,502,16,Durham,Western JL WTP (Small)
+0,0,502,23,Raleigh,Reallocate Falls Lake
+0,0,502,33,Durham,Western JL WTP (Large)
+0,0,503,16,Durham,Western JL WTP (Small)
+0,0,503,21,Raleigh,Reallocate Falls Lake
+0,0,503,33,Durham,Western JL WTP (Large)
+0,0,503,42,Raleigh,Neuse River Intake
+0,0,504,16,Durham,Western JL WTP (Small)
+0,0,504,23,Raleigh,Reallocate Falls Lake
+0,0,504,33,Durham,Western JL WTP (Large)
+0,0,504,48,Raleigh,Neuse River Intake
+0,0,505,16,Durham,Western JL WTP (Small)
+0,0,505,23,Raleigh,Reallocate Falls Lake
+0,0,505,33,Durham,Western JL WTP (Large)
+0,0,506,16,Durham,Western JL WTP (Small)
+0,0,506,23,Raleigh,Reallocate Falls Lake
+0,0,506,33,Durham,Western JL WTP (Large)
+0,0,506,48,Raleigh,Neuse River Intake
+0,0,507,16,Durham,Western JL WTP (Small)
+0,0,507,23,Raleigh,Reallocate Falls Lake
+0,0,507,33,Durham,Western JL WTP (Large)
+0,0,507,48,Raleigh,Neuse River Intake
+0,0,508,16,Durham,Western JL WTP (Small)
+0,0,508,23,Raleigh,Reallocate Falls Lake
+0,0,508,33,Durham,Western JL WTP (Large)
+0,0,508,48,Raleigh,Neuse River Intake
+0,0,509,16,Durham,Western JL WTP (Small)
+0,0,509,22,Raleigh,Reallocate Falls Lake
+0,0,509,33,Durham,Western JL WTP (Large)
+0,0,509,39,Raleigh,Neuse River Intake
+0,0,510,16,Durham,Western JL WTP (Small)
+0,0,510,21,Raleigh,Reallocate Falls Lake
+0,0,510,33,Durham,Western JL WTP (Large)
+0,0,510,39,Raleigh,Neuse River Intake
+0,0,511,16,Durham,Western JL WTP (Small)
+0,0,511,21,Raleigh,Reallocate Falls Lake
+0,0,511,33,Durham,Western JL WTP (Large)
+0,0,511,48,Raleigh,Neuse River Intake
+0,0,512,16,Durham,Western JL WTP (Small)
+0,0,512,23,Raleigh,Reallocate Falls Lake
+0,0,512,33,Durham,Western JL WTP (Large)
+0,0,512,48,Raleigh,Neuse River Intake
+0,0,513,16,Durham,Western JL WTP (Small)
+0,0,513,23,Raleigh,Reallocate Falls Lake
+0,0,513,33,Durham,Western JL WTP (Large)
+0,0,513,48,Raleigh,Neuse River Intake
+0,0,514,16,Durham,Western JL WTP (Small)
+0,0,514,23,Raleigh,Reallocate Falls Lake
+0,0,514,33,Durham,Western JL WTP (Large)
+0,0,514,48,Raleigh,Neuse River Intake
+0,0,515,16,Durham,Western JL WTP (Small)
+0,0,515,21,Raleigh,Reallocate Falls Lake
+0,0,515,33,Durham,Western JL WTP (Large)
+0,0,515,48,Raleigh,Neuse River Intake
+0,0,516,16,Durham,Western JL WTP (Small)
+0,0,516,23,Raleigh,Reallocate Falls Lake
+0,0,516,33,Durham,Western JL WTP (Large)
+0,0,516,46,Raleigh,Neuse River Intake
+0,0,517,16,Durham,Western JL WTP (Small)
+0,0,517,23,Raleigh,Reallocate Falls Lake
+0,0,517,33,Durham,Western JL WTP (Large)
+0,0,517,48,Raleigh,Neuse River Intake
+0,0,518,16,Durham,Western JL WTP (Small)
+0,0,518,23,Raleigh,Reallocate Falls Lake
+0,0,518,33,Durham,Western JL WTP (Large)
+0,0,519,16,Durham,Western JL WTP (Small)
+0,0,519,22,Raleigh,Reallocate Falls Lake
+0,0,519,33,Durham,Western JL WTP (Large)
+0,0,519,48,Raleigh,Neuse River Intake
+0,0,520,16,Durham,Western JL WTP (Small)
+0,0,520,23,Raleigh,Reallocate Falls Lake
+0,0,520,33,Durham,Western JL WTP (Large)
+0,0,520,43,Raleigh,Neuse River Intake
+0,0,521,16,Durham,Western JL WTP (Small)
+0,0,521,22,Raleigh,Reallocate Falls Lake
+0,0,521,33,Durham,Western JL WTP (Large)
+0,0,521,48,Raleigh,Neuse River Intake
+0,0,522,16,Durham,Western JL WTP (Small)
+0,0,522,22,Raleigh,Reallocate Falls Lake
+0,0,522,33,Durham,Western JL WTP (Large)
+0,0,522,43,Raleigh,Neuse River Intake
+0,0,523,16,Durham,Western JL WTP (Small)
+0,0,523,23,Raleigh,Reallocate Falls Lake
+0,0,523,33,Durham,Western JL WTP (Large)
+0,0,523,48,Raleigh,Neuse River Intake
+0,0,524,16,Durham,Western JL WTP (Small)
+0,0,524,23,Raleigh,Reallocate Falls Lake
+0,0,524,33,Durham,Western JL WTP (Large)
+0,0,524,48,Raleigh,Neuse River Intake
+0,0,525,16,Durham,Western JL WTP (Small)
+0,0,525,21,Raleigh,Reallocate Falls Lake
+0,0,525,33,Durham,Western JL WTP (Large)
+0,0,525,48,Raleigh,Neuse River Intake
+0,0,526,16,Durham,Western JL WTP (Small)
+0,0,526,23,Raleigh,Reallocate Falls Lake
+0,0,526,33,Durham,Western JL WTP (Large)
+0,0,527,16,Durham,Western JL WTP (Small)
+0,0,527,23,Raleigh,Reallocate Falls Lake
+0,0,527,33,Durham,Western JL WTP (Large)
+0,0,528,16,Durham,Western JL WTP (Small)
+0,0,528,23,Raleigh,Reallocate Falls Lake
+0,0,528,33,Durham,Western JL WTP (Large)
+0,0,529,16,Durham,Western JL WTP (Small)
+0,0,529,23,Raleigh,Reallocate Falls Lake
+0,0,529,33,Durham,Western JL WTP (Large)
+0,0,529,48,Raleigh,Neuse River Intake
+0,0,530,16,Durham,Western JL WTP (Small)
+0,0,530,23,Raleigh,Reallocate Falls Lake
+0,0,530,33,Durham,Western JL WTP (Large)
+0,0,530,49,Raleigh,Neuse River Intake
+0,0,531,16,Durham,Western JL WTP (Small)
+0,0,531,23,Raleigh,Reallocate Falls Lake
+0,0,531,33,Durham,Western JL WTP (Large)
+0,0,532,16,Durham,Western JL WTP (Small)
+0,0,532,23,Raleigh,Reallocate Falls Lake
+0,0,532,33,Durham,Western JL WTP (Large)
+0,0,532,48,Raleigh,Neuse River Intake
+0,0,533,16,Durham,Western JL WTP (Small)
+0,0,533,23,Raleigh,Reallocate Falls Lake
+0,0,533,33,Durham,Western JL WTP (Large)
+0,0,533,47,Raleigh,Neuse River Intake
+0,0,534,16,Durham,Western JL WTP (Small)
+0,0,534,23,Raleigh,Reallocate Falls Lake
+0,0,534,33,Durham,Western JL WTP (Large)
+0,0,535,16,Durham,Western JL WTP (Small)
+0,0,535,23,Raleigh,Reallocate Falls Lake
+0,0,535,33,Durham,Western JL WTP (Large)
+0,0,535,48,Raleigh,Neuse River Intake
+0,0,536,16,Durham,Western JL WTP (Small)
+0,0,536,23,Raleigh,Reallocate Falls Lake
+0,0,536,33,Durham,Western JL WTP (Large)
+0,0,536,48,Raleigh,Neuse River Intake
+0,0,537,16,Durham,Western JL WTP (Small)
+0,0,537,23,Raleigh,Reallocate Falls Lake
+0,0,537,33,Durham,Western JL WTP (Large)
+0,0,537,48,Raleigh,Neuse River Intake
+0,0,538,16,Durham,Western JL WTP (Small)
+0,0,538,23,Raleigh,Reallocate Falls Lake
+0,0,538,33,Durham,Western JL WTP (Large)
+0,0,538,48,Raleigh,Neuse River Intake
+0,0,539,16,Durham,Western JL WTP (Small)
+0,0,539,23,Raleigh,Reallocate Falls Lake
+0,0,539,33,Durham,Western JL WTP (Large)
+0,0,539,45,Raleigh,Neuse River Intake
+0,0,540,16,Durham,Western JL WTP (Small)
+0,0,540,23,Raleigh,Reallocate Falls Lake
+0,0,540,33,Durham,Western JL WTP (Large)
+0,0,541,16,Durham,Western JL WTP (Small)
+0,0,541,21,Raleigh,Reallocate Falls Lake
+0,0,541,33,Durham,Western JL WTP (Large)
+0,0,541,48,Raleigh,Neuse River Intake
+0,0,542,16,Durham,Western JL WTP (Small)
+0,0,542,23,Raleigh,Reallocate Falls Lake
+0,0,542,33,Durham,Western JL WTP (Large)
+0,0,543,16,Durham,Western JL WTP (Small)
+0,0,543,23,Raleigh,Reallocate Falls Lake
+0,0,543,33,Durham,Western JL WTP (Large)
+0,0,544,16,Durham,Western JL WTP (Small)
+0,0,544,23,Raleigh,Reallocate Falls Lake
+0,0,544,33,Durham,Western JL WTP (Large)
+0,0,544,50,Raleigh,Neuse River Intake
+0,0,545,16,Durham,Western JL WTP (Small)
+0,0,545,23,Raleigh,Reallocate Falls Lake
+0,0,545,33,Durham,Western JL WTP (Large)
+0,0,545,48,Raleigh,Neuse River Intake
+0,0,546,16,Durham,Western JL WTP (Small)
+0,0,546,23,Raleigh,Reallocate Falls Lake
+0,0,546,33,Durham,Western JL WTP (Large)
+0,0,546,50,Raleigh,Neuse River Intake
+0,0,547,16,Durham,Western JL WTP (Small)
+0,0,547,21,Raleigh,Reallocate Falls Lake
+0,0,547,33,Durham,Western JL WTP (Large)
+0,0,547,44,Raleigh,Neuse River Intake
+0,0,548,16,Durham,Western JL WTP (Small)
+0,0,548,23,Raleigh,Reallocate Falls Lake
+0,0,548,33,Durham,Western JL WTP (Large)
+0,0,549,16,Durham,Western JL WTP (Small)
+0,0,549,23,Raleigh,Reallocate Falls Lake
+0,0,549,33,Durham,Western JL WTP (Large)
+0,0,549,47,Raleigh,Neuse River Intake
+0,0,550,16,Durham,Western JL WTP (Small)
+0,0,550,23,Raleigh,Reallocate Falls Lake
+0,0,550,33,Durham,Western JL WTP (Large)
+0,0,550,48,Raleigh,Neuse River Intake
+0,0,551,16,Durham,Western JL WTP (Small)
+0,0,551,21,Raleigh,Reallocate Falls Lake
+0,0,551,33,Durham,Western JL WTP (Large)
+0,0,551,39,Raleigh,Neuse River Intake
+0,0,552,16,Durham,Western JL WTP (Small)
+0,0,552,23,Raleigh,Reallocate Falls Lake
+0,0,552,33,Durham,Western JL WTP (Large)
+0,0,553,16,Durham,Western JL WTP (Small)
+0,0,553,23,Raleigh,Reallocate Falls Lake
+0,0,553,33,Durham,Western JL WTP (Large)
+0,0,553,48,Raleigh,Neuse River Intake
+0,0,554,16,Durham,Western JL WTP (Small)
+0,0,554,23,Raleigh,Reallocate Falls Lake
+0,0,554,33,Durham,Western JL WTP (Large)
+0,0,554,50,Raleigh,Neuse River Intake
+0,0,555,16,Durham,Western JL WTP (Small)
+0,0,555,23,Raleigh,Reallocate Falls Lake
+0,0,555,33,Durham,Western JL WTP (Large)
+0,0,555,52,Raleigh,Neuse River Intake
+0,0,556,16,Durham,Western JL WTP (Small)
+0,0,556,23,Raleigh,Reallocate Falls Lake
+0,0,556,33,Durham,Western JL WTP (Large)
+0,0,557,16,Durham,Western JL WTP (Small)
+0,0,557,23,Raleigh,Reallocate Falls Lake
+0,0,557,33,Durham,Western JL WTP (Large)
+0,0,558,16,Durham,Western JL WTP (Small)
+0,0,558,23,Raleigh,Reallocate Falls Lake
+0,0,558,33,Durham,Western JL WTP (Large)
+0,0,558,48,Raleigh,Neuse River Intake
+0,0,559,16,Durham,Western JL WTP (Small)
+0,0,559,21,Raleigh,Reallocate Falls Lake
+0,0,559,33,Durham,Western JL WTP (Large)
+0,0,559,48,Raleigh,Neuse River Intake
+0,0,560,16,Durham,Western JL WTP (Small)
+0,0,560,23,Raleigh,Reallocate Falls Lake
+0,0,560,33,Durham,Western JL WTP (Large)
+0,0,560,48,Raleigh,Neuse River Intake
+0,0,561,16,Durham,Western JL WTP (Small)
+0,0,561,23,Raleigh,Reallocate Falls Lake
+0,0,561,33,Durham,Western JL WTP (Large)
+0,0,561,42,Raleigh,Neuse River Intake
+0,0,562,16,Durham,Western JL WTP (Small)
+0,0,562,23,Raleigh,Reallocate Falls Lake
+0,0,562,33,Durham,Western JL WTP (Large)
+0,0,562,49,Raleigh,Neuse River Intake
+0,0,563,16,Durham,Western JL WTP (Small)
+0,0,563,23,Raleigh,Reallocate Falls Lake
+0,0,563,33,Durham,Western JL WTP (Large)
+0,0,563,48,Raleigh,Neuse River Intake
+0,0,564,16,Durham,Western JL WTP (Small)
+0,0,564,23,Raleigh,Reallocate Falls Lake
+0,0,564,33,Durham,Western JL WTP (Large)
+0,0,565,16,Durham,Western JL WTP (Small)
+0,0,565,23,Raleigh,Reallocate Falls Lake
+0,0,565,33,Durham,Western JL WTP (Large)
+0,0,566,16,Durham,Western JL WTP (Small)
+0,0,566,23,Raleigh,Reallocate Falls Lake
+0,0,566,33,Durham,Western JL WTP (Large)
+0,0,567,16,Durham,Western JL WTP (Small)
+0,0,567,20,Raleigh,Reallocate Falls Lake
+0,0,567,33,Durham,Western JL WTP (Large)
+0,0,567,38,Raleigh,Neuse River Intake
+0,0,568,16,Durham,Western JL WTP (Small)
+0,0,568,23,Raleigh,Reallocate Falls Lake
+0,0,568,33,Durham,Western JL WTP (Large)
+0,0,569,16,Durham,Western JL WTP (Small)
+0,0,569,23,Raleigh,Reallocate Falls Lake
+0,0,569,33,Durham,Western JL WTP (Large)
+0,0,569,48,Raleigh,Neuse River Intake
+0,0,570,16,Durham,Western JL WTP (Small)
+0,0,570,23,Raleigh,Reallocate Falls Lake
+0,0,570,33,Durham,Western JL WTP (Large)
+0,0,571,16,Durham,Western JL WTP (Small)
+0,0,571,23,Raleigh,Reallocate Falls Lake
+0,0,571,33,Durham,Western JL WTP (Large)
+0,0,571,45,Raleigh,Neuse River Intake
+0,0,572,16,Durham,Western JL WTP (Small)
+0,0,572,23,Raleigh,Reallocate Falls Lake
+0,0,572,33,Durham,Western JL WTP (Large)
+0,0,572,49,Raleigh,Neuse River Intake
+0,0,573,16,Durham,Western JL WTP (Small)
+0,0,573,23,Raleigh,Reallocate Falls Lake
+0,0,573,33,Durham,Western JL WTP (Large)
+0,0,574,16,Durham,Western JL WTP (Small)
+0,0,574,23,Raleigh,Reallocate Falls Lake
+0,0,574,33,Durham,Western JL WTP (Large)
+0,0,574,39,Raleigh,Neuse River Intake
+0,0,575,16,Durham,Western JL WTP (Small)
+0,0,575,23,Raleigh,Reallocate Falls Lake
+0,0,575,33,Durham,Western JL WTP (Large)
+0,0,575,48,Raleigh,Neuse River Intake
+0,0,576,16,Durham,Western JL WTP (Small)
+0,0,576,23,Raleigh,Reallocate Falls Lake
+0,0,576,33,Durham,Western JL WTP (Large)
+0,0,576,48,Raleigh,Neuse River Intake
+0,0,577,16,Durham,Western JL WTP (Small)
+0,0,577,23,Raleigh,Reallocate Falls Lake
+0,0,577,33,Durham,Western JL WTP (Large)
+0,0,578,16,Durham,Western JL WTP (Small)
+0,0,578,21,Raleigh,Reallocate Falls Lake
+0,0,578,33,Durham,Western JL WTP (Large)
+0,0,578,41,Raleigh,Neuse River Intake
+0,0,579,16,Durham,Western JL WTP (Small)
+0,0,579,23,Raleigh,Reallocate Falls Lake
+0,0,579,33,Durham,Western JL WTP (Large)
+0,0,580,16,Durham,Western JL WTP (Small)
+0,0,580,23,Raleigh,Reallocate Falls Lake
+0,0,580,33,Durham,Western JL WTP (Large)
+0,0,580,52,Raleigh,Neuse River Intake
+0,0,581,16,Durham,Western JL WTP (Small)
+0,0,581,23,Raleigh,Reallocate Falls Lake
+0,0,581,33,Durham,Western JL WTP (Large)
+0,0,581,48,Raleigh,Neuse River Intake
+0,0,582,16,Durham,Western JL WTP (Small)
+0,0,582,23,Raleigh,Reallocate Falls Lake
+0,0,582,33,Durham,Western JL WTP (Large)
+0,0,582,52,Raleigh,Neuse River Intake
+0,0,583,16,Durham,Western JL WTP (Small)
+0,0,583,23,Raleigh,Reallocate Falls Lake
+0,0,583,33,Durham,Western JL WTP (Large)
+0,0,583,48,Raleigh,Neuse River Intake
+0,0,584,16,Durham,Western JL WTP (Small)
+0,0,584,23,Raleigh,Reallocate Falls Lake
+0,0,584,33,Durham,Western JL WTP (Large)
+0,0,584,48,Raleigh,Neuse River Intake
+0,0,585,16,Durham,Western JL WTP (Small)
+0,0,585,23,Raleigh,Reallocate Falls Lake
+0,0,585,33,Durham,Western JL WTP (Large)
+0,0,585,48,Raleigh,Neuse River Intake
+0,0,586,16,Durham,Western JL WTP (Small)
+0,0,586,23,Raleigh,Reallocate Falls Lake
+0,0,586,33,Durham,Western JL WTP (Large)
+0,0,586,44,Raleigh,Neuse River Intake
+0,0,587,16,Durham,Western JL WTP (Small)
+0,0,587,21,Raleigh,Reallocate Falls Lake
+0,0,587,33,Durham,Western JL WTP (Large)
+0,0,587,48,Raleigh,Neuse River Intake
+0,0,588,16,Durham,Western JL WTP (Small)
+0,0,588,23,Raleigh,Reallocate Falls Lake
+0,0,588,33,Durham,Western JL WTP (Large)
+0,0,588,49,Raleigh,Neuse River Intake
+0,0,589,16,Durham,Western JL WTP (Small)
+0,0,589,23,Raleigh,Reallocate Falls Lake
+0,0,589,33,Durham,Western JL WTP (Large)
+0,0,589,48,Raleigh,Neuse River Intake
+0,0,590,16,Durham,Western JL WTP (Small)
+0,0,590,23,Raleigh,Reallocate Falls Lake
+0,0,590,33,Durham,Western JL WTP (Large)
+0,0,591,16,Durham,Western JL WTP (Small)
+0,0,591,23,Raleigh,Reallocate Falls Lake
+0,0,591,33,Durham,Western JL WTP (Large)
+0,0,592,16,Durham,Western JL WTP (Small)
+0,0,592,23,Raleigh,Reallocate Falls Lake
+0,0,592,33,Durham,Western JL WTP (Large)
+0,0,593,16,Durham,Western JL WTP (Small)
+0,0,593,23,Raleigh,Reallocate Falls Lake
+0,0,593,33,Durham,Western JL WTP (Large)
+0,0,594,16,Durham,Western JL WTP (Small)
+0,0,594,23,Raleigh,Reallocate Falls Lake
+0,0,594,33,Durham,Western JL WTP (Large)
+0,0,595,16,Durham,Western JL WTP (Small)
+0,0,595,23,Raleigh,Reallocate Falls Lake
+0,0,595,33,Durham,Western JL WTP (Large)
+0,0,595,48,Raleigh,Neuse River Intake
+0,0,596,16,Durham,Western JL WTP (Small)
+0,0,596,23,Raleigh,Reallocate Falls Lake
+0,0,596,33,Durham,Western JL WTP (Large)
+0,0,597,16,Durham,Western JL WTP (Small)
+0,0,597,23,Raleigh,Reallocate Falls Lake
+0,0,597,33,Durham,Western JL WTP (Large)
+0,0,597,49,Raleigh,Neuse River Intake
+0,0,598,16,Durham,Western JL WTP (Small)
+0,0,598,23,Raleigh,Reallocate Falls Lake
+0,0,598,33,Durham,Western JL WTP (Large)
+0,0,599,16,Durham,Western JL WTP (Small)
+0,0,599,23,Raleigh,Reallocate Falls Lake
+0,0,599,33,Durham,Western JL WTP (Large)
+0,0,599,37,Raleigh,Neuse River Intake
+0,0,600,16,Durham,Western JL WTP (Small)
+0,0,600,23,Raleigh,Reallocate Falls Lake
+0,0,600,33,Durham,Western JL WTP (Large)
+0,0,601,16,Durham,Western JL WTP (Small)
+0,0,601,23,Raleigh,Reallocate Falls Lake
+0,0,601,33,Durham,Western JL WTP (Large)
+0,0,601,48,Raleigh,Neuse River Intake
+0,0,602,16,Durham,Western JL WTP (Small)
+0,0,602,23,Raleigh,Reallocate Falls Lake
+0,0,602,33,Durham,Western JL WTP (Large)
+0,0,602,49,Raleigh,Neuse River Intake
+0,0,603,16,Durham,Western JL WTP (Small)
+0,0,603,23,Raleigh,Reallocate Falls Lake
+0,0,603,33,Durham,Western JL WTP (Large)
+0,0,604,16,Durham,Western JL WTP (Small)
+0,0,604,23,Raleigh,Reallocate Falls Lake
+0,0,604,33,Durham,Western JL WTP (Large)
+0,0,604,48,Raleigh,Neuse River Intake
+0,0,605,16,Durham,Western JL WTP (Small)
+0,0,605,23,Raleigh,Reallocate Falls Lake
+0,0,605,33,Durham,Western JL WTP (Large)
+0,0,605,48,Raleigh,Neuse River Intake
+0,0,606,16,Durham,Western JL WTP (Small)
+0,0,606,21,Raleigh,Reallocate Falls Lake
+0,0,606,33,Durham,Western JL WTP (Large)
+0,0,606,45,Raleigh,Neuse River Intake
+0,0,607,16,Durham,Western JL WTP (Small)
+0,0,607,21,Raleigh,Reallocate Falls Lake
+0,0,607,33,Durham,Western JL WTP (Large)
+0,0,607,48,Raleigh,Neuse River Intake
+0,0,608,16,Durham,Western JL WTP (Small)
+0,0,608,23,Raleigh,Reallocate Falls Lake
+0,0,608,33,Durham,Western JL WTP (Large)
+0,0,608,50,Raleigh,Neuse River Intake
+0,0,609,16,Durham,Western JL WTP (Small)
+0,0,609,22,Raleigh,Reallocate Falls Lake
+0,0,609,33,Durham,Western JL WTP (Large)
+0,0,609,41,Raleigh,Neuse River Intake
+0,0,610,16,Durham,Western JL WTP (Small)
+0,0,610,23,Raleigh,Reallocate Falls Lake
+0,0,610,33,Durham,Western JL WTP (Large)
+0,0,611,16,Durham,Western JL WTP (Small)
+0,0,611,23,Raleigh,Reallocate Falls Lake
+0,0,611,33,Durham,Western JL WTP (Large)
+0,0,612,16,Durham,Western JL WTP (Small)
+0,0,612,23,Raleigh,Reallocate Falls Lake
+0,0,612,33,Durham,Western JL WTP (Large)
+0,0,612,48,Raleigh,Neuse River Intake
+0,0,613,16,Durham,Western JL WTP (Small)
+0,0,613,23,Raleigh,Reallocate Falls Lake
+0,0,613,33,Durham,Western JL WTP (Large)
+0,0,613,50,Raleigh,Neuse River Intake
+0,0,614,16,Durham,Western JL WTP (Small)
+0,0,614,23,Raleigh,Reallocate Falls Lake
+0,0,614,33,Durham,Western JL WTP (Large)
+0,0,614,47,Raleigh,Neuse River Intake
+0,0,615,16,Durham,Western JL WTP (Small)
+0,0,615,23,Raleigh,Reallocate Falls Lake
+0,0,615,33,Durham,Western JL WTP (Large)
+0,0,615,48,Raleigh,Neuse River Intake
+0,0,616,16,Durham,Western JL WTP (Small)
+0,0,616,23,Raleigh,Reallocate Falls Lake
+0,0,616,33,Durham,Western JL WTP (Large)
+0,0,616,48,Raleigh,Neuse River Intake
+0,0,617,16,Durham,Western JL WTP (Small)
+0,0,617,23,Raleigh,Reallocate Falls Lake
+0,0,617,33,Durham,Western JL WTP (Large)
+0,0,617,48,Raleigh,Neuse River Intake
+0,0,618,16,Durham,Western JL WTP (Small)
+0,0,618,23,Raleigh,Reallocate Falls Lake
+0,0,618,33,Durham,Western JL WTP (Large)
+0,0,618,46,Raleigh,Neuse River Intake
+0,0,619,16,Durham,Western JL WTP (Small)
+0,0,619,23,Raleigh,Reallocate Falls Lake
+0,0,619,33,Durham,Western JL WTP (Large)
+0,0,619,48,Raleigh,Neuse River Intake
+0,0,620,16,Durham,Western JL WTP (Small)
+0,0,620,22,Raleigh,Reallocate Falls Lake
+0,0,620,33,Durham,Western JL WTP (Large)
+0,0,620,48,Raleigh,Neuse River Intake
+0,0,621,16,Durham,Western JL WTP (Small)
+0,0,621,23,Raleigh,Reallocate Falls Lake
+0,0,621,33,Durham,Western JL WTP (Large)
+0,0,621,50,Raleigh,Neuse River Intake
+0,0,622,16,Durham,Western JL WTP (Small)
+0,0,622,23,Raleigh,Reallocate Falls Lake
+0,0,622,33,Durham,Western JL WTP (Large)
+0,0,622,48,Raleigh,Neuse River Intake
+0,0,623,16,Durham,Western JL WTP (Small)
+0,0,623,23,Raleigh,Reallocate Falls Lake
+0,0,623,33,Durham,Western JL WTP (Large)
+0,0,624,16,Durham,Western JL WTP (Small)
+0,0,624,23,Raleigh,Reallocate Falls Lake
+0,0,624,33,Durham,Western JL WTP (Large)
+0,0,624,48,Raleigh,Neuse River Intake
+0,0,625,16,Durham,Western JL WTP (Small)
+0,0,625,23,Raleigh,Reallocate Falls Lake
+0,0,625,33,Durham,Western JL WTP (Large)
+0,0,625,48,Raleigh,Neuse River Intake
+0,0,626,16,Durham,Western JL WTP (Small)
+0,0,626,23,Raleigh,Reallocate Falls Lake
+0,0,626,33,Durham,Western JL WTP (Large)
+0,0,626,48,Raleigh,Neuse River Intake
+0,0,627,16,Durham,Western JL WTP (Small)
+0,0,627,23,Raleigh,Reallocate Falls Lake
+0,0,627,33,Durham,Western JL WTP (Large)
+0,0,628,16,Durham,Western JL WTP (Small)
+0,0,628,23,Raleigh,Reallocate Falls Lake
+0,0,628,33,Durham,Western JL WTP (Large)
+0,0,628,50,Raleigh,Neuse River Intake
+0,0,629,16,Durham,Western JL WTP (Small)
+0,0,629,23,Raleigh,Reallocate Falls Lake
+0,0,629,33,Durham,Western JL WTP (Large)
+0,0,629,48,Raleigh,Neuse River Intake
+0,0,630,16,Durham,Western JL WTP (Small)
+0,0,630,23,Raleigh,Reallocate Falls Lake
+0,0,630,33,Durham,Western JL WTP (Large)
+0,0,630,48,Raleigh,Neuse River Intake
+0,0,631,16,Durham,Western JL WTP (Small)
+0,0,631,23,Raleigh,Reallocate Falls Lake
+0,0,631,33,Durham,Western JL WTP (Large)
+0,0,632,16,Durham,Western JL WTP (Small)
+0,0,632,21,Raleigh,Reallocate Falls Lake
+0,0,632,33,Durham,Western JL WTP (Large)
+0,0,632,35,Raleigh,Neuse River Intake
+0,0,633,16,Durham,Western JL WTP (Small)
+0,0,633,21,Raleigh,Reallocate Falls Lake
+0,0,633,33,Durham,Western JL WTP (Large)
+0,0,633,45,Raleigh,Neuse River Intake
+0,0,634,16,Durham,Western JL WTP (Small)
+0,0,634,23,Raleigh,Reallocate Falls Lake
+0,0,634,33,Durham,Western JL WTP (Large)
+0,0,634,50,Raleigh,Neuse River Intake
+0,0,635,16,Durham,Western JL WTP (Small)
+0,0,635,21,Raleigh,Reallocate Falls Lake
+0,0,635,33,Durham,Western JL WTP (Large)
+0,0,635,48,Raleigh,Neuse River Intake
+0,0,636,16,Durham,Western JL WTP (Small)
+0,0,636,21,Raleigh,Reallocate Falls Lake
+0,0,636,33,Durham,Western JL WTP (Large)
+0,0,636,45,Raleigh,Neuse River Intake
+0,0,637,16,Durham,Western JL WTP (Small)
+0,0,637,21,Raleigh,Reallocate Falls Lake
+0,0,637,33,Durham,Western JL WTP (Large)
+0,0,637,37,Raleigh,Neuse River Intake
+0,0,638,16,Durham,Western JL WTP (Small)
+0,0,638,23,Raleigh,Reallocate Falls Lake
+0,0,638,33,Durham,Western JL WTP (Large)
+0,0,639,16,Durham,Western JL WTP (Small)
+0,0,639,23,Raleigh,Reallocate Falls Lake
+0,0,639,33,Durham,Western JL WTP (Large)
+0,0,639,48,Raleigh,Neuse River Intake
+0,0,640,16,Durham,Western JL WTP (Small)
+0,0,640,23,Raleigh,Reallocate Falls Lake
+0,0,640,33,Durham,Western JL WTP (Large)
+0,0,640,48,Raleigh,Neuse River Intake
+0,0,641,16,Durham,Western JL WTP (Small)
+0,0,641,23,Raleigh,Reallocate Falls Lake
+0,0,641,33,Durham,Western JL WTP (Large)
+0,0,641,48,Raleigh,Neuse River Intake
+0,0,642,16,Durham,Western JL WTP (Small)
+0,0,642,21,Raleigh,Reallocate Falls Lake
+0,0,642,33,Durham,Western JL WTP (Large)
+0,0,642,48,Raleigh,Neuse River Intake
+0,0,643,16,Durham,Western JL WTP (Small)
+0,0,643,23,Raleigh,Reallocate Falls Lake
+0,0,643,33,Durham,Western JL WTP (Large)
+0,0,643,48,Raleigh,Neuse River Intake
+0,0,644,16,Durham,Western JL WTP (Small)
+0,0,644,23,Raleigh,Reallocate Falls Lake
+0,0,644,33,Durham,Western JL WTP (Large)
+0,0,645,16,Durham,Western JL WTP (Small)
+0,0,645,23,Raleigh,Reallocate Falls Lake
+0,0,645,33,Durham,Western JL WTP (Large)
+0,0,646,16,Durham,Western JL WTP (Small)
+0,0,646,23,Raleigh,Reallocate Falls Lake
+0,0,646,33,Durham,Western JL WTP (Large)
+0,0,646,48,Raleigh,Neuse River Intake
+0,0,647,16,Durham,Western JL WTP (Small)
+0,0,647,23,Raleigh,Reallocate Falls Lake
+0,0,647,33,Durham,Western JL WTP (Large)
+0,0,648,16,Durham,Western JL WTP (Small)
+0,0,648,23,Raleigh,Reallocate Falls Lake
+0,0,648,33,Durham,Western JL WTP (Large)
+0,0,648,50,Raleigh,Neuse River Intake
+0,0,649,16,Durham,Western JL WTP (Small)
+0,0,649,23,Raleigh,Reallocate Falls Lake
+0,0,649,33,Durham,Western JL WTP (Large)
+0,0,649,48,Raleigh,Neuse River Intake
+0,0,650,16,Durham,Western JL WTP (Small)
+0,0,650,23,Raleigh,Reallocate Falls Lake
+0,0,650,33,Durham,Western JL WTP (Large)
+0,0,650,42,Raleigh,Neuse River Intake
+0,0,651,16,Durham,Western JL WTP (Small)
+0,0,651,21,Raleigh,Reallocate Falls Lake
+0,0,651,33,Durham,Western JL WTP (Large)
+0,0,651,36,Raleigh,Neuse River Intake
+0,0,652,16,Durham,Western JL WTP (Small)
+0,0,652,23,Raleigh,Reallocate Falls Lake
+0,0,652,33,Durham,Western JL WTP (Large)
+0,0,652,43,Raleigh,Neuse River Intake
+0,0,653,16,Durham,Western JL WTP (Small)
+0,0,653,23,Raleigh,Reallocate Falls Lake
+0,0,653,33,Durham,Western JL WTP (Large)
+0,0,653,48,Raleigh,Neuse River Intake
+0,0,654,16,Durham,Western JL WTP (Small)
+0,0,654,23,Raleigh,Reallocate Falls Lake
+0,0,654,33,Durham,Western JL WTP (Large)
+0,0,654,48,Raleigh,Neuse River Intake
+0,0,655,16,Durham,Western JL WTP (Small)
+0,0,655,23,Raleigh,Reallocate Falls Lake
+0,0,655,33,Durham,Western JL WTP (Large)
+0,0,656,16,Durham,Western JL WTP (Small)
+0,0,656,23,Raleigh,Reallocate Falls Lake
+0,0,656,33,Durham,Western JL WTP (Large)
+0,0,656,48,Raleigh,Neuse River Intake
+0,0,657,16,Durham,Western JL WTP (Small)
+0,0,657,23,Raleigh,Reallocate Falls Lake
+0,0,657,33,Durham,Western JL WTP (Large)
+0,0,657,48,Raleigh,Neuse River Intake
+0,0,658,16,Durham,Western JL WTP (Small)
+0,0,658,23,Raleigh,Reallocate Falls Lake
+0,0,658,33,Durham,Western JL WTP (Large)
+0,0,658,35,Raleigh,Neuse River Intake
+0,0,659,16,Durham,Western JL WTP (Small)
+0,0,659,21,Raleigh,Reallocate Falls Lake
+0,0,659,33,Durham,Western JL WTP (Large)
+0,0,659,38,Raleigh,Neuse River Intake
+0,0,660,16,Durham,Western JL WTP (Small)
+0,0,660,23,Raleigh,Reallocate Falls Lake
+0,0,660,33,Durham,Western JL WTP (Large)
+0,0,660,48,Raleigh,Neuse River Intake
+0,0,661,16,Durham,Western JL WTP (Small)
+0,0,661,21,Raleigh,Reallocate Falls Lake
+0,0,661,33,Durham,Western JL WTP (Large)
+0,0,661,42,Raleigh,Neuse River Intake
+0,0,662,16,Durham,Western JL WTP (Small)
+0,0,662,23,Raleigh,Reallocate Falls Lake
+0,0,662,33,Durham,Western JL WTP (Large)
+0,0,662,48,Raleigh,Neuse River Intake
+0,0,663,16,Durham,Western JL WTP (Small)
+0,0,663,23,Raleigh,Reallocate Falls Lake
+0,0,663,33,Durham,Western JL WTP (Large)
+0,0,664,16,Durham,Western JL WTP (Small)
+0,0,664,23,Raleigh,Reallocate Falls Lake
+0,0,664,33,Durham,Western JL WTP (Large)
+0,0,664,50,Raleigh,Neuse River Intake
+0,0,665,16,Durham,Western JL WTP (Small)
+0,0,665,23,Raleigh,Reallocate Falls Lake
+0,0,665,33,Durham,Western JL WTP (Large)
+0,0,665,48,Raleigh,Neuse River Intake
+0,0,666,16,Durham,Western JL WTP (Small)
+0,0,666,21,Raleigh,Reallocate Falls Lake
+0,0,666,33,Durham,Western JL WTP (Large)
+0,0,666,48,Raleigh,Neuse River Intake
+0,0,667,16,Durham,Western JL WTP (Small)
+0,0,667,23,Raleigh,Reallocate Falls Lake
+0,0,667,33,Durham,Western JL WTP (Large)
+0,0,667,44,Raleigh,Neuse River Intake
+0,0,668,16,Durham,Western JL WTP (Small)
+0,0,668,21,Raleigh,Reallocate Falls Lake
+0,0,668,33,Durham,Western JL WTP (Large)
+0,0,668,41,Raleigh,Neuse River Intake
+0,0,669,16,Durham,Western JL WTP (Small)
+0,0,669,23,Raleigh,Reallocate Falls Lake
+0,0,669,33,Durham,Western JL WTP (Large)
+0,0,670,16,Durham,Western JL WTP (Small)
+0,0,670,23,Raleigh,Reallocate Falls Lake
+0,0,670,33,Durham,Western JL WTP (Large)
+0,0,670,50,Raleigh,Neuse River Intake
+0,0,671,16,Durham,Western JL WTP (Small)
+0,0,671,23,Raleigh,Reallocate Falls Lake
+0,0,671,33,Durham,Western JL WTP (Large)
+0,0,671,51,Raleigh,Neuse River Intake
+0,0,672,16,Durham,Western JL WTP (Small)
+0,0,672,23,Raleigh,Reallocate Falls Lake
+0,0,672,33,Durham,Western JL WTP (Large)
+0,0,673,16,Durham,Western JL WTP (Small)
+0,0,673,23,Raleigh,Reallocate Falls Lake
+0,0,673,33,Durham,Western JL WTP (Large)
+0,0,673,47,Raleigh,Neuse River Intake
+0,0,674,16,Durham,Western JL WTP (Small)
+0,0,674,23,Raleigh,Reallocate Falls Lake
+0,0,674,33,Durham,Western JL WTP (Large)
+0,0,674,48,Raleigh,Neuse River Intake
+0,0,675,16,Durham,Western JL WTP (Small)
+0,0,675,21,Raleigh,Reallocate Falls Lake
+0,0,675,33,Durham,Western JL WTP (Large)
+0,0,675,42,Raleigh,Neuse River Intake
+0,0,676,16,Durham,Western JL WTP (Small)
+0,0,676,23,Raleigh,Reallocate Falls Lake
+0,0,676,33,Durham,Western JL WTP (Large)
+0,0,676,49,Raleigh,Neuse River Intake
+0,0,677,16,Durham,Western JL WTP (Small)
+0,0,677,23,Raleigh,Reallocate Falls Lake
+0,0,677,33,Durham,Western JL WTP (Large)
+0,0,677,49,Raleigh,Neuse River Intake
+0,0,678,16,Durham,Western JL WTP (Small)
+0,0,678,23,Raleigh,Reallocate Falls Lake
+0,0,678,33,Durham,Western JL WTP (Large)
+0,0,678,49,Raleigh,Neuse River Intake
+0,0,679,16,Durham,Western JL WTP (Small)
+0,0,679,23,Raleigh,Reallocate Falls Lake
+0,0,679,33,Durham,Western JL WTP (Large)
+0,0,679,42,Raleigh,Neuse River Intake
+0,0,680,16,Durham,Western JL WTP (Small)
+0,0,680,23,Raleigh,Reallocate Falls Lake
+0,0,680,33,Durham,Western JL WTP (Large)
+0,0,680,46,Raleigh,Neuse River Intake
+0,0,681,16,Durham,Western JL WTP (Small)
+0,0,681,23,Raleigh,Reallocate Falls Lake
+0,0,681,33,Durham,Western JL WTP (Large)
+0,0,681,46,Raleigh,Neuse River Intake
+0,0,682,16,Durham,Western JL WTP (Small)
+0,0,682,23,Raleigh,Reallocate Falls Lake
+0,0,682,33,Durham,Western JL WTP (Large)
+0,0,683,16,Durham,Western JL WTP (Small)
+0,0,683,23,Raleigh,Reallocate Falls Lake
+0,0,683,33,Durham,Western JL WTP (Large)
+0,0,683,46,Raleigh,Neuse River Intake
+0,0,684,16,Durham,Western JL WTP (Small)
+0,0,684,23,Raleigh,Reallocate Falls Lake
+0,0,684,33,Durham,Western JL WTP (Large)
+0,0,684,48,Raleigh,Neuse River Intake
+0,0,685,16,Durham,Western JL WTP (Small)
+0,0,685,21,Raleigh,Reallocate Falls Lake
+0,0,685,33,Durham,Western JL WTP (Large)
+0,0,685,47,Raleigh,Neuse River Intake
+0,0,686,16,Durham,Western JL WTP (Small)
+0,0,686,23,Raleigh,Reallocate Falls Lake
+0,0,686,33,Durham,Western JL WTP (Large)
+0,0,686,48,Raleigh,Neuse River Intake
+0,0,687,16,Durham,Western JL WTP (Small)
+0,0,687,22,Raleigh,Reallocate Falls Lake
+0,0,687,33,Durham,Western JL WTP (Large)
+0,0,687,48,Raleigh,Neuse River Intake
+0,0,688,16,Durham,Western JL WTP (Small)
+0,0,688,23,Raleigh,Reallocate Falls Lake
+0,0,688,33,Durham,Western JL WTP (Large)
+0,0,688,48,Raleigh,Neuse River Intake
+0,0,689,16,Durham,Western JL WTP (Small)
+0,0,689,21,Raleigh,Reallocate Falls Lake
+0,0,689,33,Durham,Western JL WTP (Large)
+0,0,689,45,Raleigh,Neuse River Intake
+0,0,690,16,Durham,Western JL WTP (Small)
+0,0,690,21,Raleigh,Reallocate Falls Lake
+0,0,690,33,Durham,Western JL WTP (Large)
+0,0,690,48,Raleigh,Neuse River Intake
+0,0,691,16,Durham,Western JL WTP (Small)
+0,0,691,23,Raleigh,Reallocate Falls Lake
+0,0,691,33,Durham,Western JL WTP (Large)
+0,0,691,48,Raleigh,Neuse River Intake
+0,0,692,16,Durham,Western JL WTP (Small)
+0,0,692,23,Raleigh,Reallocate Falls Lake
+0,0,692,33,Durham,Western JL WTP (Large)
+0,0,692,48,Raleigh,Neuse River Intake
+0,0,693,16,Durham,Western JL WTP (Small)
+0,0,693,23,Raleigh,Reallocate Falls Lake
+0,0,693,33,Durham,Western JL WTP (Large)
+0,0,694,16,Durham,Western JL WTP (Small)
+0,0,694,23,Raleigh,Reallocate Falls Lake
+0,0,694,33,Durham,Western JL WTP (Large)
+0,0,694,48,Raleigh,Neuse River Intake
+0,0,695,16,Durham,Western JL WTP (Small)
+0,0,695,23,Raleigh,Reallocate Falls Lake
+0,0,695,33,Durham,Western JL WTP (Large)
+0,0,695,48,Raleigh,Neuse River Intake
+0,0,696,16,Durham,Western JL WTP (Small)
+0,0,696,23,Raleigh,Reallocate Falls Lake
+0,0,696,33,Durham,Western JL WTP (Large)
+0,0,696,49,Raleigh,Neuse River Intake
+0,0,697,16,Durham,Western JL WTP (Small)
+0,0,697,23,Raleigh,Reallocate Falls Lake
+0,0,697,33,Durham,Western JL WTP (Large)
+0,0,697,48,Raleigh,Neuse River Intake
+0,0,698,16,Durham,Western JL WTP (Small)
+0,0,698,21,Raleigh,Reallocate Falls Lake
+0,0,698,33,Durham,Western JL WTP (Large)
+0,0,698,42,Raleigh,Neuse River Intake
+0,0,699,16,Durham,Western JL WTP (Small)
+0,0,699,23,Raleigh,Reallocate Falls Lake
+0,0,699,33,Durham,Western JL WTP (Large)
+0,0,699,46,Raleigh,Neuse River Intake
+0,0,700,16,Durham,Western JL WTP (Small)
+0,0,700,23,Raleigh,Reallocate Falls Lake
+0,0,700,33,Durham,Western JL WTP (Large)
+0,0,700,48,Raleigh,Neuse River Intake
+0,0,701,16,Durham,Western JL WTP (Small)
+0,0,701,21,Raleigh,Reallocate Falls Lake
+0,0,701,33,Durham,Western JL WTP (Large)
+0,0,701,48,Raleigh,Neuse River Intake
+0,0,702,16,Durham,Western JL WTP (Small)
+0,0,702,23,Raleigh,Reallocate Falls Lake
+0,0,702,33,Durham,Western JL WTP (Large)
+0,0,702,45,Raleigh,Neuse River Intake
+0,0,703,16,Durham,Western JL WTP (Small)
+0,0,703,23,Raleigh,Reallocate Falls Lake
+0,0,703,33,Durham,Western JL WTP (Large)
+0,0,703,48,Raleigh,Neuse River Intake
+0,0,704,16,Durham,Western JL WTP (Small)
+0,0,704,23,Raleigh,Reallocate Falls Lake
+0,0,704,33,Durham,Western JL WTP (Large)
+0,0,704,48,Raleigh,Neuse River Intake
+0,0,705,16,Durham,Western JL WTP (Small)
+0,0,705,23,Raleigh,Reallocate Falls Lake
+0,0,705,33,Durham,Western JL WTP (Large)
+0,0,705,45,Raleigh,Neuse River Intake
+0,0,706,16,Durham,Western JL WTP (Small)
+0,0,706,23,Raleigh,Reallocate Falls Lake
+0,0,706,33,Durham,Western JL WTP (Large)
+0,0,707,16,Durham,Western JL WTP (Small)
+0,0,707,23,Raleigh,Reallocate Falls Lake
+0,0,707,33,Durham,Western JL WTP (Large)
+0,0,708,16,Durham,Western JL WTP (Small)
+0,0,708,23,Raleigh,Reallocate Falls Lake
+0,0,708,33,Durham,Western JL WTP (Large)
+0,0,708,48,Raleigh,Neuse River Intake
+0,0,709,16,Durham,Western JL WTP (Small)
+0,0,709,23,Raleigh,Reallocate Falls Lake
+0,0,709,33,Durham,Western JL WTP (Large)
+0,0,709,48,Raleigh,Neuse River Intake
+0,0,710,16,Durham,Western JL WTP (Small)
+0,0,710,23,Raleigh,Reallocate Falls Lake
+0,0,710,33,Durham,Western JL WTP (Large)
+0,0,710,48,Raleigh,Neuse River Intake
+0,0,711,16,Durham,Western JL WTP (Small)
+0,0,711,22,Raleigh,Reallocate Falls Lake
+0,0,711,33,Durham,Western JL WTP (Large)
+0,0,711,46,Raleigh,Neuse River Intake
+0,0,712,16,Durham,Western JL WTP (Small)
+0,0,712,23,Raleigh,Reallocate Falls Lake
+0,0,712,33,Durham,Western JL WTP (Large)
+0,0,712,48,Raleigh,Neuse River Intake
+0,0,713,16,Durham,Western JL WTP (Small)
+0,0,713,20,Raleigh,Reallocate Falls Lake
+0,0,713,33,Durham,Western JL WTP (Large)
+0,0,713,38,Raleigh,Neuse River Intake
+0,0,714,16,Durham,Western JL WTP (Small)
+0,0,714,21,Raleigh,Reallocate Falls Lake
+0,0,714,33,Durham,Western JL WTP (Large)
+0,0,714,48,Raleigh,Neuse River Intake
+0,0,715,16,Durham,Western JL WTP (Small)
+0,0,715,23,Raleigh,Reallocate Falls Lake
+0,0,715,33,Durham,Western JL WTP (Large)
+0,0,716,16,Durham,Western JL WTP (Small)
+0,0,716,23,Raleigh,Reallocate Falls Lake
+0,0,716,33,Durham,Western JL WTP (Large)
+0,0,716,46,Raleigh,Neuse River Intake
+0,0,717,16,Durham,Western JL WTP (Small)
+0,0,717,23,Raleigh,Reallocate Falls Lake
+0,0,717,33,Durham,Western JL WTP (Large)
+0,0,717,48,Raleigh,Neuse River Intake
+0,0,718,16,Durham,Western JL WTP (Small)
+0,0,718,21,Raleigh,Reallocate Falls Lake
+0,0,718,33,Durham,Western JL WTP (Large)
+0,0,718,45,Raleigh,Neuse River Intake
+0,0,719,16,Durham,Western JL WTP (Small)
+0,0,719,23,Raleigh,Reallocate Falls Lake
+0,0,719,33,Durham,Western JL WTP (Large)
+0,0,719,48,Raleigh,Neuse River Intake
+0,0,720,16,Durham,Western JL WTP (Small)
+0,0,720,23,Raleigh,Reallocate Falls Lake
+0,0,720,33,Durham,Western JL WTP (Large)
+0,0,720,50,Raleigh,Neuse River Intake
+0,0,721,16,Durham,Western JL WTP (Small)
+0,0,721,23,Raleigh,Reallocate Falls Lake
+0,0,721,33,Durham,Western JL WTP (Large)
+0,0,721,48,Raleigh,Neuse River Intake
+0,0,722,16,Durham,Western JL WTP (Small)
+0,0,722,23,Raleigh,Reallocate Falls Lake
+0,0,722,33,Durham,Western JL WTP (Large)
+0,0,723,16,Durham,Western JL WTP (Small)
+0,0,723,23,Raleigh,Reallocate Falls Lake
+0,0,723,33,Durham,Western JL WTP (Large)
+0,0,723,48,Raleigh,Neuse River Intake
+0,0,724,16,Durham,Western JL WTP (Small)
+0,0,724,23,Raleigh,Reallocate Falls Lake
+0,0,724,33,Durham,Western JL WTP (Large)
+0,0,724,48,Raleigh,Neuse River Intake
+0,0,725,16,Durham,Western JL WTP (Small)
+0,0,725,23,Raleigh,Reallocate Falls Lake
+0,0,725,33,Durham,Western JL WTP (Large)
+0,0,725,48,Raleigh,Neuse River Intake
+0,0,726,16,Durham,Western JL WTP (Small)
+0,0,726,23,Raleigh,Reallocate Falls Lake
+0,0,726,33,Durham,Western JL WTP (Large)
+0,0,727,16,Durham,Western JL WTP (Small)
+0,0,727,23,Raleigh,Reallocate Falls Lake
+0,0,727,33,Durham,Western JL WTP (Large)
+0,0,727,47,Raleigh,Neuse River Intake
+0,0,728,16,Durham,Western JL WTP (Small)
+0,0,728,23,Raleigh,Reallocate Falls Lake
+0,0,728,33,Durham,Western JL WTP (Large)
+0,0,729,16,Durham,Western JL WTP (Small)
+0,0,729,23,Raleigh,Reallocate Falls Lake
+0,0,729,33,Durham,Western JL WTP (Large)
+0,0,729,48,Raleigh,Neuse River Intake
+0,0,730,16,Durham,Western JL WTP (Small)
+0,0,730,23,Raleigh,Reallocate Falls Lake
+0,0,730,33,Durham,Western JL WTP (Large)
+0,0,730,52,Raleigh,Neuse River Intake
+0,0,731,16,Durham,Western JL WTP (Small)
+0,0,731,23,Raleigh,Reallocate Falls Lake
+0,0,731,33,Durham,Western JL WTP (Large)
+0,0,731,41,Raleigh,Neuse River Intake
+0,0,732,16,Durham,Western JL WTP (Small)
+0,0,732,23,Raleigh,Reallocate Falls Lake
+0,0,732,33,Durham,Western JL WTP (Large)
+0,0,732,45,Raleigh,Neuse River Intake
+0,0,733,16,Durham,Western JL WTP (Small)
+0,0,733,22,Raleigh,Reallocate Falls Lake
+0,0,733,33,Durham,Western JL WTP (Large)
+0,0,733,48,Raleigh,Neuse River Intake
+0,0,734,16,Durham,Western JL WTP (Small)
+0,0,734,23,Raleigh,Reallocate Falls Lake
+0,0,734,33,Durham,Western JL WTP (Large)
+0,0,734,48,Raleigh,Neuse River Intake
+0,0,735,16,Durham,Western JL WTP (Small)
+0,0,735,23,Raleigh,Reallocate Falls Lake
+0,0,735,33,Durham,Western JL WTP (Large)
+0,0,735,48,Raleigh,Neuse River Intake
+0,0,736,16,Durham,Western JL WTP (Small)
+0,0,736,23,Raleigh,Reallocate Falls Lake
+0,0,736,33,Durham,Western JL WTP (Large)
+0,0,736,45,Raleigh,Neuse River Intake
+0,0,737,16,Durham,Western JL WTP (Small)
+0,0,737,23,Raleigh,Reallocate Falls Lake
+0,0,737,33,Durham,Western JL WTP (Large)
+0,0,737,46,Raleigh,Neuse River Intake
+0,0,738,16,Durham,Western JL WTP (Small)
+0,0,738,23,Raleigh,Reallocate Falls Lake
+0,0,738,33,Durham,Western JL WTP (Large)
+0,0,739,16,Durham,Western JL WTP (Small)
+0,0,739,23,Raleigh,Reallocate Falls Lake
+0,0,739,33,Durham,Western JL WTP (Large)
+0,0,739,51,Raleigh,Neuse River Intake
+0,0,740,16,Durham,Western JL WTP (Small)
+0,0,740,23,Raleigh,Reallocate Falls Lake
+0,0,740,33,Durham,Western JL WTP (Large)
+0,0,740,46,Raleigh,Neuse River Intake
+0,0,741,16,Durham,Western JL WTP (Small)
+0,0,741,23,Raleigh,Reallocate Falls Lake
+0,0,741,33,Durham,Western JL WTP (Large)
+0,0,742,16,Durham,Western JL WTP (Small)
+0,0,742,23,Raleigh,Reallocate Falls Lake
+0,0,742,33,Durham,Western JL WTP (Large)
+0,0,742,50,Raleigh,Neuse River Intake
+0,0,743,16,Durham,Western JL WTP (Small)
+0,0,743,21,Raleigh,Reallocate Falls Lake
+0,0,743,33,Durham,Western JL WTP (Large)
+0,0,743,47,Raleigh,Neuse River Intake
+0,0,744,16,Durham,Western JL WTP (Small)
+0,0,744,23,Raleigh,Reallocate Falls Lake
+0,0,744,33,Durham,Western JL WTP (Large)
+0,0,744,48,Raleigh,Neuse River Intake
+0,0,745,16,Durham,Western JL WTP (Small)
+0,0,745,23,Raleigh,Reallocate Falls Lake
+0,0,745,33,Durham,Western JL WTP (Large)
+0,0,746,16,Durham,Western JL WTP (Small)
+0,0,746,23,Raleigh,Reallocate Falls Lake
+0,0,746,33,Durham,Western JL WTP (Large)
+0,0,747,16,Durham,Western JL WTP (Small)
+0,0,747,23,Raleigh,Reallocate Falls Lake
+0,0,747,33,Durham,Western JL WTP (Large)
+0,0,747,48,Raleigh,Neuse River Intake
+0,0,748,16,Durham,Western JL WTP (Small)
+0,0,748,22,Raleigh,Reallocate Falls Lake
+0,0,748,33,Durham,Western JL WTP (Large)
+0,0,748,39,Raleigh,Neuse River Intake
+0,0,749,16,Durham,Western JL WTP (Small)
+0,0,749,23,Raleigh,Reallocate Falls Lake
+0,0,749,33,Durham,Western JL WTP (Large)
+0,0,749,46,Raleigh,Neuse River Intake
+0,0,750,16,Durham,Western JL WTP (Small)
+0,0,750,23,Raleigh,Reallocate Falls Lake
+0,0,750,33,Durham,Western JL WTP (Large)
+0,0,750,48,Raleigh,Neuse River Intake
+0,0,751,16,Durham,Western JL WTP (Small)
+0,0,751,23,Raleigh,Reallocate Falls Lake
+0,0,751,33,Durham,Western JL WTP (Large)
+0,0,751,48,Raleigh,Neuse River Intake
+0,0,752,16,Durham,Western JL WTP (Small)
+0,0,752,23,Raleigh,Reallocate Falls Lake
+0,0,752,33,Durham,Western JL WTP (Large)
+0,0,752,49,Raleigh,Neuse River Intake
+0,0,753,16,Durham,Western JL WTP (Small)
+0,0,753,23,Raleigh,Reallocate Falls Lake
+0,0,753,33,Durham,Western JL WTP (Large)
+0,0,753,48,Raleigh,Neuse River Intake
+0,0,754,16,Durham,Western JL WTP (Small)
+0,0,754,21,Raleigh,Reallocate Falls Lake
+0,0,754,33,Durham,Western JL WTP (Large)
+0,0,754,41,Raleigh,Neuse River Intake
+0,0,755,16,Durham,Western JL WTP (Small)
+0,0,755,23,Raleigh,Reallocate Falls Lake
+0,0,755,33,Durham,Western JL WTP (Large)
+0,0,756,16,Durham,Western JL WTP (Small)
+0,0,756,21,Raleigh,Reallocate Falls Lake
+0,0,756,33,Durham,Western JL WTP (Large)
+0,0,756,48,Raleigh,Neuse River Intake
+0,0,757,16,Durham,Western JL WTP (Small)
+0,0,757,23,Raleigh,Reallocate Falls Lake
+0,0,757,33,Durham,Western JL WTP (Large)
+0,0,757,48,Raleigh,Neuse River Intake
+0,0,758,16,Durham,Western JL WTP (Small)
+0,0,758,23,Raleigh,Reallocate Falls Lake
+0,0,758,33,Durham,Western JL WTP (Large)
+0,0,758,48,Raleigh,Neuse River Intake
+0,0,759,16,Durham,Western JL WTP (Small)
+0,0,759,23,Raleigh,Reallocate Falls Lake
+0,0,759,33,Durham,Western JL WTP (Large)
+0,0,759,49,Raleigh,Neuse River Intake
+0,0,760,16,Durham,Western JL WTP (Small)
+0,0,760,23,Raleigh,Reallocate Falls Lake
+0,0,760,33,Durham,Western JL WTP (Large)
+0,0,761,16,Durham,Western JL WTP (Small)
+0,0,761,21,Raleigh,Reallocate Falls Lake
+0,0,761,33,Durham,Western JL WTP (Large)
+0,0,761,48,Raleigh,Neuse River Intake
+0,0,762,16,Durham,Western JL WTP (Small)
+0,0,762,23,Raleigh,Reallocate Falls Lake
+0,0,762,33,Durham,Western JL WTP (Large)
+0,0,762,46,Raleigh,Neuse River Intake
+0,0,763,16,Durham,Western JL WTP (Small)
+0,0,763,23,Raleigh,Reallocate Falls Lake
+0,0,763,33,Durham,Western JL WTP (Large)
+0,0,763,49,Raleigh,Neuse River Intake
+0,0,764,16,Durham,Western JL WTP (Small)
+0,0,764,23,Raleigh,Reallocate Falls Lake
+0,0,764,33,Durham,Western JL WTP (Large)
+0,0,764,44,Raleigh,Neuse River Intake
+0,0,765,16,Durham,Western JL WTP (Small)
+0,0,765,23,Raleigh,Reallocate Falls Lake
+0,0,765,33,Durham,Western JL WTP (Large)
+0,0,765,47,Raleigh,Neuse River Intake
+0,0,766,16,Durham,Western JL WTP (Small)
+0,0,766,23,Raleigh,Reallocate Falls Lake
+0,0,766,33,Durham,Western JL WTP (Large)
+0,0,766,49,Raleigh,Neuse River Intake
+0,0,767,16,Durham,Western JL WTP (Small)
+0,0,767,23,Raleigh,Reallocate Falls Lake
+0,0,767,33,Durham,Western JL WTP (Large)
+0,0,768,16,Durham,Western JL WTP (Small)
+0,0,768,23,Raleigh,Reallocate Falls Lake
+0,0,768,33,Durham,Western JL WTP (Large)
+0,0,768,43,Raleigh,Neuse River Intake
+0,0,769,16,Durham,Western JL WTP (Small)
+0,0,769,23,Raleigh,Reallocate Falls Lake
+0,0,769,33,Durham,Western JL WTP (Large)
+0,0,769,48,Raleigh,Neuse River Intake
+0,0,770,16,Durham,Western JL WTP (Small)
+0,0,770,23,Raleigh,Reallocate Falls Lake
+0,0,770,33,Durham,Western JL WTP (Large)
+0,0,770,46,Raleigh,Neuse River Intake
+0,0,771,16,Durham,Western JL WTP (Small)
+0,0,771,23,Raleigh,Reallocate Falls Lake
+0,0,771,33,Durham,Western JL WTP (Large)
+0,0,772,16,Durham,Western JL WTP (Small)
+0,0,772,21,Raleigh,Reallocate Falls Lake
+0,0,772,33,Durham,Western JL WTP (Large)
+0,0,772,48,Raleigh,Neuse River Intake
+0,0,773,16,Durham,Western JL WTP (Small)
+0,0,773,23,Raleigh,Reallocate Falls Lake
+0,0,773,33,Durham,Western JL WTP (Large)
+0,0,774,16,Durham,Western JL WTP (Small)
+0,0,774,20,Raleigh,Reallocate Falls Lake
+0,0,774,33,Durham,Western JL WTP (Large)
+0,0,774,34,Raleigh,Neuse River Intake
+0,0,775,16,Durham,Western JL WTP (Small)
+0,0,775,23,Raleigh,Reallocate Falls Lake
+0,0,775,33,Durham,Western JL WTP (Large)
+0,0,775,48,Raleigh,Neuse River Intake
+0,0,776,16,Durham,Western JL WTP (Small)
+0,0,776,23,Raleigh,Reallocate Falls Lake
+0,0,776,33,Durham,Western JL WTP (Large)
+0,0,776,48,Raleigh,Neuse River Intake
+0,0,777,16,Durham,Western JL WTP (Small)
+0,0,777,23,Raleigh,Reallocate Falls Lake
+0,0,777,33,Durham,Western JL WTP (Large)
+0,0,777,48,Raleigh,Neuse River Intake
+0,0,778,16,Durham,Western JL WTP (Small)
+0,0,778,21,Raleigh,Reallocate Falls Lake
+0,0,778,33,Durham,Western JL WTP (Large)
+0,0,778,47,Raleigh,Neuse River Intake
+0,0,779,16,Durham,Western JL WTP (Small)
+0,0,779,21,Raleigh,Reallocate Falls Lake
+0,0,779,33,Durham,Western JL WTP (Large)
+0,0,779,40,Raleigh,Neuse River Intake
+0,0,780,16,Durham,Western JL WTP (Small)
+0,0,780,23,Raleigh,Reallocate Falls Lake
+0,0,780,33,Durham,Western JL WTP (Large)
+0,0,780,49,Raleigh,Neuse River Intake
+0,0,781,16,Durham,Western JL WTP (Small)
+0,0,781,23,Raleigh,Reallocate Falls Lake
+0,0,781,33,Durham,Western JL WTP (Large)
+0,0,781,50,Raleigh,Neuse River Intake
+0,0,782,16,Durham,Western JL WTP (Small)
+0,0,782,23,Raleigh,Reallocate Falls Lake
+0,0,782,33,Durham,Western JL WTP (Large)
+0,0,782,48,Raleigh,Neuse River Intake
+0,0,783,16,Durham,Western JL WTP (Small)
+0,0,783,21,Raleigh,Reallocate Falls Lake
+0,0,783,33,Durham,Western JL WTP (Large)
+0,0,783,43,Raleigh,Neuse River Intake
+0,0,784,16,Durham,Western JL WTP (Small)
+0,0,784,21,Raleigh,Reallocate Falls Lake
+0,0,784,33,Durham,Western JL WTP (Large)
+0,0,784,48,Raleigh,Neuse River Intake
+0,0,785,16,Durham,Western JL WTP (Small)
+0,0,785,23,Raleigh,Reallocate Falls Lake
+0,0,785,33,Durham,Western JL WTP (Large)
+0,0,785,50,Raleigh,Neuse River Intake
+0,0,786,16,Durham,Western JL WTP (Small)
+0,0,786,23,Raleigh,Reallocate Falls Lake
+0,0,786,33,Durham,Western JL WTP (Large)
+0,0,787,16,Durham,Western JL WTP (Small)
+0,0,787,23,Raleigh,Reallocate Falls Lake
+0,0,787,33,Durham,Western JL WTP (Large)
+0,0,787,50,Raleigh,Neuse River Intake
+0,0,788,16,Durham,Western JL WTP (Small)
+0,0,788,23,Raleigh,Reallocate Falls Lake
+0,0,788,33,Durham,Western JL WTP (Large)
+0,0,788,36,Raleigh,Neuse River Intake
+0,0,789,16,Durham,Western JL WTP (Small)
+0,0,789,23,Raleigh,Reallocate Falls Lake
+0,0,789,33,Durham,Western JL WTP (Large)
+0,0,789,48,Raleigh,Neuse River Intake
+0,0,790,16,Durham,Western JL WTP (Small)
+0,0,790,22,Raleigh,Reallocate Falls Lake
+0,0,790,33,Durham,Western JL WTP (Large)
+0,0,790,48,Raleigh,Neuse River Intake
+0,0,791,16,Durham,Western JL WTP (Small)
+0,0,791,23,Raleigh,Reallocate Falls Lake
+0,0,791,33,Durham,Western JL WTP (Large)
+0,0,791,48,Raleigh,Neuse River Intake
+0,0,792,16,Durham,Western JL WTP (Small)
+0,0,792,20,Raleigh,Reallocate Falls Lake
+0,0,792,33,Durham,Western JL WTP (Large)
+0,0,792,40,Raleigh,Neuse River Intake
+0,0,793,16,Durham,Western JL WTP (Small)
+0,0,793,21,Raleigh,Reallocate Falls Lake
+0,0,793,33,Durham,Western JL WTP (Large)
+0,0,793,40,Raleigh,Neuse River Intake
+0,0,794,16,Durham,Western JL WTP (Small)
+0,0,794,23,Raleigh,Reallocate Falls Lake
+0,0,794,33,Durham,Western JL WTP (Large)
+0,0,795,16,Durham,Western JL WTP (Small)
+0,0,795,23,Raleigh,Reallocate Falls Lake
+0,0,795,33,Durham,Western JL WTP (Large)
+0,0,795,50,Raleigh,Neuse River Intake
+0,0,796,16,Durham,Western JL WTP (Small)
+0,0,796,23,Raleigh,Reallocate Falls Lake
+0,0,796,33,Durham,Western JL WTP (Large)
+0,0,796,48,Raleigh,Neuse River Intake
+0,0,797,16,Durham,Western JL WTP (Small)
+0,0,797,22,Raleigh,Reallocate Falls Lake
+0,0,797,33,Durham,Western JL WTP (Large)
+0,0,797,48,Raleigh,Neuse River Intake
+0,0,798,16,Durham,Western JL WTP (Small)
+0,0,798,23,Raleigh,Reallocate Falls Lake
+0,0,798,33,Durham,Western JL WTP (Large)
+0,0,798,48,Raleigh,Neuse River Intake
+0,0,799,16,Durham,Western JL WTP (Small)
+0,0,799,23,Raleigh,Reallocate Falls Lake
+0,0,799,33,Durham,Western JL WTP (Large)
+0,0,799,42,Raleigh,Neuse River Intake
+0,0,800,16,Durham,Western JL WTP (Small)
+0,0,800,23,Raleigh,Reallocate Falls Lake
+0,0,800,33,Durham,Western JL WTP (Large)
+0,0,800,40,Raleigh,Neuse River Intake
+0,0,801,16,Durham,Western JL WTP (Small)
+0,0,801,22,Raleigh,Reallocate Falls Lake
+0,0,801,33,Durham,Western JL WTP (Large)
+0,0,801,39,Raleigh,Neuse River Intake
+0,0,802,16,Durham,Western JL WTP (Small)
+0,0,802,23,Raleigh,Reallocate Falls Lake
+0,0,802,33,Durham,Western JL WTP (Large)
+0,0,802,48,Raleigh,Neuse River Intake
+0,0,803,16,Durham,Western JL WTP (Small)
+0,0,803,23,Raleigh,Reallocate Falls Lake
+0,0,803,33,Durham,Western JL WTP (Large)
+0,0,803,47,Raleigh,Neuse River Intake
+0,0,804,16,Durham,Western JL WTP (Small)
+0,0,804,23,Raleigh,Reallocate Falls Lake
+0,0,804,33,Durham,Western JL WTP (Large)
+0,0,805,16,Durham,Western JL WTP (Small)
+0,0,805,23,Raleigh,Reallocate Falls Lake
+0,0,805,33,Durham,Western JL WTP (Large)
+0,0,805,50,Raleigh,Neuse River Intake
+0,0,806,16,Durham,Western JL WTP (Small)
+0,0,806,23,Raleigh,Reallocate Falls Lake
+0,0,806,33,Durham,Western JL WTP (Large)
+0,0,806,47,Raleigh,Neuse River Intake
+0,0,807,16,Durham,Western JL WTP (Small)
+0,0,807,23,Raleigh,Reallocate Falls Lake
+0,0,807,33,Durham,Western JL WTP (Large)
+0,0,807,42,Raleigh,Neuse River Intake
+0,0,808,16,Durham,Western JL WTP (Small)
+0,0,808,23,Raleigh,Reallocate Falls Lake
+0,0,808,33,Durham,Western JL WTP (Large)
+0,0,808,48,Raleigh,Neuse River Intake
+0,0,809,16,Durham,Western JL WTP (Small)
+0,0,809,23,Raleigh,Reallocate Falls Lake
+0,0,809,33,Durham,Western JL WTP (Large)
+0,0,810,16,Durham,Western JL WTP (Small)
+0,0,810,23,Raleigh,Reallocate Falls Lake
+0,0,810,33,Durham,Western JL WTP (Large)
+0,0,810,48,Raleigh,Neuse River Intake
+0,0,811,16,Durham,Western JL WTP (Small)
+0,0,811,21,Raleigh,Reallocate Falls Lake
+0,0,811,33,Durham,Western JL WTP (Large)
+0,0,811,44,Raleigh,Neuse River Intake
+0,0,812,16,Durham,Western JL WTP (Small)
+0,0,812,23,Raleigh,Reallocate Falls Lake
+0,0,812,33,Durham,Western JL WTP (Large)
+0,0,812,48,Raleigh,Neuse River Intake
+0,0,813,16,Durham,Western JL WTP (Small)
+0,0,813,22,Raleigh,Reallocate Falls Lake
+0,0,813,33,Durham,Western JL WTP (Large)
+0,0,813,48,Raleigh,Neuse River Intake
+0,0,814,16,Durham,Western JL WTP (Small)
+0,0,814,23,Raleigh,Reallocate Falls Lake
+0,0,814,33,Durham,Western JL WTP (Large)
+0,0,815,16,Durham,Western JL WTP (Small)
+0,0,815,23,Raleigh,Reallocate Falls Lake
+0,0,815,33,Durham,Western JL WTP (Large)
+0,0,815,48,Raleigh,Neuse River Intake
+0,0,816,16,Durham,Western JL WTP (Small)
+0,0,816,23,Raleigh,Reallocate Falls Lake
+0,0,816,33,Durham,Western JL WTP (Large)
+0,0,816,48,Raleigh,Neuse River Intake
+0,0,817,16,Durham,Western JL WTP (Small)
+0,0,817,23,Raleigh,Reallocate Falls Lake
+0,0,817,33,Durham,Western JL WTP (Large)
+0,0,817,48,Raleigh,Neuse River Intake
+0,0,818,16,Durham,Western JL WTP (Small)
+0,0,818,23,Raleigh,Reallocate Falls Lake
+0,0,818,33,Durham,Western JL WTP (Large)
+0,0,818,45,Raleigh,Neuse River Intake
+0,0,819,16,Durham,Western JL WTP (Small)
+0,0,819,21,Raleigh,Reallocate Falls Lake
+0,0,819,33,Durham,Western JL WTP (Large)
+0,0,819,48,Raleigh,Neuse River Intake
+0,0,820,16,Durham,Western JL WTP (Small)
+0,0,820,23,Raleigh,Reallocate Falls Lake
+0,0,820,33,Durham,Western JL WTP (Large)
+0,0,821,16,Durham,Western JL WTP (Small)
+0,0,821,23,Raleigh,Reallocate Falls Lake
+0,0,821,33,Durham,Western JL WTP (Large)
+0,0,821,48,Raleigh,Neuse River Intake
+0,0,822,16,Durham,Western JL WTP (Small)
+0,0,822,23,Raleigh,Reallocate Falls Lake
+0,0,822,33,Durham,Western JL WTP (Large)
+0,0,822,41,Raleigh,Neuse River Intake
+0,0,823,16,Durham,Western JL WTP (Small)
+0,0,823,23,Raleigh,Reallocate Falls Lake
+0,0,823,33,Durham,Western JL WTP (Large)
+0,0,823,48,Raleigh,Neuse River Intake
+0,0,824,16,Durham,Western JL WTP (Small)
+0,0,824,23,Raleigh,Reallocate Falls Lake
+0,0,824,33,Durham,Western JL WTP (Large)
+0,0,825,16,Durham,Western JL WTP (Small)
+0,0,825,23,Raleigh,Reallocate Falls Lake
+0,0,825,33,Durham,Western JL WTP (Large)
+0,0,825,48,Raleigh,Neuse River Intake
+0,0,826,16,Durham,Western JL WTP (Small)
+0,0,826,23,Raleigh,Reallocate Falls Lake
+0,0,826,33,Durham,Western JL WTP (Large)
+0,0,826,48,Raleigh,Neuse River Intake
+0,0,827,16,Durham,Western JL WTP (Small)
+0,0,827,23,Raleigh,Reallocate Falls Lake
+0,0,827,33,Durham,Western JL WTP (Large)
+0,0,827,48,Raleigh,Neuse River Intake
+0,0,828,16,Durham,Western JL WTP (Small)
+0,0,828,23,Raleigh,Reallocate Falls Lake
+0,0,828,33,Durham,Western JL WTP (Large)
+0,0,829,16,Durham,Western JL WTP (Small)
+0,0,829,23,Raleigh,Reallocate Falls Lake
+0,0,829,33,Durham,Western JL WTP (Large)
+0,0,830,16,Durham,Western JL WTP (Small)
+0,0,830,23,Raleigh,Reallocate Falls Lake
+0,0,830,33,Durham,Western JL WTP (Large)
+0,0,831,16,Durham,Western JL WTP (Small)
+0,0,831,23,Raleigh,Reallocate Falls Lake
+0,0,831,33,Durham,Western JL WTP (Large)
+0,0,831,48,Raleigh,Neuse River Intake
+0,0,832,16,Durham,Western JL WTP (Small)
+0,0,832,23,Raleigh,Reallocate Falls Lake
+0,0,832,33,Durham,Western JL WTP (Large)
+0,0,832,46,Raleigh,Neuse River Intake
+0,0,833,16,Durham,Western JL WTP (Small)
+0,0,833,21,Raleigh,Reallocate Falls Lake
+0,0,833,33,Durham,Western JL WTP (Large)
+0,0,833,40,Raleigh,Neuse River Intake
+0,0,834,16,Durham,Western JL WTP (Small)
+0,0,834,23,Raleigh,Reallocate Falls Lake
+0,0,834,33,Durham,Western JL WTP (Large)
+0,0,834,48,Raleigh,Neuse River Intake
+0,0,835,16,Durham,Western JL WTP (Small)
+0,0,835,23,Raleigh,Reallocate Falls Lake
+0,0,835,33,Durham,Western JL WTP (Large)
+0,0,835,50,Raleigh,Neuse River Intake
+0,0,836,16,Durham,Western JL WTP (Small)
+0,0,836,23,Raleigh,Reallocate Falls Lake
+0,0,836,33,Durham,Western JL WTP (Large)
+0,0,837,16,Durham,Western JL WTP (Small)
+0,0,837,23,Raleigh,Reallocate Falls Lake
+0,0,837,33,Durham,Western JL WTP (Large)
+0,0,837,48,Raleigh,Neuse River Intake
+0,0,838,16,Durham,Western JL WTP (Small)
+0,0,838,21,Raleigh,Reallocate Falls Lake
+0,0,838,33,Durham,Western JL WTP (Large)
+0,0,838,46,Raleigh,Neuse River Intake
+0,0,839,16,Durham,Western JL WTP (Small)
+0,0,839,23,Raleigh,Reallocate Falls Lake
+0,0,839,33,Durham,Western JL WTP (Large)
+0,0,839,48,Raleigh,Neuse River Intake
+0,0,840,16,Durham,Western JL WTP (Small)
+0,0,840,21,Raleigh,Reallocate Falls Lake
+0,0,840,33,Durham,Western JL WTP (Large)
+0,0,840,48,Raleigh,Neuse River Intake
+0,0,841,16,Durham,Western JL WTP (Small)
+0,0,841,23,Raleigh,Reallocate Falls Lake
+0,0,841,33,Durham,Western JL WTP (Large)
+0,0,841,44,Raleigh,Neuse River Intake
+0,0,842,16,Durham,Western JL WTP (Small)
+0,0,842,23,Raleigh,Reallocate Falls Lake
+0,0,842,33,Durham,Western JL WTP (Large)
+0,0,842,48,Raleigh,Neuse River Intake
+0,0,843,16,Durham,Western JL WTP (Small)
+0,0,843,23,Raleigh,Reallocate Falls Lake
+0,0,843,33,Durham,Western JL WTP (Large)
+0,0,843,52,Raleigh,Neuse River Intake
+0,0,844,16,Durham,Western JL WTP (Small)
+0,0,844,23,Raleigh,Reallocate Falls Lake
+0,0,844,33,Durham,Western JL WTP (Large)
+0,0,844,46,Raleigh,Neuse River Intake
+0,0,845,16,Durham,Western JL WTP (Small)
+0,0,845,23,Raleigh,Reallocate Falls Lake
+0,0,845,33,Durham,Western JL WTP (Large)
+0,0,845,48,Raleigh,Neuse River Intake
+0,0,846,16,Durham,Western JL WTP (Small)
+0,0,846,23,Raleigh,Reallocate Falls Lake
+0,0,846,33,Durham,Western JL WTP (Large)
+0,0,847,16,Durham,Western JL WTP (Small)
+0,0,847,23,Raleigh,Reallocate Falls Lake
+0,0,847,33,Durham,Western JL WTP (Large)
+0,0,848,16,Durham,Western JL WTP (Small)
+0,0,848,23,Raleigh,Reallocate Falls Lake
+0,0,848,33,Durham,Western JL WTP (Large)
+0,0,848,46,Raleigh,Neuse River Intake
+0,0,849,16,Durham,Western JL WTP (Small)
+0,0,849,23,Raleigh,Reallocate Falls Lake
+0,0,849,33,Durham,Western JL WTP (Large)
+0,0,850,16,Durham,Western JL WTP (Small)
+0,0,850,23,Raleigh,Reallocate Falls Lake
+0,0,850,33,Durham,Western JL WTP (Large)
+0,0,850,48,Raleigh,Neuse River Intake
+0,0,851,16,Durham,Western JL WTP (Small)
+0,0,851,23,Raleigh,Reallocate Falls Lake
+0,0,851,33,Durham,Western JL WTP (Large)
+0,0,851,45,Raleigh,Neuse River Intake
+0,0,852,16,Durham,Western JL WTP (Small)
+0,0,852,21,Raleigh,Reallocate Falls Lake
+0,0,852,33,Durham,Western JL WTP (Large)
+0,0,852,44,Raleigh,Neuse River Intake
+0,0,853,16,Durham,Western JL WTP (Small)
+0,0,853,23,Raleigh,Reallocate Falls Lake
+0,0,853,33,Durham,Western JL WTP (Large)
+0,0,854,16,Durham,Western JL WTP (Small)
+0,0,854,23,Raleigh,Reallocate Falls Lake
+0,0,854,33,Durham,Western JL WTP (Large)
+0,0,854,48,Raleigh,Neuse River Intake
+0,0,855,16,Durham,Western JL WTP (Small)
+0,0,855,23,Raleigh,Reallocate Falls Lake
+0,0,855,33,Durham,Western JL WTP (Large)
+0,0,855,48,Raleigh,Neuse River Intake
+0,0,856,16,Durham,Western JL WTP (Small)
+0,0,856,23,Raleigh,Reallocate Falls Lake
+0,0,856,33,Durham,Western JL WTP (Large)
+0,0,856,48,Raleigh,Neuse River Intake
+0,0,857,16,Durham,Western JL WTP (Small)
+0,0,857,21,Raleigh,Reallocate Falls Lake
+0,0,857,33,Durham,Western JL WTP (Large)
+0,0,857,46,Raleigh,Neuse River Intake
+0,0,858,16,Durham,Western JL WTP (Small)
+0,0,858,22,Raleigh,Reallocate Falls Lake
+0,0,858,33,Durham,Western JL WTP (Large)
+0,0,858,41,Raleigh,Neuse River Intake
+0,0,859,16,Durham,Western JL WTP (Small)
+0,0,859,21,Raleigh,Reallocate Falls Lake
+0,0,859,33,Durham,Western JL WTP (Large)
+0,0,859,38,Raleigh,Neuse River Intake
+0,0,860,16,Durham,Western JL WTP (Small)
+0,0,860,23,Raleigh,Reallocate Falls Lake
+0,0,860,33,Durham,Western JL WTP (Large)
+0,0,860,48,Raleigh,Neuse River Intake
+0,0,861,16,Durham,Western JL WTP (Small)
+0,0,861,23,Raleigh,Reallocate Falls Lake
+0,0,861,33,Durham,Western JL WTP (Large)
+0,0,861,43,Raleigh,Neuse River Intake
+0,0,862,16,Durham,Western JL WTP (Small)
+0,0,862,23,Raleigh,Reallocate Falls Lake
+0,0,862,33,Durham,Western JL WTP (Large)
+0,0,863,16,Durham,Western JL WTP (Small)
+0,0,863,23,Raleigh,Reallocate Falls Lake
+0,0,863,33,Durham,Western JL WTP (Large)
+0,0,863,52,Raleigh,Neuse River Intake
+0,0,864,16,Durham,Western JL WTP (Small)
+0,0,864,23,Raleigh,Reallocate Falls Lake
+0,0,864,33,Durham,Western JL WTP (Large)
+0,0,864,48,Raleigh,Neuse River Intake
+0,0,865,16,Durham,Western JL WTP (Small)
+0,0,865,23,Raleigh,Reallocate Falls Lake
+0,0,865,33,Durham,Western JL WTP (Large)
+0,0,865,48,Raleigh,Neuse River Intake
+0,0,866,16,Durham,Western JL WTP (Small)
+0,0,866,21,Raleigh,Reallocate Falls Lake
+0,0,866,33,Durham,Western JL WTP (Large)
+0,0,866,45,Raleigh,Neuse River Intake
+0,0,867,16,Durham,Western JL WTP (Small)
+0,0,867,23,Raleigh,Reallocate Falls Lake
+0,0,867,33,Durham,Western JL WTP (Large)
+0,0,868,16,Durham,Western JL WTP (Small)
+0,0,868,21,Raleigh,Reallocate Falls Lake
+0,0,868,33,Durham,Western JL WTP (Large)
+0,0,868,47,Raleigh,Neuse River Intake
+0,0,869,16,Durham,Western JL WTP (Small)
+0,0,869,23,Raleigh,Reallocate Falls Lake
+0,0,869,33,Durham,Western JL WTP (Large)
+0,0,869,48,Raleigh,Neuse River Intake
+0,0,870,16,Durham,Western JL WTP (Small)
+0,0,870,23,Raleigh,Reallocate Falls Lake
+0,0,870,33,Durham,Western JL WTP (Large)
+0,0,871,16,Durham,Western JL WTP (Small)
+0,0,871,23,Raleigh,Reallocate Falls Lake
+0,0,871,33,Durham,Western JL WTP (Large)
+0,0,871,43,Raleigh,Neuse River Intake
+0,0,872,16,Durham,Western JL WTP (Small)
+0,0,872,23,Raleigh,Reallocate Falls Lake
+0,0,872,33,Durham,Western JL WTP (Large)
+0,0,872,48,Raleigh,Neuse River Intake
+0,0,873,16,Durham,Western JL WTP (Small)
+0,0,873,23,Raleigh,Reallocate Falls Lake
+0,0,873,33,Durham,Western JL WTP (Large)
+0,0,873,50,Raleigh,Neuse River Intake
+0,0,874,16,Durham,Western JL WTP (Small)
+0,0,874,23,Raleigh,Reallocate Falls Lake
+0,0,874,33,Durham,Western JL WTP (Large)
+0,0,874,48,Raleigh,Neuse River Intake
+0,0,875,16,Durham,Western JL WTP (Small)
+0,0,875,23,Raleigh,Reallocate Falls Lake
+0,0,875,33,Durham,Western JL WTP (Large)
+0,0,875,48,Raleigh,Neuse River Intake
+0,0,876,16,Durham,Western JL WTP (Small)
+0,0,876,21,Raleigh,Reallocate Falls Lake
+0,0,876,33,Durham,Western JL WTP (Large)
+0,0,876,39,Raleigh,Neuse River Intake
+0,0,877,16,Durham,Western JL WTP (Small)
+0,0,877,23,Raleigh,Reallocate Falls Lake
+0,0,877,33,Durham,Western JL WTP (Large)
+0,0,877,42,Raleigh,Neuse River Intake
+0,0,878,16,Durham,Western JL WTP (Small)
+0,0,878,23,Raleigh,Reallocate Falls Lake
+0,0,878,33,Durham,Western JL WTP (Large)
+0,0,878,48,Raleigh,Neuse River Intake
+0,0,879,16,Durham,Western JL WTP (Small)
+0,0,879,21,Raleigh,Reallocate Falls Lake
+0,0,879,33,Durham,Western JL WTP (Large)
+0,0,879,46,Raleigh,Neuse River Intake
+0,0,880,16,Durham,Western JL WTP (Small)
+0,0,880,23,Raleigh,Reallocate Falls Lake
+0,0,880,33,Durham,Western JL WTP (Large)
+0,0,880,48,Raleigh,Neuse River Intake
+0,0,881,16,Durham,Western JL WTP (Small)
+0,0,881,21,Raleigh,Reallocate Falls Lake
+0,0,881,33,Durham,Western JL WTP (Large)
+0,0,881,33,Raleigh,Neuse River Intake
+0,0,882,16,Durham,Western JL WTP (Small)
+0,0,882,23,Raleigh,Reallocate Falls Lake
+0,0,882,33,Durham,Western JL WTP (Large)
+0,0,883,16,Durham,Western JL WTP (Small)
+0,0,883,21,Raleigh,Reallocate Falls Lake
+0,0,883,33,Durham,Western JL WTP (Large)
+0,0,883,48,Raleigh,Neuse River Intake
+0,0,884,16,Durham,Western JL WTP (Small)
+0,0,884,23,Raleigh,Reallocate Falls Lake
+0,0,884,33,Durham,Western JL WTP (Large)
+0,0,884,48,Raleigh,Neuse River Intake
+0,0,885,16,Durham,Western JL WTP (Small)
+0,0,885,23,Raleigh,Reallocate Falls Lake
+0,0,885,33,Durham,Western JL WTP (Large)
+0,0,886,16,Durham,Western JL WTP (Small)
+0,0,886,23,Raleigh,Reallocate Falls Lake
+0,0,886,33,Durham,Western JL WTP (Large)
+0,0,886,48,Raleigh,Neuse River Intake
+0,0,887,16,Durham,Western JL WTP (Small)
+0,0,887,23,Raleigh,Reallocate Falls Lake
+0,0,887,33,Durham,Western JL WTP (Large)
+0,0,887,40,Raleigh,Neuse River Intake
+0,0,888,16,Durham,Western JL WTP (Small)
+0,0,888,23,Raleigh,Reallocate Falls Lake
+0,0,888,33,Durham,Western JL WTP (Large)
+0,0,888,48,Raleigh,Neuse River Intake
+0,0,889,16,Durham,Western JL WTP (Small)
+0,0,889,21,Raleigh,Reallocate Falls Lake
+0,0,889,33,Durham,Western JL WTP (Large)
+0,0,889,47,Raleigh,Neuse River Intake
+0,0,890,16,Durham,Western JL WTP (Small)
+0,0,890,22,Raleigh,Reallocate Falls Lake
+0,0,890,33,Durham,Western JL WTP (Large)
+0,0,890,46,Raleigh,Neuse River Intake
+0,0,891,16,Durham,Western JL WTP (Small)
+0,0,891,21,Raleigh,Reallocate Falls Lake
+0,0,891,33,Durham,Western JL WTP (Large)
+0,0,891,48,Raleigh,Neuse River Intake
+0,0,892,16,Durham,Western JL WTP (Small)
+0,0,892,23,Raleigh,Reallocate Falls Lake
+0,0,892,33,Durham,Western JL WTP (Large)
+0,0,892,46,Raleigh,Neuse River Intake
+0,0,893,16,Durham,Western JL WTP (Small)
+0,0,893,23,Raleigh,Reallocate Falls Lake
+0,0,893,33,Durham,Western JL WTP (Large)
+0,0,893,48,Raleigh,Neuse River Intake
+0,0,894,16,Durham,Western JL WTP (Small)
+0,0,894,22,Raleigh,Reallocate Falls Lake
+0,0,894,33,Durham,Western JL WTP (Large)
+0,0,894,43,Raleigh,Neuse River Intake
+0,0,895,16,Durham,Western JL WTP (Small)
+0,0,895,23,Raleigh,Reallocate Falls Lake
+0,0,895,33,Durham,Western JL WTP (Large)
+0,0,895,49,Raleigh,Neuse River Intake
+0,0,896,16,Durham,Western JL WTP (Small)
+0,0,896,23,Raleigh,Reallocate Falls Lake
+0,0,896,33,Durham,Western JL WTP (Large)
+0,0,896,47,Raleigh,Neuse River Intake
+0,0,897,16,Durham,Western JL WTP (Small)
+0,0,897,21,Raleigh,Reallocate Falls Lake
+0,0,897,33,Durham,Western JL WTP (Large)
+0,0,897,41,Raleigh,Neuse River Intake
+0,0,898,16,Durham,Western JL WTP (Small)
+0,0,898,23,Raleigh,Reallocate Falls Lake
+0,0,898,33,Durham,Western JL WTP (Large)
+0,0,898,46,Raleigh,Neuse River Intake
+0,0,899,16,Durham,Western JL WTP (Small)
+0,0,899,23,Raleigh,Reallocate Falls Lake
+0,0,899,33,Durham,Western JL WTP (Large)
+0,0,899,48,Raleigh,Neuse River Intake
+0,0,900,16,Durham,Western JL WTP (Small)
+0,0,900,23,Raleigh,Reallocate Falls Lake
+0,0,900,33,Durham,Western JL WTP (Large)
+0,0,900,47,Raleigh,Neuse River Intake
+0,0,901,16,Durham,Western JL WTP (Small)
+0,0,901,22,Raleigh,Reallocate Falls Lake
+0,0,901,33,Durham,Western JL WTP (Large)
+0,0,901,42,Raleigh,Neuse River Intake
+0,0,902,16,Durham,Western JL WTP (Small)
+0,0,902,23,Raleigh,Reallocate Falls Lake
+0,0,902,33,Durham,Western JL WTP (Large)
+0,0,902,50,Raleigh,Neuse River Intake
+0,0,903,16,Durham,Western JL WTP (Small)
+0,0,903,23,Raleigh,Reallocate Falls Lake
+0,0,903,33,Durham,Western JL WTP (Large)
+0,0,903,48,Raleigh,Neuse River Intake
+0,0,904,16,Durham,Western JL WTP (Small)
+0,0,904,23,Raleigh,Reallocate Falls Lake
+0,0,904,33,Durham,Western JL WTP (Large)
+0,0,904,47,Raleigh,Neuse River Intake
+0,0,905,16,Durham,Western JL WTP (Small)
+0,0,905,23,Raleigh,Reallocate Falls Lake
+0,0,905,33,Durham,Western JL WTP (Large)
+0,0,905,50,Raleigh,Neuse River Intake
+0,0,906,16,Durham,Western JL WTP (Small)
+0,0,906,23,Raleigh,Reallocate Falls Lake
+0,0,906,33,Durham,Western JL WTP (Large)
+0,0,906,48,Raleigh,Neuse River Intake
+0,0,907,16,Durham,Western JL WTP (Small)
+0,0,907,23,Raleigh,Reallocate Falls Lake
+0,0,907,33,Durham,Western JL WTP (Large)
+0,0,907,46,Raleigh,Neuse River Intake
+0,0,908,16,Durham,Western JL WTP (Small)
+0,0,908,23,Raleigh,Reallocate Falls Lake
+0,0,908,33,Durham,Western JL WTP (Large)
+0,0,908,50,Raleigh,Neuse River Intake
+0,0,909,16,Durham,Western JL WTP (Small)
+0,0,909,23,Raleigh,Reallocate Falls Lake
+0,0,909,33,Durham,Western JL WTP (Large)
+0,0,909,47,Raleigh,Neuse River Intake
+0,0,910,16,Durham,Western JL WTP (Small)
+0,0,910,23,Raleigh,Reallocate Falls Lake
+0,0,910,33,Durham,Western JL WTP (Large)
+0,0,910,47,Raleigh,Neuse River Intake
+0,0,911,16,Durham,Western JL WTP (Small)
+0,0,911,23,Raleigh,Reallocate Falls Lake
+0,0,911,33,Durham,Western JL WTP (Large)
+0,0,912,16,Durham,Western JL WTP (Small)
+0,0,912,23,Raleigh,Reallocate Falls Lake
+0,0,912,33,Durham,Western JL WTP (Large)
+0,0,913,16,Durham,Western JL WTP (Small)
+0,0,913,23,Raleigh,Reallocate Falls Lake
+0,0,913,33,Durham,Western JL WTP (Large)
+0,0,913,48,Raleigh,Neuse River Intake
+0,0,914,16,Durham,Western JL WTP (Small)
+0,0,914,21,Raleigh,Reallocate Falls Lake
+0,0,914,33,Durham,Western JL WTP (Large)
+0,0,914,43,Raleigh,Neuse River Intake
+0,0,915,16,Durham,Western JL WTP (Small)
+0,0,915,23,Raleigh,Reallocate Falls Lake
+0,0,915,33,Durham,Western JL WTP (Large)
+0,0,916,16,Durham,Western JL WTP (Small)
+0,0,916,23,Raleigh,Reallocate Falls Lake
+0,0,916,33,Durham,Western JL WTP (Large)
+0,0,916,52,Raleigh,Neuse River Intake
+0,0,917,16,Durham,Western JL WTP (Small)
+0,0,917,21,Raleigh,Reallocate Falls Lake
+0,0,917,33,Durham,Western JL WTP (Large)
+0,0,917,41,Raleigh,Neuse River Intake
+0,0,918,16,Durham,Western JL WTP (Small)
+0,0,918,23,Raleigh,Reallocate Falls Lake
+0,0,918,33,Durham,Western JL WTP (Large)
+0,0,918,50,Raleigh,Neuse River Intake
+0,0,919,16,Durham,Western JL WTP (Small)
+0,0,919,23,Raleigh,Reallocate Falls Lake
+0,0,919,33,Durham,Western JL WTP (Large)
+0,0,920,16,Durham,Western JL WTP (Small)
+0,0,920,21,Raleigh,Reallocate Falls Lake
+0,0,920,33,Durham,Western JL WTP (Large)
+0,0,920,48,Raleigh,Neuse River Intake
+0,0,921,16,Durham,Western JL WTP (Small)
+0,0,921,22,Raleigh,Reallocate Falls Lake
+0,0,921,33,Durham,Western JL WTP (Large)
+0,0,921,42,Raleigh,Neuse River Intake
+0,0,922,16,Durham,Western JL WTP (Small)
+0,0,922,23,Raleigh,Reallocate Falls Lake
+0,0,922,33,Durham,Western JL WTP (Large)
+0,0,922,50,Raleigh,Neuse River Intake
+0,0,923,16,Durham,Western JL WTP (Small)
+0,0,923,23,Raleigh,Reallocate Falls Lake
+0,0,923,33,Durham,Western JL WTP (Large)
+0,0,923,48,Raleigh,Neuse River Intake
+0,0,924,16,Durham,Western JL WTP (Small)
+0,0,924,23,Raleigh,Reallocate Falls Lake
+0,0,924,33,Durham,Western JL WTP (Large)
+0,0,925,16,Durham,Western JL WTP (Small)
+0,0,925,23,Raleigh,Reallocate Falls Lake
+0,0,925,33,Durham,Western JL WTP (Large)
+0,0,925,48,Raleigh,Neuse River Intake
+0,0,926,16,Durham,Western JL WTP (Small)
+0,0,926,21,Raleigh,Reallocate Falls Lake
+0,0,926,33,Durham,Western JL WTP (Large)
+0,0,926,48,Raleigh,Neuse River Intake
+0,0,927,16,Durham,Western JL WTP (Small)
+0,0,927,23,Raleigh,Reallocate Falls Lake
+0,0,927,33,Durham,Western JL WTP (Large)
+0,0,927,52,Raleigh,Neuse River Intake
+0,0,928,16,Durham,Western JL WTP (Small)
+0,0,928,23,Raleigh,Reallocate Falls Lake
+0,0,928,33,Durham,Western JL WTP (Large)
+0,0,928,43,Raleigh,Neuse River Intake
+0,0,929,16,Durham,Western JL WTP (Small)
+0,0,929,23,Raleigh,Reallocate Falls Lake
+0,0,929,33,Durham,Western JL WTP (Large)
+0,0,930,16,Durham,Western JL WTP (Small)
+0,0,930,23,Raleigh,Reallocate Falls Lake
+0,0,930,33,Durham,Western JL WTP (Large)
+0,0,930,47,Raleigh,Neuse River Intake
+0,0,931,16,Durham,Western JL WTP (Small)
+0,0,931,23,Raleigh,Reallocate Falls Lake
+0,0,931,33,Durham,Western JL WTP (Large)
+0,0,931,48,Raleigh,Neuse River Intake
+0,0,932,16,Durham,Western JL WTP (Small)
+0,0,932,23,Raleigh,Reallocate Falls Lake
+0,0,932,33,Durham,Western JL WTP (Large)
+0,0,933,16,Durham,Western JL WTP (Small)
+0,0,933,23,Raleigh,Reallocate Falls Lake
+0,0,933,33,Durham,Western JL WTP (Large)
+0,0,933,46,Raleigh,Neuse River Intake
+0,0,934,16,Durham,Western JL WTP (Small)
+0,0,934,23,Raleigh,Reallocate Falls Lake
+0,0,934,33,Durham,Western JL WTP (Large)
+0,0,935,16,Durham,Western JL WTP (Small)
+0,0,935,23,Raleigh,Reallocate Falls Lake
+0,0,935,33,Durham,Western JL WTP (Large)
+0,0,935,48,Raleigh,Neuse River Intake
+0,0,936,16,Durham,Western JL WTP (Small)
+0,0,936,23,Raleigh,Reallocate Falls Lake
+0,0,936,33,Durham,Western JL WTP (Large)
+0,0,936,48,Raleigh,Neuse River Intake
+0,0,937,16,Durham,Western JL WTP (Small)
+0,0,937,23,Raleigh,Reallocate Falls Lake
+0,0,937,33,Durham,Western JL WTP (Large)
+0,0,937,50,Raleigh,Neuse River Intake
+0,0,938,16,Durham,Western JL WTP (Small)
+0,0,938,23,Raleigh,Reallocate Falls Lake
+0,0,938,33,Durham,Western JL WTP (Large)
+0,0,938,48,Raleigh,Neuse River Intake
+0,0,939,16,Durham,Western JL WTP (Small)
+0,0,939,23,Raleigh,Reallocate Falls Lake
+0,0,939,33,Durham,Western JL WTP (Large)
+0,0,939,50,Raleigh,Neuse River Intake
+0,0,940,16,Durham,Western JL WTP (Small)
+0,0,940,23,Raleigh,Reallocate Falls Lake
+0,0,940,33,Durham,Western JL WTP (Large)
+0,0,940,42,Raleigh,Neuse River Intake
+0,0,941,16,Durham,Western JL WTP (Small)
+0,0,941,23,Raleigh,Reallocate Falls Lake
+0,0,941,33,Durham,Western JL WTP (Large)
+0,0,941,48,Raleigh,Neuse River Intake
+0,0,942,16,Durham,Western JL WTP (Small)
+0,0,942,23,Raleigh,Reallocate Falls Lake
+0,0,942,33,Durham,Western JL WTP (Large)
+0,0,943,16,Durham,Western JL WTP (Small)
+0,0,943,21,Raleigh,Reallocate Falls Lake
+0,0,943,33,Durham,Western JL WTP (Large)
+0,0,943,48,Raleigh,Neuse River Intake
+0,0,944,16,Durham,Western JL WTP (Small)
+0,0,944,23,Raleigh,Reallocate Falls Lake
+0,0,944,33,Durham,Western JL WTP (Large)
+0,0,944,48,Raleigh,Neuse River Intake
+0,0,945,16,Durham,Western JL WTP (Small)
+0,0,945,23,Raleigh,Reallocate Falls Lake
+0,0,945,33,Durham,Western JL WTP (Large)
+0,0,945,49,Raleigh,Neuse River Intake
+0,0,946,16,Durham,Western JL WTP (Small)
+0,0,946,23,Raleigh,Reallocate Falls Lake
+0,0,946,33,Durham,Western JL WTP (Large)
+0,0,946,48,Raleigh,Neuse River Intake
+0,0,947,16,Durham,Western JL WTP (Small)
+0,0,947,23,Raleigh,Reallocate Falls Lake
+0,0,947,33,Durham,Western JL WTP (Large)
+0,0,947,48,Raleigh,Neuse River Intake
+0,0,948,16,Durham,Western JL WTP (Small)
+0,0,948,23,Raleigh,Reallocate Falls Lake
+0,0,948,33,Durham,Western JL WTP (Large)
+0,0,948,48,Raleigh,Neuse River Intake
+0,0,949,16,Durham,Western JL WTP (Small)
+0,0,949,23,Raleigh,Reallocate Falls Lake
+0,0,949,33,Durham,Western JL WTP (Large)
+0,0,949,48,Raleigh,Neuse River Intake
+0,0,950,16,Durham,Western JL WTP (Small)
+0,0,950,23,Raleigh,Reallocate Falls Lake
+0,0,950,33,Durham,Western JL WTP (Large)
+0,0,951,16,Durham,Western JL WTP (Small)
+0,0,951,23,Raleigh,Reallocate Falls Lake
+0,0,951,33,Durham,Western JL WTP (Large)
+0,0,951,50,Raleigh,Neuse River Intake
+0,0,952,16,Durham,Western JL WTP (Small)
+0,0,952,23,Raleigh,Reallocate Falls Lake
+0,0,952,33,Durham,Western JL WTP (Large)
+0,0,952,49,Raleigh,Neuse River Intake
+0,0,953,16,Durham,Western JL WTP (Small)
+0,0,953,23,Raleigh,Reallocate Falls Lake
+0,0,953,33,Durham,Western JL WTP (Large)
+0,0,953,46,Raleigh,Neuse River Intake
+0,0,954,16,Durham,Western JL WTP (Small)
+0,0,954,23,Raleigh,Reallocate Falls Lake
+0,0,954,33,Durham,Western JL WTP (Large)
+0,0,954,49,Raleigh,Neuse River Intake
+0,0,955,16,Durham,Western JL WTP (Small)
+0,0,955,23,Raleigh,Reallocate Falls Lake
+0,0,955,33,Durham,Western JL WTP (Large)
+0,0,955,44,Raleigh,Neuse River Intake
+0,0,956,16,Durham,Western JL WTP (Small)
+0,0,956,23,Raleigh,Reallocate Falls Lake
+0,0,956,33,Durham,Western JL WTP (Large)
+0,0,956,48,Raleigh,Neuse River Intake
+0,0,957,16,Durham,Western JL WTP (Small)
+0,0,957,23,Raleigh,Reallocate Falls Lake
+0,0,957,33,Durham,Western JL WTP (Large)
+0,0,957,48,Raleigh,Neuse River Intake
+0,0,958,16,Durham,Western JL WTP (Small)
+0,0,958,23,Raleigh,Reallocate Falls Lake
+0,0,958,33,Durham,Western JL WTP (Large)
+0,0,958,49,Raleigh,Neuse River Intake
+0,0,959,16,Durham,Western JL WTP (Small)
+0,0,959,21,Raleigh,Reallocate Falls Lake
+0,0,959,33,Durham,Western JL WTP (Large)
+0,0,959,48,Raleigh,Neuse River Intake
+0,0,960,16,Durham,Western JL WTP (Small)
+0,0,960,21,Raleigh,Reallocate Falls Lake
+0,0,960,33,Durham,Western JL WTP (Large)
+0,0,960,48,Raleigh,Neuse River Intake
+0,0,961,16,Durham,Western JL WTP (Small)
+0,0,961,23,Raleigh,Reallocate Falls Lake
+0,0,961,33,Durham,Western JL WTP (Large)
+0,0,961,48,Raleigh,Neuse River Intake
+0,0,962,16,Durham,Western JL WTP (Small)
+0,0,962,23,Raleigh,Reallocate Falls Lake
+0,0,962,33,Durham,Western JL WTP (Large)
+0,0,962,44,Raleigh,Neuse River Intake
+0,0,963,16,Durham,Western JL WTP (Small)
+0,0,963,23,Raleigh,Reallocate Falls Lake
+0,0,963,33,Durham,Western JL WTP (Large)
+0,0,963,45,Raleigh,Neuse River Intake
+0,0,964,16,Durham,Western JL WTP (Small)
+0,0,964,23,Raleigh,Reallocate Falls Lake
+0,0,964,33,Durham,Western JL WTP (Large)
+0,0,964,48,Raleigh,Neuse River Intake
+0,0,965,16,Durham,Western JL WTP (Small)
+0,0,965,23,Raleigh,Reallocate Falls Lake
+0,0,965,33,Durham,Western JL WTP (Large)
+0,0,965,46,Raleigh,Neuse River Intake
+0,0,966,16,Durham,Western JL WTP (Small)
+0,0,966,17,Raleigh,Reallocate Falls Lake
+0,0,966,33,Durham,Western JL WTP (Large)
+0,0,966,33,Raleigh,Neuse River Intake
+0,0,967,16,Durham,Western JL WTP (Small)
+0,0,967,23,Raleigh,Reallocate Falls Lake
+0,0,967,33,Durham,Western JL WTP (Large)
+0,0,967,45,Raleigh,Neuse River Intake
+0,0,968,16,Durham,Western JL WTP (Small)
+0,0,968,23,Raleigh,Reallocate Falls Lake
+0,0,968,33,Durham,Western JL WTP (Large)
+0,0,968,44,Raleigh,Neuse River Intake
+0,0,969,16,Durham,Western JL WTP (Small)
+0,0,969,23,Raleigh,Reallocate Falls Lake
+0,0,969,33,Durham,Western JL WTP (Large)
+0,0,969,49,Raleigh,Neuse River Intake
+0,0,970,16,Durham,Western JL WTP (Small)
+0,0,970,23,Raleigh,Reallocate Falls Lake
+0,0,970,33,Durham,Western JL WTP (Large)
+0,0,970,48,Raleigh,Neuse River Intake
+0,0,971,16,Durham,Western JL WTP (Small)
+0,0,971,23,Raleigh,Reallocate Falls Lake
+0,0,971,33,Durham,Western JL WTP (Large)
+0,0,972,16,Durham,Western JL WTP (Small)
+0,0,972,23,Raleigh,Reallocate Falls Lake
+0,0,972,33,Durham,Western JL WTP (Large)
+0,0,972,48,Raleigh,Neuse River Intake
+0,0,973,16,Durham,Western JL WTP (Small)
+0,0,973,23,Raleigh,Reallocate Falls Lake
+0,0,973,33,Durham,Western JL WTP (Large)
+0,0,973,48,Raleigh,Neuse River Intake
+0,0,974,16,Durham,Western JL WTP (Small)
+0,0,974,21,Raleigh,Reallocate Falls Lake
+0,0,974,33,Durham,Western JL WTP (Large)
+0,0,974,48,Raleigh,Neuse River Intake
+0,0,975,16,Durham,Western JL WTP (Small)
+0,0,975,23,Raleigh,Reallocate Falls Lake
+0,0,975,33,Durham,Western JL WTP (Large)
+0,0,975,48,Raleigh,Neuse River Intake
+0,0,976,16,Durham,Western JL WTP (Small)
+0,0,976,23,Raleigh,Reallocate Falls Lake
+0,0,976,33,Durham,Western JL WTP (Large)
+0,0,976,40,Raleigh,Neuse River Intake
+0,0,977,16,Durham,Western JL WTP (Small)
+0,0,977,23,Raleigh,Reallocate Falls Lake
+0,0,977,33,Durham,Western JL WTP (Large)
+0,0,977,48,Raleigh,Neuse River Intake
+0,0,978,16,Durham,Western JL WTP (Small)
+0,0,978,23,Raleigh,Reallocate Falls Lake
+0,0,978,33,Durham,Western JL WTP (Large)
+0,0,978,43,Raleigh,Neuse River Intake
+0,0,979,16,Durham,Western JL WTP (Small)
+0,0,979,23,Raleigh,Reallocate Falls Lake
+0,0,979,33,Durham,Western JL WTP (Large)
+0,0,979,48,Raleigh,Neuse River Intake
+0,0,980,16,Durham,Western JL WTP (Small)
+0,0,980,21,Raleigh,Reallocate Falls Lake
+0,0,980,33,Durham,Western JL WTP (Large)
+0,0,980,45,Raleigh,Neuse River Intake
+0,0,981,16,Durham,Western JL WTP (Small)
+0,0,981,23,Raleigh,Reallocate Falls Lake
+0,0,981,33,Durham,Western JL WTP (Large)
+0,0,981,48,Raleigh,Neuse River Intake
+0,0,982,16,Durham,Western JL WTP (Small)
+0,0,982,23,Raleigh,Reallocate Falls Lake
+0,0,982,33,Durham,Western JL WTP (Large)
+0,0,982,46,Raleigh,Neuse River Intake
+0,0,983,16,Durham,Western JL WTP (Small)
+0,0,983,23,Raleigh,Reallocate Falls Lake
+0,0,983,33,Durham,Western JL WTP (Large)
+0,0,984,16,Durham,Western JL WTP (Small)
+0,0,984,23,Raleigh,Reallocate Falls Lake
+0,0,984,33,Durham,Western JL WTP (Large)
+0,0,984,46,Raleigh,Neuse River Intake
+0,0,985,16,Durham,Western JL WTP (Small)
+0,0,985,23,Raleigh,Reallocate Falls Lake
+0,0,985,33,Durham,Western JL WTP (Large)
+0,0,985,48,Raleigh,Neuse River Intake
+0,0,986,16,Durham,Western JL WTP (Small)
+0,0,986,23,Raleigh,Reallocate Falls Lake
+0,0,986,33,Durham,Western JL WTP (Large)
+0,0,986,48,Raleigh,Neuse River Intake
+0,0,987,16,Durham,Western JL WTP (Small)
+0,0,987,20,Raleigh,Reallocate Falls Lake
+0,0,987,33,Durham,Western JL WTP (Large)
+0,0,987,38,Raleigh,Neuse River Intake
+0,0,988,16,Durham,Western JL WTP (Small)
+0,0,988,23,Raleigh,Reallocate Falls Lake
+0,0,988,33,Durham,Western JL WTP (Large)
+0,0,989,16,Durham,Western JL WTP (Small)
+0,0,989,23,Raleigh,Reallocate Falls Lake
+0,0,989,33,Durham,Western JL WTP (Large)
+0,0,989,48,Raleigh,Neuse River Intake
+0,0,990,16,Durham,Western JL WTP (Small)
+0,0,990,23,Raleigh,Reallocate Falls Lake
+0,0,990,33,Durham,Western JL WTP (Large)
+0,0,990,48,Raleigh,Neuse River Intake
+0,0,991,16,Durham,Western JL WTP (Small)
+0,0,991,23,Raleigh,Reallocate Falls Lake
+0,0,991,33,Durham,Western JL WTP (Large)
+0,0,991,50,Raleigh,Neuse River Intake
+0,0,992,16,Durham,Western JL WTP (Small)
+0,0,992,23,Raleigh,Reallocate Falls Lake
+0,0,992,33,Durham,Western JL WTP (Large)
+0,0,992,48,Raleigh,Neuse River Intake
+0,0,993,16,Durham,Western JL WTP (Small)
+0,0,993,23,Raleigh,Reallocate Falls Lake
+0,0,993,33,Durham,Western JL WTP (Large)
+0,0,993,48,Raleigh,Neuse River Intake
+0,0,994,16,Durham,Western JL WTP (Small)
+0,0,994,23,Raleigh,Reallocate Falls Lake
+0,0,994,33,Durham,Western JL WTP (Large)
+0,0,994,47,Raleigh,Neuse River Intake
+0,0,995,16,Durham,Western JL WTP (Small)
+0,0,995,21,Raleigh,Reallocate Falls Lake
+0,0,995,33,Durham,Western JL WTP (Large)
+0,0,995,48,Raleigh,Neuse River Intake
+0,0,996,16,Durham,Western JL WTP (Small)
+0,0,996,23,Raleigh,Reallocate Falls Lake
+0,0,996,33,Durham,Western JL WTP (Large)
+0,0,996,50,Raleigh,Neuse River Intake
+0,0,997,16,Durham,Western JL WTP (Small)
+0,0,997,23,Raleigh,Reallocate Falls Lake
+0,0,997,33,Durham,Western JL WTP (Large)
+0,0,997,46,Raleigh,Neuse River Intake
+0,0,998,16,Durham,Western JL WTP (Small)
+0,0,998,21,Raleigh,Reallocate Falls Lake
+0,0,998,33,Durham,Western JL WTP (Large)
+0,0,998,38,Raleigh,Neuse River Intake
+0,0,999,16,Durham,Western JL WTP (Small)
+0,0,999,23,Raleigh,Reallocate Falls Lake
+0,0,999,33,Durham,Western JL WTP (Large)
+0,0,999,44,Raleigh,Neuse River Intake

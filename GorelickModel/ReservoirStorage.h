@@ -79,6 +79,7 @@ public:
 	void upgradeCaryTreatmentPlant2();
 	void upgradeDurhamCaryConnection();
 	void upgradeDurhamOWASAConnection();
+	void upgradeDurhamOWASAConnectionTWO();
 	void openResFiles();
 	void buildULexp();
 	void buildCCexp();
@@ -119,6 +120,24 @@ public:
 	
 	int ReqCount;
 	int ReqCurtail;
+	
+	double RJLWestWTPdem;
+	double DJLWestWTPdem;
+	double OJLWestWTPdem;
+		// weekly demands from the western joint wtp on jordan lake 
+		// to be counted as transfers 
+		
+	double WJLWTPinterconnectCapacity;
+	double OWASADurhamInterconnectTWO;
+		// smallest pipe connection before reaching Durham-OWASA interconnection 
+		// and the smaller OWASA interconnection
+		
+	double WJLWTPfracD;
+	double WJLWTPfracO;
+	double WJLWTPfracR;
+	double WJLWTPfracTOT;
+	double WJLWTPfracRDonly;
+		// fraction of treatment plant capacity available for each city 
 
 private:
 	
@@ -191,7 +210,9 @@ private:
 	double caryQuarryOutflowCapacity;//maximum withdrawls from quarry
 	////Interconnections
 	double DurhamCaryCapacity;//Capacity of the Durham Cary interconnection
-	double DurhamOWASACapacity;//Capacity of the Durham OWASA interconnection
+	double DurhamOWASACapacityToD;//Capacity of the Durham OWASA interconnection to durham
+	double DurhamOWASACapacityToO;// capacity of the interconnect to owasa 
+		// the difference is needed to incorporate the WJLWTP 
 	double RaleighCaryCapacity;//Capacity of the Raleigh Cary interconnection
 	double RaleighDurhamCapacity;//Capacity of the Raleigh Durham interconnection
 	////Jordan Lake treatment Plants

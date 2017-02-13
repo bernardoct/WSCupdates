@@ -48,7 +48,7 @@ public:
 	data_t parameterInput;
 	
 	void createInfrastructure(int realization);
-	void triggerInfrastructure(int realization);
+	void triggerInfrastructure(int realization, ofstream &checker);
 	void updateFallsQuality();
 	void setStartYear(int SSY);
 	void chooseStreamflows();
@@ -157,6 +157,9 @@ public:
 	double DcriticalStorageLevel;
 	double discountrate;
 	double contracttypetoggle;
+	double WesternJLWTPdeadstorage;
+	double WJLWWTPtotal;
+	double NewAllocFrac;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;
@@ -164,8 +167,11 @@ public:
 	double jordan_lake_wq_capacity;
 	double cary_treatment_capacity;
 	double durham_cary_capacity;
-	double durham_owasa_capacity;
+	double durham_owasa_capacityONEd;
+	double durham_owasa_capacityONEo;
+	double durham_owasa_capacityTWO;
 	double raleigh_cary_capacity;
+	double raleigh_durham_capacity;
 	
 	int numRealizations;
 	
@@ -266,6 +272,7 @@ private:
 	ofstream RestData;
 	ofstream ALLTdata;
 	ofstream storcheck;
+	ofstream checker;
 	
 };
 #endif

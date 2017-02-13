@@ -871,9 +871,23 @@ void Simulation::fixRDMFactors(int rdm_i)
 		// these numbers are in MG of storage 
 		
 	cary_treatment_capacity = 40.0*rdm_factors[11];
-	durham_cary_capacity = 10.0*rdm_factors[12];
-	durham_owasa_capacity = 7.0*rdm_factors[12];
-	raleigh_cary_capacity = 10.8*rdm_factors[12];
+	durham_cary_capacity    = 10.0*rdm_factors[12];
+	
+	durham_owasa_capacityONEd = 5.9*rdm_factors[12];
+	durham_owasa_capacityTWO  = 1.1*rdm_factors[12];
+	durham_owasa_capacityONEo = 5.9;
+		// two lines, the first and largest connects to WJLWTP interconnection (ONEd and o)
+		// but is split into two parts at the intersection with the WJLWTP line, so that 
+		// if the new WTP connection is made, the capacity of ONEd is increased 
+	
+	systemStorage.WJLWTPinterconnectCapacity = 24.0;
+	riskOfFailureStorageIP.WJLWTPinterconnectCapacity = 24.0;
+	riskOfFailureStorageInf.WJLWTPinterconnectCapacity = 24.0;
+	riskOfFailureStorageROF.WJLWTPinterconnectCapacity = 24.0;
+		// capacity of smallest connection between WJLWTP and D-O interconnection 
+	
+	raleigh_cary_capacity   = 10.8*rdm_factors[12];
+	raleigh_durham_capacity = 11.5;
 		// set all RDM factors to 1 for default 
 	
 	// FALLS LAKE CONSERVATION POOL ALLOCATIONS
@@ -891,7 +905,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 
 	// cout << "Setting permiting times" << endl;
 	//MORDM EXTENSION - permiting periods
-	owasa.infMatrix[0][2] = rdm_factors[15];//17;
+	owasa.infMatrix[0][2] = rdm_factors[15]; 
 		// permitting period, cant be built until 17th year
 		// University Lake Exp
 	owasa.infMatrix[1][2] = rdm_factors[16];
@@ -922,8 +936,10 @@ void Simulation::fixRDMFactors(int rdm_i)
 		// for David MS thesis runs, experiment with removing this 
 
 	// for these last 6, the 12s and 27s must be the same.
-	owasa.infMatrix[4][2] = rdm_factors[28]; // 12
-	owasa.infMatrix[5][2] = rdm_factors[29]; // 27 
+	owasa.infMatrix[4][2] = rdm_factors[28]; 
+		// 12
+	owasa.infMatrix[5][2] = rdm_factors[29]; 
+		// 27 
 	durham.infMatrix[5][2] = rdm_factors[28];
 	durham.infMatrix[6][2] = rdm_factors[29];
 	raleigh.infMatrix[4][2] = rdm_factors[28];
@@ -1430,7 +1446,7 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	durham.infMatrix[4][4] = 203.3;
 	durham.infMatrix[4][5] = 3 + rand() % 3;
 	///Raleigh infrastructure
-	raleigh.infMatrix[0][0] = xreal[37];////Little River Reservoir
+	raleigh.infMatrix[0][0] = xreal[36];////Little River Reservoir
 	raleigh.infMatrix[0][4] = 263.0;
 	raleigh.infMatrix[0][5] = 3 + rand() % 3;
 	raleigh.infMatrix[1][0] = xreal[37];////Richland Creek Quarry
@@ -1498,22 +1514,35 @@ double Simulation::calculation(double *c_xreal, double *c_obj, double *c_constr)
 	caryUpgrades[1] = xreal[47];
 	caryUpgrades[2] = xreal[48];
 	caryUpgrades[3] = 999.0;
-	if(xreal[49]+xreal[50]+xreal[51]>1.0)
+	
+	WJLWWTPtotal = xreal[49] + xreal[50] + xreal[51];
+	if(xreal[49] + xreal[50] + xreal[51] > (1.0 - WesternJLWTPdeadstorage))
         // double check when you apply this constraint
 	{
-		double WWWTPtotal = xreal[49]+xreal[50]+xreal[51];
-		owasa.westernWakeTreatmentFrac = xreal[49]/WWWTPtotal;
-		durham.westernWakeTreatmentFrac = xreal[50]/WWWTPtotal;
-		raleigh.westernWakeTreatmentFrac = xreal[51]/WWWTPtotal;
+		owasa.westernWakeTreatmentFrac   = xreal[49]/WJLWWTPtotal * (1.0 - WesternJLWTPdeadstorage);
+		durham.westernWakeTreatmentFrac  = xreal[50]/WJLWWTPtotal * (1.0 - WesternJLWTPdeadstorage);
+		raleigh.westernWakeTreatmentFrac = xreal[51]/WJLWWTPtotal * (1.0 - WesternJLWTPdeadstorage);
 	}
 	else
 	{
-		owasa.westernWakeTreatmentFrac = xreal[49];
-		durham.westernWakeTreatmentFrac = xreal[50];
+		owasa.westernWakeTreatmentFrac   = xreal[49];
+		durham.westernWakeTreatmentFrac  = xreal[50];
 		raleigh.westernWakeTreatmentFrac = xreal[51];
 	}
+	
+	systemStorage.WJLWTPfracTOT           = owasa.westernWakeTreatmentFrac + durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageIP.WJLWTPfracTOT  = owasa.westernWakeTreatmentFrac + durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageInf.WJLWTPfracTOT = owasa.westernWakeTreatmentFrac + durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageROF.WJLWTPfracTOT = owasa.westernWakeTreatmentFrac + durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	
+	systemStorage.WJLWTPfracRDonly           = durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageIP.WJLWTPfracRDonly  = durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageInf.WJLWTPfracRDonly = durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+	riskOfFailureStorageROF.WJLWTPfracRDonly = durham.westernWakeTreatmentFrac + raleigh.westernWakeTreatmentFrac;
+		// pass to reservoir model for calculations in water balance 
+	
 	fallsLakeReallocation = xreal[52];
-	//fallsLakeReallocation = 10000;
+		// Raleigh has requested 4.1 BGal reallocation 
 
 	caryWTPcosts[0] = 69.1;
 	caryWTPcosts[1] = 21.4;
@@ -2611,6 +2640,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "OWASA" << "," << "Western JL WTP (Small)" << endl;
@@ -2620,6 +2655,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "OWASA" << "," << "Western JL WTP (Large)" << endl;
@@ -2699,6 +2740,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "Durham" << "," << "Western JL WTP (Small)" << endl;
@@ -2708,6 +2755,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "Durham" << "," << "Western JL WTP (Large)" << endl;
@@ -2790,6 +2843,8 @@ void Simulation::createInfrastructure(int realization)
 					raleigh.addCapacity(fallsLakeReallocation);
 					raleigh.addInsStorage(fallsLakeReallocation);
 					
+					NewAllocFrac  = systemStorage.getFallsSupplyAllocFrac();
+					
 					InfraBuilt << "Raleigh" << "," << "Reallocate Falls Lake" << endl;
 					
 					break;
@@ -2797,6 +2852,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPlow(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "Raleigh" << "," << "Western JL WTP (Small)" << endl;
@@ -2806,6 +2867,12 @@ void Simulation::createInfrastructure(int realization)
 					systemStorage.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageROF.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
 					riskOfFailureStorageIP.buildWWWTPhigh(owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac);
+					
+					systemStorage.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnection();
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnection();
+					
 					wwWTPInsuranceTrigger = 1.0;
 					
 					InfraBuilt << "Raleigh" << "," << "Western JL WTP (Large)" << endl;
@@ -3228,14 +3295,15 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 
 	return;
 }
-void Simulation::triggerInfrastructure(int realization)
+void Simulation::triggerInfrastructure(int realization, ofstream &checker)
 {
 	int owasaIndex;
 	int durhamIndex;
 	int raleighIndex;
 	if(owasa.infRisk > owasa.infTrigger)
 	{
-		owasaIndex = owasa.startNewInfrastructure(year);
+		// checker << realization << "," << year << "," << "OWASA" << ",";
+		owasaIndex = owasa.startNewInfrastructure(year, checker);
 		switch(owasaIndex)
 		{
 
@@ -3303,7 +3371,8 @@ void Simulation::triggerInfrastructure(int realization)
 	}
 	if(durham.infRisk > durham.infTrigger)
 	{
-		durhamIndex = durham.startNewInfrastructure(year);
+		// checker << realization << "," << year << "," << "Durham" << ",";
+		durhamIndex = durham.startNewInfrastructure(year, checker);
 		switch(durhamIndex)
 		{
 			case 0:
@@ -3445,8 +3514,8 @@ void Simulation::triggerInfrastructure(int realization)
 	}
 	if(raleigh.infRisk > raleigh.infTrigger)
 	{
-
-		raleighIndex = raleigh.startNewInfrastructure(year);
+		// checker << realization << "," << year << "," << "Raleigh" << ",";
+		raleighIndex = raleigh.startNewInfrastructure(year, checker);
 		switch(raleighIndex)
 		{
 			case 0:
@@ -5229,7 +5298,6 @@ void Simulation::realizationLoop()
 	double stone_quarry_supply_capacity = 200.0;
 	double university_lake_supply_capacity = 449.0;
 	double lake_wheeler_benson_supply_capacity = 2789.66;
-	double raleigh_durham_capacity = 10.0;
 	double teer_quarry_supply_capacity = 1315.0;
 	double teer_quarry_intake_capacity = 0.0;
 	double teer_quarry_outflow_capacity = 0.0;
@@ -5246,6 +5314,11 @@ void Simulation::realizationLoop()
 	
 	double raleigh_Lake_Michie_capacity = 0.0;
 		// initially, Raleigh has no capacity in Lake Michie
+		
+	systemStorage.RJLWestWTPdem = 0.0;
+	systemStorage.DJLWestWTPdem = 0.0;
+	systemStorage.OJLWestWTPdem = 0.0;
+		// initially there are no demands from the joint WTP 
 	
 	/////////////////////////////////////////////////////////////////////////
 	///////// PUT RELEASE CONSTRAINTS HERE (DEPENDS ON CONTRACT) ////////////
@@ -5360,6 +5433,7 @@ void Simulation::realizationLoop()
 		std::string filenameB = "output/RestrictionData";
 		std::string filenameE = "output/ALLtransferData";
 		std::string filenameF = "output/storagecheck";
+		std::string filenameH = "output/checker";
 		
 		std::string filenameEND = ".csv";
 			
@@ -5372,6 +5446,7 @@ void Simulation::realizationLoop()
 		std::string completeFilenameB;
 		std::string completeFilenameE;
 		std::string completeFilenameF;
+		std::string completeFilenameH;
 		
 		std::stringstream sstmA;
 		std::stringstream sstmC;
@@ -5382,6 +5457,7 @@ void Simulation::realizationLoop()
 		std::stringstream sstmB;
 		std::stringstream sstmE;
 		std::stringstream sstmF;
+		std::stringstream sstmH;
 		
 		sstmA << filenameA << rank << "_" << formulation << "_" << rdmNumber << filenameEND;
 		sstmC << filenameC << rank << "_" << formulation << "_" << rdmNumber << filenameEND;
@@ -5392,6 +5468,7 @@ void Simulation::realizationLoop()
 		sstmB << filenameB << solutionNumber << "_" << formulation << "_" << rdmNumber << filenameEND;
 		sstmE << filenameE << solutionNumber << "_" << formulation << "_" << rdmNumber << filenameEND;
 		sstmF << filenameF << solutionNumber << "_" << formulation << "_" << rdmNumber << filenameEND;
+		sstmH << filenameH << solutionNumber << "_" << formulation << "_" << rdmNumber << filenameEND;
 		
 		completeFilenameA = sstmA.str();
 		completeFilenameC = sstmC.str();
@@ -5402,6 +5479,7 @@ void Simulation::realizationLoop()
 		completeFilenameB = sstmB.str();
 		completeFilenameE = sstmE.str();
 		completeFilenameF = sstmF.str();
+		completeFilenameH = sstmH.str();
 		
 		openFile(out100, completeFilenameA);
 		openFile(outNew, completeFilenameC);
@@ -5412,6 +5490,9 @@ void Simulation::realizationLoop()
 		openFile(RestData, completeFilenameB);
 		openFile(ALLTdata, completeFilenameE);
 		openFile(storcheck, completeFilenameF);
+		openFile(checker, completeFilenameH);
+		
+		
 			// all these are defined in the header file 
 		
 		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
@@ -5439,7 +5520,7 @@ void Simulation::realizationLoop()
 		
 		ALLTdata << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << ",";
 		ALLTdata << "RaleighTargetStorageFraction" << "," << "DurhamTargetStorageFraction" << ",";
-		ALLTdata << "TTR" << "," << "TTD" << ",";
+		ALLTdata << "TTR" << "," << "TTD" << "," << "TTO" << ",";
 		ALLTdata << "RRR" << "," << "BBD" << ",";
 		ALLTdata << "Rstor" << "," << "Dstor" << endl;
 		
@@ -5452,6 +5533,8 @@ void Simulation::realizationLoop()
 		storcheck << "Rstor6" << "," << "Dstor6" << ",";
 		storcheck << "Rstor7" << "," << "Dstor7" << ",";
 		storcheck << "Rstor8" << "," << "Dstor8" << endl;
+		
+		checker << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "RJLWestWTPdem" << "," << "DJLWestWTPdem" << "," << "OJLWestWTPdem" << endl;
 		
 		if (spotPricing)
 		{
@@ -5540,6 +5623,7 @@ void Simulation::realizationLoop()
 		yearcounter = 0;
 		contractriskyearcounter = 0;
 		LOOPCHECKER = 0;
+		NewAllocFrac = 0.423;
 		
 		if (formulation > 0) 
 		{
@@ -5569,7 +5653,7 @@ void Simulation::realizationLoop()
 
 		systemStorage.initializeReservoirStorage(durham_res_supply_capacity,
 													cane_creek_supply_capacity, stone_quarry_supply_capacity,university_lake_supply_capacity, lake_wheeler_benson_supply_capacity, falls_lake_supply_capacity, falls_lake_wq_capacity,
-													jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity, 
+													jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacityONEd, raleigh_cary_capacity, raleigh_durham_capacity, 
 													raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
 													little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, raleigh_quarry_intake_capacity, 
 													raleigh_quarry_outflow_capacity, raleigh_intake_capacity, cary_quarry_capacity, cary_quarry_intake_capacity, cary_quarry_outflow_capacity, 
@@ -5578,12 +5662,14 @@ void Simulation::realizationLoop()
 														// infrastructure included in the model
 														// MICHIE RELEASE MIN AND CAP INCLUDED HERE (BY DAVID), as well as Raleigh's stake of Lake Michie 
             // actual reservoir storage
+			
+		systemStorage.OWASADurhamInterconnectTWO = durham_owasa_capacityTWO;
 
 		riskOfFailureStorageInf.initializeReservoirStorageROF(durham_res_supply_capacity,
 																cane_creek_supply_capacity,	stone_quarry_supply_capacity,				
 																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,falls_lake_supply_capacity, 
 																falls_lake_wq_capacity, jordan_lake_supply_capacity, jordan_lake_wq_capacity, cary_treatment_capacity, 
-																durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, raleigh_durham_capacity,raleigh.jordanLakeAlloc, 
+																durham_cary_capacity, durham_owasa_capacityONEd, raleigh_cary_capacity, raleigh_durham_capacity,raleigh.jordanLakeAlloc, 
 																durham.jordanLakeAlloc, owasa.jordanLakeAlloc, cary.jordanLakeAlloc, teer_quarry_supply_capacity, 
 																teer_quarry_intake_capacity, teer_quarry_outflow_capacity, little_river_raleigh_supply_capacity, 
 																western_wake_treatment_capacity, durham_reclaimation_capacity, raleigh_quarry_capacity, 
@@ -5592,13 +5678,15 @@ void Simulation::realizationLoop()
 																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
 																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // used once per year to calculate ROF
+			
+		riskOfFailureStorageInf.OWASADurhamInterconnectTWO = durham_owasa_capacityTWO;
 
 		riskOfFailureStorageROF.initializeReservoirStorageROF(durham_res_supply_capacity,
 																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
 																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
 																falls_lake_supply_capacity, falls_lake_wq_capacity,					
 																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
-																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
+																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacityONEd, raleigh_cary_capacity, 
 																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
 																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
 																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
@@ -5607,13 +5695,15 @@ void Simulation::realizationLoop()
 																owasa.westernWakeTreatmentFrac, durham.westernWakeTreatmentFrac, raleigh.westernWakeTreatmentFrac,0,
 																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // calculated every week using current storage
+			
+		riskOfFailureStorageROF.OWASADurhamInterconnectTWO = durham_owasa_capacityTWO;
 
 		riskOfFailureStorageIP.initializeReservoirStorageROF(durham_res_supply_capacity,
 																cane_creek_supply_capacity,	stone_quarry_supply_capacity,					
 																university_lake_supply_capacity, lake_wheeler_benson_supply_capacity,			
 																falls_lake_supply_capacity, falls_lake_wq_capacity,					
 																jordan_lake_supply_capacity, jordan_lake_wq_capacity,					
-																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacity, raleigh_cary_capacity, 
+																cary_treatment_capacity, durham_cary_capacity, durham_owasa_capacityONEd, raleigh_cary_capacity, 
 																raleigh_durham_capacity, raleigh.jordanLakeAlloc, durham.jordanLakeAlloc, owasa.jordanLakeAlloc, 
 																cary.jordanLakeAlloc, teer_quarry_supply_capacity, teer_quarry_intake_capacity, teer_quarry_outflow_capacity, 
 																little_river_raleigh_supply_capacity, western_wake_treatment_capacity, durham_reclaimation_capacity, 
@@ -5623,6 +5713,8 @@ void Simulation::realizationLoop()
 																LMreleaseCap, LMreleaseMin, raleigh_Lake_Michie_capacity);
             // based on weekly changes this calculates insurance payouts
 
+		riskOfFailureStorageIP.OWASADurhamInterconnectTWO = durham_owasa_capacityTWO;
+		
 		year = simDates.getYear();//passes the dates from the simDates class to the main simulation
 		month = simDates.getMonth();
 		week = simDates.getWeek();
@@ -5667,6 +5759,22 @@ void Simulation::realizationLoop()
 		double raleighIntakeCap = raleigh_intake_capacity;
 		zeroes(caryBuild,3);
 		thisYearFalls = 0;
+		
+		systemStorage.WJLWTPfracD = durham.westernWakeTreatmentFrac;
+		systemStorage.WJLWTPfracO = owasa.westernWakeTreatmentFrac;
+		systemStorage.WJLWTPfracR = raleigh.westernWakeTreatmentFrac;
+		
+		riskOfFailureStorageROF.WJLWTPfracD = durham.westernWakeTreatmentFrac;
+		riskOfFailureStorageROF.WJLWTPfracO = owasa.westernWakeTreatmentFrac;
+		riskOfFailureStorageROF.WJLWTPfracR = raleigh.westernWakeTreatmentFrac;
+		
+		riskOfFailureStorageInf.WJLWTPfracD = durham.westernWakeTreatmentFrac;
+		riskOfFailureStorageInf.WJLWTPfracO = owasa.westernWakeTreatmentFrac;
+		riskOfFailureStorageInf.WJLWTPfracR = raleigh.westernWakeTreatmentFrac;
+		
+		riskOfFailureStorageIP.WJLWTPfracD = durham.westernWakeTreatmentFrac;
+		riskOfFailureStorageIP.WJLWTPfracO = owasa.westernWakeTreatmentFrac;
+		riskOfFailureStorageIP.WJLWTPfracR = raleigh.westernWakeTreatmentFrac;
 		
 		while (year-1<(terminateYear))
             // in a single realization, from year to year
@@ -5729,6 +5837,15 @@ void Simulation::realizationLoop()
 					if (indepReleaseAlloc)
 					{
 						FLSPreleaseFrac = FallsSupplyAllocationFraction;
+						
+						if (FLSPreleaseFrac < NewAllocFrac)
+						{
+							FLSPreleaseFrac = NewAllocFrac;
+						}
+							// this follows the parameter input value, and if/when
+							// falls lake is reallocated it will adjust the parameter input
+							// if the parameter input allocation fraction is below the 
+							// new ratio of storage/quality pools in falls lake 
 					}
 					else
 					{
@@ -6006,9 +6123,12 @@ void Simulation::realizationLoop()
 			{
 				ALLTdata << rank << "," << realization << "," << year << "," << week << ",";
 				ALLTdata << raleigh.ReleaseRiskVolume[week-1] << "," << durham.ReleaseRiskVolume[week-1] << ",";
-				ALLTdata << systemStorage.getRaleighTransfers() << "," << systemStorage.getDurhamTransfers() << ",";
+				ALLTdata << systemStorage.getRaleighTransfers() << "," << systemStorage.getDurhamTransfers() << "," << systemStorage.getOWASATransfers() << ",";
 				ALLTdata << systemStorage.getRaleighReleases() << "," << systemStorage.getDurhamBuybackRequest() << ",";
 				ALLTdata << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << endl;
+				
+				checker << rank << "," << realization << "," << year << "," << week << ",";
+				checker << systemStorage.RJLWestWTPdem << "," << systemStorage.DJLWestWTPdem << "," << systemStorage.OJLWestWTPdem << endl;
 			}
 
 			//Retrieve the weekly transfers
@@ -6092,7 +6212,7 @@ void Simulation::realizationLoop()
 					}
 				}
 					
-				triggerInfrastructure(realization);
+				triggerInfrastructure(realization, checker);
                     // check on infra
 					
 				if (printDetailedOutput)
@@ -6115,6 +6235,23 @@ void Simulation::realizationLoop()
 					caryBuild[caryWTPcounter] += 1;
 					caryWTPcounter++;
 				}
+				
+				if ((year-1) == 8)
+					// expand interconnections in 2018
+				{
+					systemStorage.upgradeDurhamOWASAConnectionTWO();
+					//systemStorage.upgradeDurhamCaryConnection();
+					
+					riskOfFailureStorageInf.upgradeDurhamOWASAConnectionTWO();
+					//riskOfFailureStorageInf.upgradeDurhamCaryConnection();
+					
+					riskOfFailureStorageROF.upgradeDurhamOWASAConnectionTWO();
+					//riskOfFailureStorageROF.upgradeDurhamCaryConnection();
+					
+					riskOfFailureStorageIP.upgradeDurhamOWASAConnectionTWO();
+					//riskOfFailureStorageIP.upgradeDurhamCaryConnection();
+				}
+				
 				for(int x = 0; x<3; x++)
 				{
 					if(caryBuild[x]>0&&caryBuild[x]<4)
@@ -6201,6 +6338,7 @@ void Simulation::realizationLoop()
 		ALLTdata.close();
 		storcheck.close();
 		RestData.close();
+		checker.close();
 			// Jan 2017: some of these outputs have been commented or disabled with logicals in other functions...
 			// only the outputs necessary for figures are printed
 	}

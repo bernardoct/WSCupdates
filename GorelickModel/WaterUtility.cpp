@@ -1184,38 +1184,70 @@ int WaterUtility::buildInfrastructure(int infIndex)
  return indexValue;
 }
 
-int WaterUtility::startNewInfrastructure(int year)
+int WaterUtility::startNewInfrastructure(int year, ofstream &checker)
 	// triggered if risk is high enough
 {
 	double rankValue = 0.0;
 	int indexValue = 999;
+	// double checkerValueDouble = 999.0;
+	// int checkerValueInt = 999;
+	
+	// checker << indexValue << "," << rankValue << ",";
+	
 	for(int x = 0; x < infrastructureCount;x++)
 	{
-		if((infMatrix[x][1] < 1.0) && (year >= int(infMatrix[x][2])))
+		if (infMatrix[x][1] < 1.0)
 			// the first column is either 0 or 1, 0 being this option has 
 			// not been triggered yet.  the second column is the realization year
 			// after which permitting has completed and this project is 
 			// eligible to be constructed.
 		{
-			if(infMatrix[x][0] > rankValue && infMatrix[x][0] < 1.0)
-				// by cycling through all infrastructure options (x)
-				// the model is looking for the greatest rankValue 
-				// or the 0th column which holds a 0-to-1 value from
-				// the parameter input file.  the eligible infrastructure
-				// option with the greatest ranking value will be found 
-				// and selected to be built 
+			if (year > infMatrix[x][2])
+				// check the permitting period constraint
 			{
-				indexValue = x;
-				rankValue = infMatrix[x][0];
-					// indicates which option is picked
+				if (infMatrix[x][0] > rankValue)
+					// by cycling through all infrastructure options (x)
+					// the model is looking for the greatest rankValue 
+					// or the 0th column which holds a 0-to-1 value from
+					// the parameter input file.  the eligible infrastructure
+					// option with the greatest ranking value will be found 
+					// and selected to be built 
+				{
+					if (infMatrix[x][0] < 1.0)
+						// NO OPTION CAN BE TRIGGERED IF IT'S RANK VALUE
+						// IS <= 0 OR >= 1
+					{
+						indexValue = x;
+						rankValue = infMatrix[x][0];
+							// indicates which option is picked
+					}
+				}
 			}
 		}
 	}
-	if(indexValue < infrastructureCount)
+	
+	// checker << indexValue << "," << rankValue << ",";
+	
+	if (indexValue < infrastructureCount)
 	{
 		infMatrix[indexValue][1] = 1.0;
 			// mark the chosen option as triggered
 	}
+	
+	// if (indexValue < infrastructureCount)
+	// {
+		// checkerValueDouble = infMatrix[indexValue][2];
+		// checkerValueInt    = int(infMatrix[indexValue][2]);
+	// }
+	// else
+	// {
+		// checkerValueDouble = 999.0;
+		// checkerValueInt = 999;
+	// }
+	
+	// checker << indexValue << "," << rankValue << ",";
+	// checker << checkerValueDouble << "," << checkerValueInt <<  endl;
+	
 	return indexValue;
 }
 void WaterUtility::addDebt(int year, int realization, double amount, int repaymentYears, double rate, double drate)

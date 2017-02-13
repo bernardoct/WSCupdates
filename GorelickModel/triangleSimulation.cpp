@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
 	int endYear = simulation.endYear;
 	int currentYear = simulation.currentYear;
 
-	int terminateYear = endYear-startYear + 1;
+	int terminateYear = endYear - startYear + 1;
 	int startSimulationYear = currentYear - startYear + 1;
 	simulation.setNumYears(terminateYear);
 	simulation.setStartYear(startSimulationYear);
@@ -152,8 +152,9 @@ int main (int argc, char *argv[])
 	simulation.numIntervals = 50;
 		// the number of discrete volume increments
 		// used for insurance payouts and for 
-		// setting the "GUIDE curve" for raleigh
+		// setting the "GUIDE curve" for raleigh (at 2% precision)
 		// and durham water supply for release determination
+		// ADJUSTING THIS HAS DRASTIC COMPUTATIONAL TIME CONSEQUENCES
 	simulation.discountrate = 0.05;
 		// discount rate on present value calculations 
 	simulation.numContractRiskYears = 20;
@@ -164,6 +165,10 @@ int main (int argc, char *argv[])
 		// that can be divided among Cary, OWASA, Durham, and Raleigh.
 		// may be less than 1 (100%) because of allocation
 		// to Chatham County communities.
+	simulation.WesternJLWTPdeadstorage = 0.519;
+		// if there is a joint WTP built on the western side of Jordan Lake,
+		// how much treatment capacity is allocated to populations that 
+		// are NOT raleigh, durham, OWASA
 		
 	// if (simulation.formulation > 0)
 		// // in zero formulation, no releases 
@@ -387,11 +392,13 @@ int main (int argc, char *argv[])
 			// use this one for Bernardo's input file 
 		readFile(simulation.parameterInput, "./inputfiles/paramterInputFile.csv", numSolutions, c_num_dec);
 			// these are david's input parameters 
-		readFile(simulation.RDMInput, "./inputfiles/lhs_samples_final.csv", nRDM, simulation.num_rdm_factors);
+		//readFile(simulation.RDMInput, "./inputfiles/lhs_samples_final.csv", nRDM, simulation.num_rdm_factors);
+		readFile(simulation.RDMInput, "./inputfiles/RDMSamples.csv", nRDM, simulation.num_rdm_factors);
 			// Read the random samples of the 13 uncertain parameters. This will be a 13 x numRealizations matrix.  
 			// ADDED BY BERNARDO
 			// num_rdm_factors is set to 30 in the Simulation header file
 			// the first value of the first line of this file will determine 
+			// FEB 2017: REVERSE THE COMMENTING ON THESE TO CALL THE FILE BERNARDO EXPECTS
 
 		// Set up the output stream for objective values
 		MPI_Init(NULL,NULL);
