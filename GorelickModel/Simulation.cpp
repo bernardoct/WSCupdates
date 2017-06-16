@@ -3294,6 +3294,7 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
         // results in the infra ROF and expected number of weeks per year in failure
 
 	return;
+
 }
 void Simulation::triggerInfrastructure(int realization, ofstream &checker)
 {
@@ -3865,7 +3866,7 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			{
 				for(int x = 0; x < discreteintervals; x++)
 				{
-					if(rIPs<(0.2 + double(x)/double(discreteintervals) - rIPex))
+					if(rIPs < (0.2 + double(x)/double(discreteintervals) - rIPex))
 					{
 						for(int y = x; y < discreteintervals; y++)
 						{
@@ -5434,6 +5435,7 @@ void Simulation::realizationLoop()
 		std::string filenameE = "output/ALLtransferData";
 		std::string filenameF = "output/storagecheck";
 		std::string filenameH = "output/checker";
+		std::string filenameI = "output/weeklyevap";
 		
 		std::string filenameEND = ".csv";
 			
@@ -5492,7 +5494,11 @@ void Simulation::realizationLoop()
 		openFile(storcheck, completeFilenameF);
 		openFile(checker, completeFilenameH);
 		
-		
+		std::string completeFilenameI;
+		std::stringstream sstmI;
+		sstmI << filenameI << solutionNumber << "_" << formulation << "_" << rdmNumber << filenameEND;
+		completeFilenameI = sstmI.str();
+		openFile(demandout, completeFilenameI);
 			// all these are defined in the header file 
 		
 		InfraBuilt << "Solution" << "," << "RDMnum" << "," << "Realization" << "," << "Year" << "," << "Utility" << "," << "Project" << endl;
@@ -5533,6 +5539,9 @@ void Simulation::realizationLoop()
 		storcheck << "Rstor6" << "," << "Dstor6" << ",";
 		storcheck << "Rstor7" << "," << "Dstor7" << ",";
 		storcheck << "Rstor8" << "," << "Dstor8" << endl;
+		
+		demandout << "Realization" << "," << "Year" << "," << "Week" << "," << "evapDO" << "," << "evapFalls" << "," << "evapWB" << endl;
+			// output the unrestricted demand 
 		
 		checker << "Rank" << "," << "Realization" << "," << "Year" << "," << "Week" << "," << "RJLWestWTPdem" << "," << "DJLWestWTPdem" << "," << "OJLWestWTPdem" << endl;
 		
@@ -5963,7 +5972,8 @@ void Simulation::realizationLoop()
 			cary.calculateDemand(realization, week, numdays, year);
 			raleigh.calculateDemand(realization, week, numdays, year);
                 // give unrestricted demand in each week
-				
+			
+			demandout << realization << "," << year << "," << week << ",";
 				
 			durham.calculateRestrictions(year, week, numdays, month, realization);
 			owasa.calculateRestrictions(year, week, numdays, month, realization);
@@ -5990,6 +6000,9 @@ void Simulation::realizationLoop()
 			actualWBEvap = wheelerEvap.synthetic[realization][syntheticIndex];
                 // real inflow and evap records
 
+			demandout << "," << actualEvap << "," << actualFallsEvap << "," << actualWBEvap << endl;
+				// output the evaporation records 
+				
 			//Pass along inflow values
 			systemStorage.setInflow(durhamActualInflow, 31.4*owasaActualInflow,
 				28.7*owasaActualInflow, 1.2*owasaActualInflow, fallsActualInflow, wbActualInflow, claytonActualInflow, crabtreeActualInflow, jordanActualInflow, lillingtonActualInflow,
@@ -6339,6 +6352,7 @@ void Simulation::realizationLoop()
 		storcheck.close();
 		RestData.close();
 		checker.close();
+		demandout.close();
 			// Jan 2017: some of these outputs have been commented or disabled with logicals in other functions...
 			// only the outputs necessary for figures are printed
 	}

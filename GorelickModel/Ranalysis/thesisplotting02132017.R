@@ -319,7 +319,7 @@ Sub1 = ALLTdata[which(ALLTdata$Realization == REALIZATION),c("Year", "Week",
                                                              "TTR", "TTD", "RRR")]
 
 startyear = 20
-endyear   = 26
+endyear   = 23
 
 Years = seq((2015 + startyear - 6 + 1), (2015 + endyear - 6 - 1), 1)
 
@@ -346,24 +346,27 @@ plotR = ggplot() +
                               colour = "Storage (Without Releases)", 
                               linetype = "solid"), size = linesize) +
   geom_line(data = Suby1, aes(x = TimeseriesWeek, y = Rstor, colour = "Storage (Spot Releases)", 
-                              linetype = "dashed"), size = linesize) +
+                              linetype = "solid"), size = linesize) +
   geom_line(data = Suby0, aes(x = TimeseriesWeek, y = RaleighTargetStorageFraction, colour = "ROF Guide Curve", 
                               linetype = "dotted"), size = linesize) +
   geom_bar(data  = Suby1, aes(x = TimeseriesWeek, y = RRR, fill = RRR*maxrel1/0.3), stat = "identity") +
   scale_colour_discrete(guide = FALSE) +
   scale_fill_continuous(name = "Releases (MGW)") +
-  theme(legend.position = c(0.37, 0.18), 
+  theme(legend.position = c(0.13, 0.17), 
         legend.background = element_rect(fill = "grey90", colour = "black"),
+        legend.text = element_text(face = "bold", size = 12),
+        legend.title = element_text(face = "bold", size = 14),
         axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_text(size = 12, face = "bold"),
         axis.title.y = element_text(size = 15, face = "bold")) + 
-  geom_text(data = data.frame(), aes(12.5, 0.85), label = "Raleigh", size = 8) +
+  geom_text(data = data.frame(), aes(8, 0.88), label = "Raleigh", size = 8) +
   ylab("Storage Fraction") + ylim(c(0,1)) +
-  guides(fill = guide_colorbar(barwidth = 8.3, barheight = 0.6, 
-                               breaks = c(0, 500, 1000), limits = c(0,1000), 
-                               label.position = "bottom", direction = "horizontal", title.position = "top"))
+  guides(fill = guide_colorbar(barwidth = 9, barheight = 0.6, 
+                               breaks = c(0, 250, 500), limits = c(0,500), 
+                               label.position = "bottom", direction = "horizontal", 
+                               title.position = "top", label.hjust = 0.75))
 
 plotD = ggplot() +
   scale_linetype_identity() +
@@ -372,18 +375,19 @@ plotD = ggplot() +
                               linetype = "solid"), size = linesize) +
   geom_line(data = Suby1, aes(x = TimeseriesWeek, y = Dstor, 
                               colour = "Storage (Spot Releases)",
-                              linetype = "dashed"), size = linesize) +
+                              linetype = "solid"), size = linesize) +
   geom_line(data = Suby0, aes(x = TimeseriesWeek, y = DurhamTargetStorageFraction, 
                               colour = "ROF Guide Curve",
                               linetype = "dotted"), size = linesize) +
-  theme(legend.position = c(0.12,0.23), legend.box = "vertical",
+  theme(legend.position = c(0.34,0.11), legend.box = "horizontal",
         legend.title = element_blank(), 
         legend.background = element_rect(fill = "grey90", colour = "black"),
+        legend.text = element_text(face = "bold", size = 12),
         axis.title.x = element_blank(), axis.text = element_text(size = 12, face = "bold"),
         axis.title.y = element_text(size = 15, face = "bold")) + 
   ylab("Storage Fraction") +
-  guides(colour = guide_legend(ncol = 1), fill = F) + ylim(c(0,1)) +
-  geom_text(data = data.frame(), aes(12.5, 0.85), label = "Durham", size = 8) +
+  guides(colour = guide_legend(ncol = 3), fill = F) + ylim(c(0,1)) +
+  geom_text(data = data.frame(), aes(8, 0.88), label = "Durham", size = 8) +
 #  scale_fill_continuous(name = "Buybacks\n(MGW)") +
 #  guides(fill = guide_colorbar(barwidth = 8.3, barheight = 0.6, 
 #                               breaks = c(0, 500, 1000), limits = c(0,1000), 
@@ -534,11 +538,11 @@ dev.off()
 
 RDMnum = 0
 FORMULATION = 2
-REALIZATION = 546
+REALIZATION = 10
 datafolder = "figure4data\\a\\"
   # either pick for the spot or option contract 
 firstrank = 45
-Years = seq((2015 + 36 - 6 + 1), (2015 + 40 - 6 - 1), 1)
+Years = seq((2015 + 20 - 6 + 1), (2015 + 23 - 6 - 1), 1)
 
 for (RANK in c(firstrank,c(29:31)+45))
 {
@@ -549,8 +553,8 @@ for (RANK in c(firstrank,c(29:31)+45))
   Sub0 = ALLTdata[which(ALLTdata$Realization == REALIZATION),c("Year", "Week", 
                                                                "Rstor", "Dstor", 
                                                                "RaleighTargetStorageFraction", "DurhamTargetStorageFraction")]
-  Sub0 = Sub0[which(Sub0$Year < 40),]
-  Sub0 = Sub0[which(Sub0$Year > 36),]
+  Sub0 = Sub0[which(Sub0$Year < 23),]
+  Sub0 = Sub0[which(Sub0$Year > 20),]
   Sub0 = Sub0[with(Sub0, order(Year, Week)),]
   Sub0$TimeseriesWeek = c(1:nrow(Sub0))
     # collect and subset storage level data
@@ -598,10 +602,12 @@ RGC$colorcol = as.character(RGC$variable2)
 Rdata = rbind(RGC, RStorages)
 
 fig4allocfraclevelsR = ggplot() + 
-  geom_line(data = Rdata, aes(x = TimeseriesWeek, y = value, colour = colorcol)) + 
+  geom_line(data = Rdata, aes(x = TimeseriesWeek, y = value, colour = colorcol), size = 0.5) + 
   ylab("Storage Fraction") + theme(legend.position = "none", axis.title.x = element_blank(),
-                                   axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
-  geom_text(data = data.frame(), aes(144, 0.125), label = "Raleigh", size = 7) + ylim(c(0,1)) +
+                                   axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                                   axis.title = element_text(size = 15, face = "bold"),
+                                   axis.text  = element_text(size = 12, face = "bold")) +
+  geom_text(data = data.frame(), aes(100, 0.125), label = "Raleigh", size = 7) + ylim(c(0,1)) +
   geom_text(data = data.frame(), aes(1, 0.9), label = "(a)", size = 12)
 
 DStorages$colorcol = DStorages$ReleaseAllocationFraction
@@ -613,19 +619,24 @@ rm(ALLTdata, alld, Data, allmelt, DGC, RGC, ObjData, DStorages, RStorages, Sub0,
    AllocFrac, GuideCurves, Storages)
 
 fig4allocfraclevelsD = ggplot() + 
-  geom_line(data = Ddata, aes(x = TimeseriesWeek, y = value, colour = colorcol)) + 
+  geom_line(data = Ddata, aes(x = TimeseriesWeek, y = value, colour = colorcol), size = 0.5) + 
   ylab("Storage Fraction") +
   scale_colour_discrete(name = "% of releases allocated for water supply",
                         breaks = c("0.423", "0.6", "0.8", "1", "Durham ROF Guide Curve"),
                         labels = c("42.3", "60", "80", "100", "2% ROF Level")) +
-  theme(legend.position = c(0.21, 0.15), 
+  theme(legend.position = c(0.25, 0.15), 
         legend.background = element_rect(fill = "grey90", colour = "black"),
-        axis.title.x = element_blank()) + 
-  geom_text(data = data.frame(), aes(144, 0.125), label = "Durham", size = 7) + ylim(c(0,1)) +
-  guides(colour = guide_legend(title.position = "top", direction = "horizontal", label.position = "bottom", 
-                               ncol = 5,
+        axis.title.x = element_blank(),
+        axis.title = element_text(size = 15, face = "bold"),
+        axis.text  = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 14, face = "bold"),
+        legend.key.size = unit(0.5, "in"),
+        legend.title = element_text(size = 15, face = "bold"),
+        legend.spacing = unit(1, "in")) + 
+  geom_text(data = data.frame(), aes(100, 0.125), label = "Durham", size = 7) + ylim(c(0,1)) +
+  guides(colour = guide_legend(title.position = "top", direction = "horizontal", label.position = "bottom", ncol = 5,
                                keywidth = 0.52, keyheight = 0.1, default.unit = "inch")) +
-  scale_x_continuous(breaks = seq(1,52*3, by = 52), 
+  scale_x_continuous(breaks = seq(1,52*nrow(Ddata)/5/52, by = 52), 
                      labels = Years)
 
 png(paste(figurepath, "Figure4a", ".png", sep = ""), units = "in", width = 10, height = 6.5, res = 400)
@@ -635,13 +646,13 @@ dev.off()
 # REPEAT CODE BUT CHANGE SLIGHTLY TO DO THE SAME FOR DIFFERENT RELEASE SIZES --------------------------------------------
 
 RDMnum = 0
-FORMULATION = 1
+FORMULATION = 2
 REALIZATION = 603
 datafolder = "figure4data\\b\\"
 
-Years = seq((2015 + 32 - 6 + 1), (2015 + 36 - 6 - 1), 1)
+Years = seq((2015 + 22 - 6 + 1), (2015 + 25 - 6 - 1), 1)
 
-for (RANK in c(21,24,0,26,27))
+for (RANK in c(c(23,0,28)+90))
 {
   ALLTdata = read.csv(paste(datafolder, "ALLtransferData", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = T)
   ObjData  = read.csv(paste(datafolder, "simulationOutput", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = F)
@@ -650,13 +661,13 @@ for (RANK in c(21,24,0,26,27))
   Sub0 = ALLTdata[which(ALLTdata$Realization == REALIZATION),c("Year", "Week", 
                                                                "Rstor", "Dstor", 
                                                                "RaleighTargetStorageFraction", "DurhamTargetStorageFraction")]
-  Sub0 = Sub0[which(Sub0$Year < 36),]
-  Sub0 = Sub0[which(Sub0$Year > 32),]
+  Sub0 = Sub0[which(Sub0$Year < 25),]
+  Sub0 = Sub0[which(Sub0$Year > 22),]
   Sub0 = Sub0[with(Sub0, order(Year, Week)),]
   Sub0$TimeseriesWeek = c(1:nrow(Sub0))
   # collect and subset storage level data
   
-  if (RANK == 0)
+  if (RANK == 113)
   {
     Sub0 = Sub0[,c("TimeseriesWeek","Rstor", "Dstor", 
                    "RaleighTargetStorageFraction", "DurhamTargetStorageFraction")]
@@ -671,7 +682,7 @@ for (RANK in c(21,24,0,26,27))
   alld = data.frame(ReleaseCap = RelCap, Sub0)
   allmelt = melt(alld, id = c("TimeseriesWeek", "ReleaseCap"))
   
-  if (RANK == 0)
+  if (RANK == 113)
   {
     Data = allmelt
   }
@@ -701,8 +712,10 @@ Rdata = rbind(RGC, RStorages)
 fig4relcaplevelsR = ggplot() + 
   geom_line(data = Rdata, aes(x = TimeseriesWeek, y = value, colour = colorcol)) + 
   ylab("Storage Fraction") + theme(legend.position = "none", axis.title.x = element_blank(),
-                                   axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
-  geom_text(data = data.frame(), aes(144, 0.125), label = "Raleigh", size = 7) + ylim(c(0,1)) +
+                                   axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                                   axis.title = element_text(size = 15, face = "bold"),
+                                   axis.text  = element_text(size = 12, face = "bold")) +
+  geom_text(data = data.frame(), aes(100, 0.125), label = "Raleigh", size = 7) + ylim(c(0,1)) +
   geom_text(data = data.frame(), aes(1, 0.9), label = "(b)", size = 12)
 
 DStorages$colorcol = DStorages$ReleaseCap
@@ -714,16 +727,22 @@ fig4relcaplevelsD = ggplot() +
   geom_line(data = Ddata, aes(x = TimeseriesWeek, y = value, colour = colorcol)) + 
   ylab("Storage Fraction") +
   scale_colour_discrete(name = "Release cap (MGW)",
-                        breaks = c("100", "500", "1000", "1500", "2000", "3000", "Durham ROF Guide Curve"),
-                        labels = c("100", "500", "1,000", "1,500", "2,000", "3,000", "2% ROF Level")) +
+                        breaks = c("100", "500", "5000", "Durham ROF Guide Curve"),
+                        labels = c("100", "500", "5,000", "2% ROF Level")) +
   theme(legend.position = c(0.23, 0.15), 
         legend.background = element_rect(fill = "grey90", colour = "black"),
-        axis.title.x = element_blank()) + 
-  geom_text(data = data.frame(), aes(144, 0.125), label = "Durham", size = 7) + ylim(c(0,1)) +
+        axis.title.x = element_blank(),
+        axis.title = element_text(size = 15, face = "bold"),
+        axis.text  = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 14, face = "bold"),
+        legend.key.size = unit(0.5, "in"),
+        legend.title = element_text(size = 15, face = "bold"),
+        legend.spacing = unit(1, "in")) + 
+  geom_text(data = data.frame(), aes(100, 0.125), label = "Durham", size = 7) + ylim(c(0,1)) +
   guides(colour = guide_legend(title.position = "top", direction = "horizontal", label.position = "bottom", 
-                               ncol = 6,
+                               ncol = 4,
                                keywidth = 0.52, keyheight = 0.1, default.unit = "inch")) +
-  scale_x_continuous(breaks = seq(1,52*3, by = 52), 
+  scale_x_continuous(breaks = seq(1,52*2, by = 52), 
                      labels = Years)
 
 png(paste(figurepath, "Figure4b", ".png", sep = ""), units = "in", width = 10, height = 6.5, res = 400)
@@ -1120,7 +1139,7 @@ write.csv(ParallelPlotData1, paste(figurepath, "ParallelPlotDatabyFormulation.cs
 RDMnum     = 0
 datafolder = "figure4data\\a\\"
 allobjdata = c()
-for (RANK in c(0,29:31,   45,74:76,   90,119:121))
+for (RANK in c(90,119:121))
 {
   for (FORMULATION in 2:2)
   {
@@ -1177,7 +1196,7 @@ write.csv(ParallelPlotData3, paste(figurepath, "ParallelPlotDatabyAllocationFrac
 RDMnum     = 0
 datafolder = "figure4data\\b\\"
 allobjdata = c()
-for (RANK in c(23,24,0,25:28,   68,69,45,70:73,   113,114,90,115:118))
+for (RANK in c(113,114,90,115:118))
 {
   for (FORMULATION in 2:2)
   {
@@ -1406,7 +1425,7 @@ write.csv(ParallelPlotData4, paste(figurepath, "ParallelPlotDatabyBothReleaseROF
 RDMnum     = 0
 datafolder = "figure4data\\f\\"
 allobjdata = c()
-for (RANK in c(c(126,127,90,128:134)-90,  c(126,127,90,128:134)-45,  c(126,127,90,128:134)))
+for (RANK in c(c(126,127,90,128:134)))
 {
   for (FORMULATION in 2:2)
   {
@@ -1463,14 +1482,14 @@ write.csv(ParallelPlotData4, paste(figurepath, "ParallelPlotDatabyJointLMdevelop
 RDMnum     = 0
 datafolder = "figure4data\\g\\"
 allobjdata = c()
-for (RANK in c(0, 109:112))
+for (RANK in c(132))
 {
   for (FORMULATION in 0:2)
   {
     ObjData = read.csv(paste(datafolder, "simulationOutput", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = F)
     ObjData = as.numeric(as.character(ObjData[,1:105]))
     
-    TypeToggle = paste(FORMULATION, "-", RANK, sep = "")
+    TypeToggle = FORMULATION
     
     allobjdata = rbind(allobjdata, c(TypeToggle, FORMULATION, ObjData))
   }
@@ -1494,7 +1513,7 @@ RaleighRelease = aodata$ReleasesR
 DTransfer      = aodata$TransfersD
 RTransfer      = aodata$TransfersR
 
-ParallelPlotData3 = data.frame(group = aodata[,1]*100,
+ParallelPlotData3 = data.frame(group = aodata[,1],
                                Reliability  = as.numeric(FailuresMax)*100,
                                Restrictions = RestrictionMax*100,
                                #                               PeakDebt     = PeakDebtMax,
@@ -1514,4 +1533,140 @@ objnames = c("Failures\n(% of weeks in worst year)",
 colnames(ParallelPlotData3) = c("group", objnames)
 write.csv(ParallelPlotData3, paste(figurepath, "ParallelPlotDatabyInfrastructureAndFormulation.csv", sep = ""), row.names = F)
 
+RANK = 132
+RDMnum = 0
+for (FORMULATION in 0:2)
+{
+  datafolder = "figure4data\\c\\period3\\"
+  
+  ALLTdata = read.csv(paste(datafolder, "ALLtransferData", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = T)
+  RSTdata  = read.csv(paste(datafolder, "RestrictionData", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = T)
+  
+  Tdata = aggregate(x = ALLTdata, by = list(ALLTdata$Realization, ALLTdata$Year), FUN = sum, na.rm = T)
+    # first aggregate sums to annual level, then decide how to display data
+  Tdata = aggregate(x = Tdata,    by = list(Tdata$Realization),   FUN = max, na.rm = T)
+  Rdata = aggregate(x = RSTdata,  by = list(RSTdata$Realization), FUN = mean, na.rm = T)
+    # realization-level counts of weeks of restrictions, total MG of transfers to R and D, releases, buybacks
+  
+  colnames(Tdata)[1] = "col1"
+  
+  Tdata = Tdata[,c("Group.1", "TTR", "TTD", "RRR", "BBD")]
+  Rdata = Rdata[,c("Group.1", "restR", "restD")]
+    # just keep necessary data
+  
+  colnames(Tdata) = c("Realization", 
+                      paste("TTR", FORMULATION, sep = ""),
+                      paste("TTD", FORMULATION, sep = ""),
+                      paste("RRR", FORMULATION, sep = ""),
+                      paste("BBD", FORMULATION, sep = ""))
+  colnames(Rdata) = c("Realization", 
+                      paste("restR", FORMULATION, sep = ""),
+                      paste("restD", FORMULATION, sep = ""))
+  plotdata = merge(Tdata, Rdata, by = "Realization")
+    # merge and rename
+  
+  if (FORMULATION == 0)
+  {
+    alldata = plotdata
+      # add to master set
+  }
+  else
+  {
+    alldata = merge(alldata, plotdata, by = "Realization")
+  }
+  
+  rm(ALLTdata, Tdata, plotdata)
+  
+}
+
+fig4c3RRRdensplot = ggplot(alldata) + 
+  #  geom_density(aes(RRR0, fill = "0", colour = "0"), alpha = trans) +
+  geom_density(aes(RRR1, fill = "1", colour = "1"), alpha = trans) +
+  geom_density(aes(RRR2, fill = "2", colour = "2"), alpha = trans) +
+  scale_fill_discrete(name = "Formulation") + xlim(c(75000,200000)) + ylim(c(0,0.00003)) +
+  guides(colour = F, fill = guide_legend(ncol = 2)) +
+  theme(legend.position = c(0.87, 0.91),
+        legend.background = element_rect(fill = "grey90", colour = "black")) + 
+  xlab("") + ylab("") +
+  geom_text(data = data.frame(), aes((200000+75000)/2, 0.000028), label = "Build Year 30", size = 7)
+
+png(paste(figurepath, "Figure4c", ".png", sep = ""), units = "in", width = 15, height = 5, res = 400)
+multiplot(fig4c1RRRdensplot, fig4c2RRRdensplot, fig4c3RRRdensplot, cols = 3)
+dev.off()
+
+# figure 4h ----------------------------------------------------------------------------------------------------
+
+RDMnum     = 0
+datafolder = "figure4data\\h\\"
+allobjdata = c()
+
+ObjData = read.csv(paste(datafolder, "simulationOutput", 0, "_", 0, "_", RDMnum, ".csv", sep = ""), header = F)
+ObjData = as.numeric(as.character(ObjData[,1:105]))
+
+TypeToggle = 0
+
+allobjdata = rbind(allobjdata, c(TypeToggle, FORMULATION, ObjData))
+
+for (RANK in c(13,14,23,35))
+{
+  for (FORMULATION in 1:1)
+  {
+    ObjData = read.csv(paste(datafolder, "simulationOutput", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = F)
+    ObjData = as.numeric(as.character(ObjData[,1:105]))
+    
+    TypeToggle = FORMULATION
+    
+    allobjdata = rbind(allobjdata, c(TypeToggle, FORMULATION, ObjData))
+  }
+}
+for (RANK in c(23,35,42))
+{
+  for (FORMULATION in 2:2)
+  {
+    ObjData = read.csv(paste(datafolder, "simulationOutput", RANK, "_", FORMULATION , "_", RDMnum, ".csv", sep = ""), header = F)
+    ObjData = as.numeric(as.character(ObjData[,1:105]))
+    
+    TypeToggle = FORMULATION
+    
+    allobjdata = rbind(allobjdata, c(TypeToggle, FORMULATION, ObjData))
+  }
+}
+
+aodata = as.data.frame(allobjdata)
+aodata = aodata[,c(1:2, 83:107)]
+
+objectivenames = c("Failures", "PeakDebt", "TotalLosses", "Releases", "Restrictions", "Transfers")
+colnames(aodata)[3:27] = c(paste(objectivenames, "D", sep = ""), 
+                           paste(objectivenames, "O", sep = ""),
+                           paste(objectivenames, "R", sep = ""),
+                           paste(objectivenames, "C", sep = ""),
+                           "FallsFailures")
+
+FailuresMax    = apply(aodata[,c(3, 9, 15, 21)],  MARGIN = 1, FUN = max)
+RestrictionMax = apply(aodata[,c(7, 13, 19, 25)], MARGIN = 1, FUN = max)
+PeakDebtMax    = apply(aodata[,c(4, 10, 16, 22)], MARGIN = 1, FUN = max)
+TotalLossesMax = apply(aodata[,c(5, 11, 17, 23)], MARGIN = 1, FUN = max)
+RaleighRelease = aodata$ReleasesR
+DTransfer      = aodata$TransfersD
+RTransfer      = aodata$TransfersR
+
+ParallelPlotData4 = data.frame(group = aodata[,1],
+                               Reliability  = as.numeric(FailuresMax)*100,
+                               Restrictions = RestrictionMax*100,
+                               PeakDebt     = PeakDebtMax,
+                               TotalLosses  = TotalLossesMax,
+                               Releases     = RaleighRelease,
+                               RaleighTransfers = RTransfer,
+                               DurhamTransfers  = DTransfer)
+
+objnames = c("Failures\n(% of weeks in worst year)", 
+             "Restrictions\n(% of weeks in worst year)",
+             "Peak Debt",
+             "Total Losses",
+             "Releases (MG)",
+             "Raleigh Transfers (MG)",
+             "Durham Transfers (MG)")
+
+colnames(ParallelPlotData4) = c("group", objnames)
+write.csv(ParallelPlotData4, paste(figurepath, "ParallelPlotDataBaseComparisonSubsetSub.csv", sep = ""), row.names = F)
 

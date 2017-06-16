@@ -273,6 +273,6 @@ private:
 	ofstream ALLTdata;
 	ofstream storcheck;
 	ofstream checker;
-	
+	ofstream demandout;
 };
 #endif

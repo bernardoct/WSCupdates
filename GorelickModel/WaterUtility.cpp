@@ -671,6 +671,9 @@ void WaterUtility::calculateObjectives()
 				maxRRfreq = annualRRfreq[year][realization];
 			}
 		}
+			// the worst year value for each objective is calculated for each 
+			// realization of the simulation and the objective value is then 
+			// calculated as the AVERAGE worst-case year totals 
 
 		peakDebt += maxPayment/double(numRealizations);
 		peakInsurance += maxInsurance/double(numRealizations);
@@ -686,7 +689,7 @@ void WaterUtility::calculateObjectives()
 
 	//Adding the mitigation costs to total costs
 
-	//Worst case scenario (95% VAR) mitigation costs
+	//Worst case scenario (99% VAR) mitigation costs
  	sort(annualCosts.begin(), annualCosts.end());
 	totalLosses = annualCosts[costRiskLevel];
         // calculates financial risk
