@@ -65,6 +65,39 @@ void setProblemDefinition(BORG_Problem &problem, int formulation)
 	BORG_Problem_set_bounds(problem, 55, 0.0, 20.0);
 	BORG_Problem_set_bounds(problem, 56, 0.0, 20.0);
 	
+	BORG_Problem_set_bounds(problem, 57, 0.001, 1.0);
+	BORG_Problem_set_bounds(problem, 58, 0.001, 1.0);
+		// raw release ROF triggers 
+	BORG_Problem_set_bounds(problem, 59, 100.0, 1000.0);
+		// release weekly MG cap 
+	BORG_Problem_set_bounds(problem, 60, 0.0030, 0.0040);
+		// buyback rate in $MM per MG 
+	BORG_Problem_set_bounds(problem, 61, 0.1, 50.0);
+		// annual payment to durham for releases 
+	BORG_Problem_set_bounds(problem, 62, 0.0, 1.0);
+		// falls lake release allocation fraction
+	BORG_Problem_set_bounds(problem, 63, 0.01, 0.2);
+		// buyback ROF zone
+	BORG_Problem_set_bounds(problem, 64, 0.5, 20.0);
+		// release contract length
+	BORG_Problem_set_bounds(problem, 65, 0.001, 1.0);
+	BORG_Problem_set_bounds(problem, 66, 0.001, 1.0);
+		// RR contract triggers
+	BORG_Problem_set_bounds(problem, 67, 0.0, 10000.0);
+	BORG_Problem_set_bounds(problem, 68, 0.0, 10000.0);
+		// TT magnitude triggers 
+	BORG_Problem_set_bounds(problem, 69, 0.0, 52.0);
+	BORG_Problem_set_bounds(problem, 70, 0.0, 52.0);
+		// TT frequency triggers
+	BORG_Problem_set_bounds(problem, 71, 0.0020, 0.0070);
+		// spot release base rate per MG 
+	BORG_Problem_set_bounds(problem, 72, 10.0, 1000.0);
+		// tier size for spot release pricing in MG
+	BORG_Problem_set_bounds(problem, 73, 0.0, 2.0);
+		// fractional increase in price with tier increase
+	BORG_Problem_set_bounds(problem, 74, 0.5, 1.0);
+		// joint expansion of LM fraction for durham
+	
 	// Set epsilons for objectives
 	// Original values: (works fine for Formulations 0-4)
 	
@@ -73,8 +106,6 @@ void setProblemDefinition(BORG_Problem &problem, int formulation)
 	BORG_Problem_set_epsilon(problem, 2, 0.02);
 	BORG_Problem_set_epsilon(problem, 3, 0.02);
 	BORG_Problem_set_epsilon(problem, 4, 0.05);
-	BORG_Problem_set_epsilon(problem, 5, 0.05);
-
 
 }
 

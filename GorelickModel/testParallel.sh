@@ -1,8 +1,8 @@
-#PBS -l nodes=2:ppn=8
-#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=16
+#PBS -l walltime=24:00:00
 #PBS -j oe
 #PBS -o output/testParallel.out
 
 cd $PBS_O_WORKDIR
 
-time mpirun ./triangleSimulation -r 100 -t 1000 -s 1 -c 2 -b 3
+time mpirun ./triangleSimulation -r 1 -t 1 -s 0 -c 0 -b 3 -o 0

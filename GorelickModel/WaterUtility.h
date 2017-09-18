@@ -44,6 +44,9 @@ class WaterUtility
 	
 	// RAW RELEASE TRIGGER DECISION VARIABLES
 	double RRtrigger;
+	double RRcontractTrigger;
+	double TTmagnitudetrigger;
+	double TTfrequencytrigger;
 	
 	// Storage amount (fraction of full)
 	double storageFraction;
@@ -51,6 +54,7 @@ class WaterUtility
 	// Restriction stage (0 means no restrictions)
 	int restrictionStage;
 	double restrictionReduction;
+	double weekrestrictioncount;
 	
 	// Usage tier info. Cost per million gallons. Usage reductions during restrictions.
 	double **reductions;
@@ -99,17 +103,35 @@ class WaterUtility
 	double peakInsurance;
 	double insuranceRevenue;
 	double infBuffer;
+	double TTmagObj;
+	double TTfreqObj;
+	double RRmagObj;
+	double RRfreqObj;
 	
 	double weeklyReleaseVolume;
 	double weeklyBuybackVolume;
 	double *ReleaseStorageRisk; 
 	double *ReleaseRiskVolume;
+	double *BuybackRiskVolume;
+	double *SpinupRisk;
+	double *CurrentRisk;
+	double *TransferHistory;
+	double *TransferFrequency;
+	double annualTransfers;
+	double annualTransferFrequency;
+	double annualReleases;
+	double annualReleaseFrequency;
+	double **annualTTmag;
+	double **annualTTfreq;
+	double **annualRRmag;
+	double **annualRRfreq;
+	
 	
 	//~~~~~~~~~~~~~~~~ Public functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	void calcWaterPrice(double elasticity_Of_Demand[]);
 	void calcSurchargePrice(double elasticity_Of_Demand[], int constant);
 	void configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int terminateYear,
-		int volumeInc, int numRealizations, int formulation, int infCount);
+		int volumeInc, int numRealizations, int formulation, int infCount, int nContractRiskYears);
 	void clearVariablesForSimulation();
 	void clearVariablesForRealization(int year);
 	void fillRestrictionsArray(int season);
@@ -124,17 +146,24 @@ class WaterUtility
 	void addCapacity(double cap);
 	void setInsurancePayment(double dB, double inflw, int wk);
 	void calculateDemand(int realizations, int week, int numdays, int year);
-	int startNewInfrastructure(int year);
+	int startNewInfrastructure(int year, ofstream &checker);
 	int buildInfrastructure(int index);
-	void addDebt(int yr, int rlztn, double amt, int repayYears, double rt);
+	void addDebt(int yr, int rlztn, double amt, int repayYears, double rt, double drt);
 	void addInsStorage(double add);
 	void priceInsurance(int yr, int rlztn);
 	void payForTransfers(double tC);
 	
-	void payForReleases(double contractValue, double contractLengthWeeks);
-	void acceptReleasePayment(double contractValue, double contractLengthWeeks);
+	void payForReleases(double contractValue);
+	void acceptReleasePayment(double contractValue);
 	void payForBuybacks(double buybackratePerMG);
 	void acceptBuybackPayment(double buybackratePerMG);
+	void ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor);
+	void ReleaseSpotAccept(bool tiered, double floorRate, double tiersize, double tierFactor);
+	void ReleaseSpotPayment(double floorRate);
+	void ReleaseSpotAccept(double floorRate);
+
+	double DVM;
+    double weeklyVariation;
 	
 	//~~~~~~~~~~~~~~~~ Private class members ~~~~~~~~~~~~~~~~~~~~~~~
 	private:

@@ -39,6 +39,13 @@ double maxValue(double, double, double, double);
 double maxValue(double, double, double, double, double);
 double meanValue(double, double, double, double);
 
+// New Statistics Helper Function (def. by David G, 2016)
+double std_dev_vector(double*, int);
+double average_array(double*, int);
+double maxValue_array(double*, int);
+double minValue_array(double*, int);
+double sumValue_array(double*, int, int);
+
 // Standardize data (make into Z values)
 void normalize_array(double**, double*, double*, double**, int, int);
 

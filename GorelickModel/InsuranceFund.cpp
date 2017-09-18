@@ -49,10 +49,14 @@ double InsuranceFund::calcAnnualLosses(double annualRevenue, bool addInterest)
 		fundSize = 0;
 	}
 	else
+	{
 		annualLosses = 0;
+	}	
 	
 	if(addInterest)
+	{
 		fundSize *= 1.05; // 5% annual fund growth
+	}
 	
 	return annualLosses;
 }

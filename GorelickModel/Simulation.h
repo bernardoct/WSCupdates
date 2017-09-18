@@ -28,13 +28,27 @@ public:
 	void correlateDemandVariations(double demand_variation_multiplier);
 	
 	void createRiskOfFailure(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand,
-							 int discreteintervals);
+							 int discreteintervals, ofstream &streamFile);
+	void createRiskOfFailure_InsuranceReleases(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
+											   int discreteintervals);
+	void createRiskOfFailure_RestrictionsTransfers(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue, ofstream &streamFile);
 	int numIntervals;
 	
-	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand);
+	void createInfrastructureRisk(int real, int synthY, double durhAnnDemand, double owasaAnnDemand, double ralAnnDemand, double carAnnDemand, ofstream &streamFile);
+	void createInfrastructureRisk_spinup(int realization, int synthYear, 
+										 double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue);
+	void calculateOptionContract(int yearcounter, int LOOPCHECKER, int realization, int firstyear, int contractcount,
+								 int currentYear, int startYear, int numContractRiskYears, 
+								 double Duse, double Dusebuffer, double Ouse, double Ousebuffer, double Ruse, double Rusebuffer, double Cuse, double Cusebuffer,
+								 bool allowReleaseContract, bool previousContract, double annualpayment, double buybackratePerMG,
+								 ofstream &outfile, bool printDetailedOutput);
+	void calculateSpotContract(int realization, int numContractRiskYears, 
+							   double tieredFloorPrice, ofstream &outfile);
+										 
 	data_t parameterInput;
+	
 	void createInfrastructure(int realization);
-	void triggerInfrastructure(int realization);
+	void triggerInfrastructure(int realization, ofstream &checker);
 	void updateFallsQuality();
 	void setStartYear(int SSY);
 	void chooseStreamflows();
@@ -47,10 +61,86 @@ public:
 	int formulation;
 	int borgToggle;
 	bool printDetailedOutput;
+	int numRealizationsTOREAD;
+	bool spotPricing;
+	bool tieredSpotPricing;
+	bool sharedLM;
+	
+	int startYear;
+	int endYear;
+	int currentYear;
+	int numContractRiskYears;
+	int transferRiskYears;
+	
+	int yearcounter;
+	int LOOPCHECKER;
+	int contractcount;
+	int currentcontract;
+	int firstyear;
+	
+	int contractlength;
+	double annualpayment;
+	double adjustedannualpayment;
+	double adjustedbuybackpayment;
+	double contractbuybacks;
+	double contracttransfersD;
+	
+	double adjustedspotpayment;
+	
+	double RtriggerDiff;
+	double DtriggerDiff;
+	double triggerDiff;
+	double magDiff;
+	double freqDiff;
+	double RBBstddev;
+	double DBBstddev;
+	double contractSplits;
+	double RTTmagnitudeDiff;
+	double DTTmagnitudeDiff;
+	double RTTfrequencyDiff;
+	double DTTfrequencyDiff;
+	
+	double tieredFloorPrice;
+	double tierSize;
+	double tierPriceInc;
+	double storageratio;
+	
+	double LMbuildpath;
+		// positive means non-cooperative low build
+		// negative means cooperative low build occurred
+		// zero means low build was skipped 
 	
 	data_t RDMInput;
 	static const int num_rdm_factors = 30;
+	
 	string directoryName;
+	string historicFlowPath;
+	string fakesynthFlowPath;
+	string syntheticFlowPath;
+	string evaporationPath;
+	string oldstochPath;
+	string demanddataPath;
+	
+	ofstream out100;
+	ofstream outNew;
+	ofstream outRiskParams;
+	ofstream ReleaseContractData;
+	ofstream DurhamSystemStates;
+	ofstream OWASASystemStates;
+	ofstream CarySystemStates;
+	ofstream RaleighSystemStates;
+	ofstream Policies_out;
+	ofstream params_out;
+	ofstream continuity_out;
+	ofstream ST_ROF_out;
+	ofstream LT_ROF_out;
+	
+	bool use_RDM_ext;
+	bool indepReleaseAlloc;
+	bool runHistoric;
+	bool allowReleaseContract;
+	bool previousContract;
+	
 	double rdm_factors[30];
 	int rdmNumber;
 	int nDeeplyUncertainSets;
@@ -69,6 +159,16 @@ public:
 	double buybackratePerMG;
 	double ReleaseContractPrice;
 	double FallsSupplyAllocationFraction;
+	double FLSPfrac;
+	double FLSPreleaseFrac;
+	double BuybackROFZone;
+	double RcriticalStorageLevel;
+	double DcriticalStorageLevel;
+	double discountrate;
+	double contracttypetoggle;
+	double WesternJLWTPdeadstorage;
+	double WJLWWTPtotal;
+	double NewAllocFrac;
 
 	double falls_lake_supply_capacity;
 	double falls_lake_wq_capacity;
@@ -76,8 +176,11 @@ public:
 	double jordan_lake_wq_capacity;
 	double cary_treatment_capacity;
 	double durham_cary_capacity;
-	double durham_owasa_capacity;
+	double durham_owasa_capacityONEd;
+	double durham_owasa_capacityONEo;
+	double durham_owasa_capacityTWO;
 	double raleigh_cary_capacity;
+	double raleigh_durham_capacity;
 	
 	int numRealizations;
 	
@@ -153,7 +256,7 @@ private:
 	int numFutureYears;
 	int startSimulationYear;
 	int volumeIncrements, costRiskLevel;
-	double *actualStreamflows;
+	//double *actualStreamflows;
 	
 	
 	double caryUpgrades[4];
@@ -168,10 +271,17 @@ private:
 	double fallsFailurePoint, maxFallsFailure;
 	double *totalFallsFailure;
 	int thisYearFalls;
+
+	int fakebreak;
 	
 	ofstream out1;
 	ofstream out3;
 	ofstream InfraBuilt;
-	
+	ofstream LMallocData;
+	ofstream RestData;
+	ofstream ALLTdata;
+	ofstream storcheck;
+	ofstream checker;
+	ofstream demandout;
 };
 #endif

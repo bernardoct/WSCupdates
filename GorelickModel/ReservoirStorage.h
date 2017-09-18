@@ -7,36 +7,44 @@ public:
 	//ReservoirStorage();
 	double fallsArea;
 	
-	void initializeReservoirStorage(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin);
+	void initializeReservoirStorage(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin, double RaleighLMCap);
 	
-	void initializeReservoirStorageROF(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin);
+	void initializeReservoirStorageROF(double durhamCap, double CCRCap, double StQCap, double ULCap, double lakeWBCap, double fallsLakeSupplyCap, double fallsLakeQualityCap, double jordanLakeSupplyCap, double jordanLakeQualityCap, double CaryTreatmentCap, double DurhamCaryCap, double DurhamOWASACap, double RaleighCaryCap, double RaleighDurhamCap, double raleighAllocation, double durhamAllocation, double owasaAllocation, double caryAllocation, double teerQCap, double tQIc, double tQOc, double littleRiverRaleighCap, double westTrtCap, double durhamRecCap, double rQc, double rQIc, double rQOc, double rIc, double cQs, double cQIs, double cQOs, double oWWWTP, double dWWWTP, double rWWWTP, int s, double DurhamReleaseCap, double DurhamReleaseMin, double RaleighLMCap);
 	
-	void updateReservoirStorageROF(double durhamS, double teerS, double CCRS, double ULS, double STQS, double owasaS, double lakeWBS, double flSS, double flQS, double jlSS, double jlQS, double caryJordanS, double raleighJordanS, double durhamJordanS, double owasaJordanS, double littleRiverRalS, double raleighQS);
+	void updateReservoirStorageROF(double durhamS, double teerS, double CCRS, double ULS, double STQS, double owasaS, double lakeWBS, double flSS, double flQS, double jlSS, double jlQS, double caryJordanS, double raleighJordanS, double durhamJordanS, double owasaJordanS, double littleRiverRalS, double raleighQS, double RLMstor);
 	void updateReservoirStorageROF();
 	
 	void setDemands(double durham, double owasa, double cary, double raleigh, int numberOfDaysInWeek);
 	
 	void setSpillover(int week);
-	void calcTransfers(double transferDurham, double durhamR, double transferOWASA, double owasaR, double transferRaleigh, double raleighR, double owasaWD);		
+	void calcTransfers(double transferDurham, double durhamR, double transferOWASA, double owasaR, double transferRaleigh, double raleighR, double owasaWD, 
+					   ofstream &streamFile, bool printOutput, int formul);		
 	
 	void setInflow(double durham, double ccr, double ul, double stq, double falls, double wb, double clayton, double crabtree, double jordan, double lillington, double ralRet, double durRet, double durRet2, double owasaRet, double evaporationf, double evaporationwb, double evaporation, double lRR);
 	
 	void calcRawReleases(double DreleaseWeekCap, double DreleaseMin, double RcriticalStorageLevel, double DcriticalStorageLevel, 
-						 double RstorageTarget, double DstorageTarget, double FallsSupplyFraction,
-						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK);
+						 double RstorageTarget, double DstorageTarget, double FallsSupplyFraction, double DbuybackLevel,
+						 int realization, ofstream &streamFile, int year, int week, int numRealizationsTOOUTPUT, int RANK, bool printOutput,
+						 bool ACTIVE);
+	void calcSpotReleases(int realization, ofstream &streamFile, bool ACTIVE, int numreal, bool writefiles, 
+						  double ReleaseCap, int rank, int year, int week, double Rtrigger, double Dtrigger,
+						  double FLSPsize, double Rcutoff, double Dcutoff);
+	
 	double getRaleighReleases();
 	double getDurhamBuybackRequest();
 	
 	void getReturnRatios(double raleighR, double durhamR);
-	void updateStorage(int whatWeek);
+	void updateStorage(int whatWeek, int formul);
 	double updateOWASAStorage();
 	double updateDurhamStorage();
-	double updateRaleighStorage(int whatWeek);
+	double updateRaleighStorage(int whatWeek, int formul);
 	void updateJordanLakeStorage(double ow, double dur, double ral);
 	double getDurhamStorage();
 	double getOWASAStorage();
 	double getRaleighStorage();
+	double getRaleighStorageVol();
 	double getCaryStorage();
+	double getCaryStorageVol();
 	double getDurhamTransfers();
 	double getOWASATransfers();
 	double getRaleighTransfers();
@@ -48,14 +56,32 @@ public:
 	double getRaleighTreatment();
 	double getRaleighIntake();
 	double getFallsQuality();
+	double getRaleighLMStorage();
+	double getRaleighLMCapacity();
+	double getRaleighCapacity();
+	double getDurhamCapacity();
 	
 	double getFallsSupplyStorage();
+	double getFallsSupplyAllocFrac();
 	double getFallsSpillage();
+	
+	double raleighDirect;
+	double durhamDirect;
+	double raleighIndirect;
+	double durhamIndirect;
+	double extraCap;
+	double owasaDirect;
+	double LMRaleighCapacity;
+	double raleighMichieStorage;
+	
+	void buildMichieSharedLow(double ratio);
+	void buildMichieSharedHigh(double ratio, double checkval);
 	
 	void upgradeCaryTreatmentPlant(int counter);
 	void upgradeCaryTreatmentPlant2();
 	void upgradeDurhamCaryConnection();
 	void upgradeDurhamOWASAConnection();
+	void upgradeDurhamOWASAConnectionTWO();
 	void openResFiles();
 	void buildULexp();
 	void buildCCexp();
@@ -65,7 +91,7 @@ public:
 	void buildReclaimedLow();
 	void buildReclaimedHigh();
 	void buildMichieLow();
-	void buildMichieHigh();
+	void buildMichieHigh(double checkval);
 	void buildLittleRiverRal();
 	void buildRalQuarry();
 	void buildNeuseIntake();
@@ -93,9 +119,43 @@ public:
 	double getOWASAJordanStorageVol();
 	double getLittleRiverRalStorageVol();
 	double getRaleighQuarryStorageVol();
-
-private:
 	
+	int ReqCount;
+	int ReqCurtail;
+	
+	double RJLWestWTPdem;
+	double DJLWestWTPdem;
+	double OJLWestWTPdem;
+		// weekly demands from the western joint wtp on jordan lake 
+		// to be counted as transfers 
+		
+	double WJLWTPinterconnectCapacity;
+	double OWASADurhamInterconnectTWO;
+		// smallest pipe connection before reaching Durham-OWASA interconnection 
+		// and the smaller OWASA interconnection
+		
+	double WJLWTPfracD;
+	double WJLWTPfracO;
+	double WJLWTPfracR;
+	double WJLWTPfracTOT;
+	double WJLWTPfracRDonly;
+		// fraction of treatment plant capacity available for each city 
+
+	/////Spillage
+	double durhamSpillage;
+	double OWASASpillage;
+	double CCRSpillage;
+	double MinCCROut;
+	double ULSpillage;
+	double StQSpillage;
+	double fallsSpillage;
+	double lakeWBSpillage;
+	double jordanLakeMinRelease;
+	double raleighLittleRiverSpillage;
+	double enoSpillage;
+	double fallsLakeSupplyExcess;
+	double fallsJordanWithdraw;
+
 	///Inflow gains
 	double durhamInflow;
 	double CCRInflow;
@@ -109,7 +169,9 @@ private:
 	double lillingtonInflow;
 	double littleRiverRaleighInflow;
 	double raleighReturn;
+	double raleighReturnOut;
 	double durhamReturn;
+	double durhamReturnOut;
 	double durhamReturn2;
 	double owasaReturn;
 	double evapF;
@@ -158,6 +220,7 @@ private:
 	double raleighQuarryIntakeCapacity;//maximum quarry filling rate
 	double raleighQuarryOutflowCapacity;//maximum withdrawls from quarry
 	double raleighIntakeCapacity;//maximum withdrawl from Neuse intake
+	double intakeDemand;
 	////Cary Storage Infrastructure
 	double caryQuarryCapacity;
 	double caryQuarryStorage;
@@ -165,7 +228,9 @@ private:
 	double caryQuarryOutflowCapacity;//maximum withdrawls from quarry
 	////Interconnections
 	double DurhamCaryCapacity;//Capacity of the Durham Cary interconnection
-	double DurhamOWASACapacity;//Capacity of the Durham OWASA interconnection
+	double DurhamOWASACapacityToD;//Capacity of the Durham OWASA interconnection to durham
+	double DurhamOWASACapacityToO;// capacity of the interconnect to owasa 
+		// the difference is needed to incorporate the WJLWTP 
 	double RaleighCaryCapacity;//Capacity of the Raleigh Cary interconnection
 	double RaleighDurhamCapacity;//Capacity of the Raleigh Durham interconnection
 	////Jordan Lake treatment Plants
@@ -204,30 +269,40 @@ private:
 	double jordanCaryFraction;
 	double jordanOWASAFraction;
 
-
-	/////Spillage
-	double durhamSpillage;
-	double OWASASpillage;
-	double CCRSpillage;
-	double ULSpillage;
-	double StQSpillage;
-	double fallsSpillage;
-	double lakeWBSpillage;
-	double jordanLakeMinRelease;
-	double raleighLittleRiverSpillage;
-	double enoSpillage;
-	
 	double owasaExcess;
 	double raleighExcess;
 	double durhamExcess;
 	double caryExcess;
-	
 	
 	/////Demands
 	double durhamUse;
 	double OWASAUse;
 	double CaryUse;
 	double raleighUse;
+
+	//Reservoir Demands
+	double JLAllDemands;
+	double JLCaryDemands;
+	double JLDurhamDemands;
+	double JLRaleighDemands;
+	double JLOWASADemands;
+	double FallsLakeDemands;
+	double WBDemands;
+	double LRRDemands;
+	double RichlandDemands;
+	double CCRDemands;
+	double ULDemands;
+	double TeerDemands;
+	double DurhamDemands;
+
+	double jordanTotalStorageVol;
+	double jordanSpillage;
+	double jordanQualityExcess;
+
+
+private:
+	
+	
 	
 	double numdays;
 	int thingCounter;

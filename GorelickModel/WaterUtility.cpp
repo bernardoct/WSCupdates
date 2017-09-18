@@ -45,10 +45,20 @@ WaterUtility::~WaterUtility()
 
 	zap(ReleaseStorageRisk);
 	zap(ReleaseRiskVolume);
+	zap(BuybackRiskVolume);
+	zap(SpinupRisk);
+	zap(CurrentRisk);
+	zap(TransferHistory);
+	zap(TransferFrequency);
+	
+	zap(annualTTmag, terminateYear);
+	zap(annualTTfreq, terminateYear);
+	zap(annualRRmag, terminateYear);
+	zap(annualRRfreq, terminateYear);
 }
 
 void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, int nstages, int nfutureyears, double failure, int nannualdecisionperiods, int termyear,
-		int volumeInc, int nrealizations, int formulation, int infCount)
+		int volumeInc, int nrealizations, int formulation, int infCount, int nContractRiskYears)
 {
 	numMonths = nmonths;
 	numYears = nyears;
@@ -68,13 +78,13 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 	volumeIncrements = volumeInc;
 	weeklyTransferTriggers = 0.0;
 	
-	if(formulation<2)
+	if (formulation >= 0)
 	{
-		infrastructureCount = infCount;
+		infrastructureCount = infCount + 2;
 	}
 	else
 	{
-		infrastructureCount = infCount + 2;
+		infrastructureCount = infCount;
 	}
 
 	// Initialize pointers to null
@@ -120,7 +130,17 @@ void WaterUtility::configure(int nmonths, int nyears, int ntypes, int ntiers, in
 
 	general_1d_allocate(ReleaseStorageRisk, volumeIncrements, 0.0);
 	general_1d_allocate(ReleaseRiskVolume, 52, 0.0);
-
+	general_1d_allocate(BuybackRiskVolume, 52, 0.0);
+	general_1d_allocate(SpinupRisk, nContractRiskYears, 0.0);
+	general_1d_allocate(CurrentRisk, nContractRiskYears, 0.0);
+	general_1d_allocate(TransferHistory, nContractRiskYears, 0.0);
+	general_1d_allocate(TransferFrequency, nContractRiskYears, 0.0);
+	
+	general_2d_allocate(annualTTmag, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualTTfreq, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualRRmag, terminateYear, numRealizations, 0.0);
+	general_2d_allocate(annualRRfreq, terminateYear, numRealizations, 0.0);
+	
 	usesROF = true;
 
 }
@@ -214,7 +234,7 @@ void WaterUtility::setInsurancePayment(double demandBaseline, double inflows, in
 {
 	Fund.getInsuranceStage(demandBaseline, inflows);
 
-	if(Fund.insuranceStorage<=riskVolume[week-1])
+	if(Fund.insuranceStorage <= riskVolume[week-1])
 	{
 		Fund.setInsurancePayment(insuranceRevenue*insurancePayment);
 	}
@@ -223,7 +243,7 @@ void WaterUtility::setInsurancePayment(double demandBaseline, double inflows, in
 
 void WaterUtility::generateDemandVariation(int numWeeks, TimeSeriesData *Inflows, double demand_variation_multiplier)
 {
-
+	DVM = demand_variation_multiplier;
 	int totalNumber, partialNumber, counter, index;
 	double demandLevel;
 	counter = 0;
@@ -281,6 +301,7 @@ void WaterUtility::generateDemandVariation(int numWeeks, TimeSeriesData *Inflows
 void WaterUtility::calculateDemand(int realization, int week, int numdays, int year)
 {
 	weeklyDemand = numdays*averageUse*(demandVariation[realization][week-1+ (year-1)*52]*UD.standardDeviations[week-1] + UD.averages[week-1]);
+    weeklyVariation = (demandVariation[realization][week-1+ (year-1)*52]*UD.standardDeviations[week-1] + UD.averages[week-1]);
 }
 void WaterUtility::calculateRestrictions(int year, int week, int numdays, int month, int realization)
 {
@@ -325,6 +346,7 @@ void WaterUtility::calculateRestrictions(int year, int week, int numdays, int mo
 		weeklyDemand = restrictedDemand; // update actual demand under restrictions
 		Fund.subtract(demandDeficit/1000000.0); // dip into the insurance fund to cover demand deficit
 		thisYearRestrictions = 1;
+		weekrestrictioncount += 1;
 	}
 	else
 	{
@@ -342,16 +364,16 @@ void WaterUtility::payForTransfers(double transferCosts)
 
 /////////////////////////// pay for releases function ///////////////////////////////////////////////////////////////////////
 
-void WaterUtility::payForReleases(double contractValue, double contractLengthWeeks)
+void WaterUtility::payForReleases(double contractValue)
 {
-	Fund.subtract(contractValue/contractLengthWeeks*52.0);
+	Fund.subtract(contractValue);
 		// DO I NEED TO PRESENT VALUE THIS NOW OR IS IT DONE LATER?
 		// THIS IS NOW AN ANNUAL PAYMENT
 }
 
-void WaterUtility::acceptReleasePayment(double contractValue, double contractLengthWeeks)
+void WaterUtility::acceptReleasePayment(double contractValue)
 {
-	Fund.add(contractValue/contractLengthWeeks*52.0);
+	Fund.add(contractValue);
 }
 
 //////////////////////////// pay for buybacks ///////////////////////////////////////////////////////////////////////////////
@@ -368,6 +390,58 @@ void WaterUtility::acceptBuybackPayment(double buybackratePerMG)
 	Fund.add(buybackratePerMG*weeklyBuybackVolume);
 }
 
+//////////////////////////// pay for spot releases //////////////////////////////////////////////////////////////////////////
+
+void WaterUtility::ReleaseSpotPayment(bool tiered, double floorRate, double tiersize, double tierFactor)
+{
+	if (tiered)
+	{
+		double numTiers = weeklyReleaseVolume / tiersize;
+			// 
+		
+		for (int tier = 0; tier < (numTiers - 1); tier++)
+		{
+			Fund.subtract(tiersize * floorRate * (1 + tier * tierFactor));
+		}
+		
+		Fund.subtract((weeklyReleaseVolume - (int)numTiers * tiersize) * floorRate * (1 + (int)numTiers * tierFactor));
+	}
+	else
+	{
+		Fund.subtract(weeklyReleaseVolume * floorRate);
+	}
+}
+
+void WaterUtility::ReleaseSpotAccept(bool tiered, double floorRate, double tiersize, double tierFactor)
+{
+	if (tiered)
+	{
+		double numTiers = weeklyReleaseVolume / tiersize;
+			// 
+		
+		for (int tier = 0; tier < (numTiers - 1); tier++)
+		{
+			Fund.add(tiersize * floorRate * (1 + tier * tierFactor));
+		}
+		
+		Fund.add((weeklyReleaseVolume - (int)numTiers * tiersize) * floorRate * (1 + (int)numTiers * tierFactor));
+	}
+	else
+	{
+		Fund.add(weeklyReleaseVolume * floorRate);
+	}
+}
+
+void WaterUtility::ReleaseSpotPayment(double floorRate)
+{
+	Fund.subtract(weeklyReleaseVolume * floorRate);
+}
+
+void WaterUtility::ReleaseSpotAccept(double floorRate)
+{
+	Fund.add(weeklyReleaseVolume * floorRate);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void WaterUtility::clearVariablesForSimulation()
@@ -380,6 +454,8 @@ void WaterUtility::clearVariablesForSimulation()
 	peakDebt = 0.0;
 	peakInsurance = 0.0;
 	expectedNPC = 0.0;
+	TTfreqObj = 0.0;
+	TTmagObj = 0.0;
 
 
 	annualCosts.clear();
@@ -402,7 +478,7 @@ void WaterUtility::clearVariablesForSimulation()
 
 void WaterUtility::clearVariablesForRealization(int year)
 {
-	for(int x = 0; x< infrastructureCount; x++)
+	for(int x = 0; x < infrastructureCount; x++)
 	{
 		infMatrix[x][1] = 0.0;
 		infMatrix[x][3] = 0.0;
@@ -430,6 +506,9 @@ void WaterUtility::clearVariablesForRealization(int year)
 	Fund.initializeRealization();
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	weekrestrictioncount = 0;
+	annualTransfers = 0;
+	annualTransferFrequency = 0;
 
         // reset infrastructure counters, so that nothing has been built yet
         // reset restriction counter, storage is full, average demand, revenue to 0
@@ -510,8 +589,20 @@ void WaterUtility::annualUpdate(int year, int realization)
 	{
 		restrictionFreq[year-1] += 1.0/(double(numRealizations));
 	}
+	
+	annualTTmag[year-1][realization]  = annualTransfers;
+	annualTTfreq[year-1][realization] = annualTransferFrequency;
+	
+	annualRRmag[year-1][realization] = annualReleases;
+	annualRRfreq[year-1][realization] = annualReleaseFrequency;
+	
 	yearlyFailure = 0;
 	thisYearRestrictions = 0;
+	weekrestrictioncount = 0;
+	annualTransfers = 0;
+	annualTransferFrequency = 0;
+	annualReleases = 0;
+	annualReleaseFrequency = 0;
         // reset
 
 }
@@ -544,12 +635,17 @@ void WaterUtility::calculateObjectives()
 			maxRestrictions = restrictionFreq[year];
 		}
 	}
+	
 	for (int realization = 0; realization< numRealizations; realization++)
 	{
 		double maxPayment = 0.0;
 		double maxInsurance = 0.0;
+		double maxTTmag = 0.0;
+		double maxTTfreq = 0.0;
+		double maxRRmag = 0.0;
+		double maxRRfreq = 0.0;
 		for (int year = 0; year< terminateYear; year++)
-            // year with highest insurance payment in this given realization
+            // year with highest insurance payment or transfer magnitude/frequency in this given realization
 		{
 			if(annualPayments[year][realization]>maxPayment)
 			{
@@ -559,18 +655,42 @@ void WaterUtility::calculateObjectives()
 			{
 				maxInsurance = annualInsurance[year][realization];
 			}
+			if(annualTTmag[year][realization] > maxTTmag)
+			{
+				maxTTmag = annualTTmag[year][realization];
+			}
+			if(annualTTfreq[year][realization] > maxTTfreq)
+			{
+				maxTTfreq = annualTTfreq[year][realization];
+			}
+			if(annualRRmag[year][realization] > maxRRmag)
+			{
+				maxRRmag = annualRRmag[year][realization];
+			}
+			if(annualRRfreq[year][realization] > maxRRfreq)
+			{
+				maxRRfreq = annualRRfreq[year][realization];
+			}
 		}
+			// the worst year value for each objective is calculated for each 
+			// realization of the simulation and the objective value is then 
+			// calculated as the AVERAGE worst-case year totals 
 
 		peakDebt += maxPayment/double(numRealizations);
 		peakInsurance += maxInsurance/double(numRealizations);
 		expectedNPC += netPresentCostInfrastructure[realization]/double(numRealizations);
+		
+		TTmagObj  += maxTTmag/double(numRealizations);
+		TTfreqObj += maxTTfreq/double(numRealizations);
+		RRmagObj  += maxRRmag/double(numRealizations);
+		RRfreqObj += maxRRfreq/double(numRealizations);
 	}
 
 	//Average utility costs, including mitigation costs
 
 	//Adding the mitigation costs to total costs
 
-	//Worst case scenario (95% VAR) mitigation costs
+	//Worst case scenario (99% VAR) mitigation costs
  	sort(annualCosts.begin(), annualCosts.end());
 	totalLosses = annualCosts[costRiskLevel];
         // calculates financial risk
@@ -1068,41 +1188,73 @@ int WaterUtility::buildInfrastructure(int infIndex)
  return indexValue;
 }
 
-int WaterUtility::startNewInfrastructure(int year)
+int WaterUtility::startNewInfrastructure(int year, ofstream &checker)
 	// triggered if risk is high enough
 {
 	double rankValue = 0.0;
 	int indexValue = 999;
-	for(int x = 0; x<infrastructureCount;x++)
+	// double checkerValueDouble = 999.0;
+	// int checkerValueInt = 999;
+	
+	// checker << indexValue << "," << rankValue << ",";
+	
+	for(int x = 0; x < infrastructureCount;x++)
 	{
-		if( infMatrix[x][1] < 1.0 && year >= int(infMatrix[x][2]) )
+		if (infMatrix[x][1] < 1.0)
 			// the first column is either 0 or 1, 0 being this option has 
 			// not been triggered yet.  the second column is the realization year
 			// after which permitting has completed and this project is 
 			// eligible to be constructed.
 		{
-			if(infMatrix[x][0]>rankValue && infMatrix[x][0] < 1.0)
-				// by cycling through all infrastructure options (x)
-				// the model is looking for the greatest rankValue 
-				// or the 0th column which holds a 0-to-1 value from
-				// the parameter input file.  the eligible infrastructure
-				// option with the greatest ranking value will be found 
-				// and selected to be built 
+			if (year > infMatrix[x][2])
+				// check the permitting period constraint
 			{
-				indexValue = x;
-				rankValue = infMatrix[x][0];
-					// indicates which option is picked
+				if (infMatrix[x][0] > rankValue)
+					// by cycling through all infrastructure options (x)
+					// the model is looking for the greatest rankValue 
+					// or the 0th column which holds a 0-to-1 value from
+					// the parameter input file.  the eligible infrastructure
+					// option with the greatest ranking value will be found 
+					// and selected to be built 
+				{
+					if (infMatrix[x][0] < 1.0)
+						// NO OPTION CAN BE TRIGGERED IF IT'S RANK VALUE
+						// IS <= 0 OR >= 1
+					{
+						indexValue = x;
+						rankValue = infMatrix[x][0];
+							// indicates which option is picked
+					}
+				}
 			}
 		}
 	}
-	if(indexValue<infrastructureCount)
+	
+	// checker << indexValue << "," << rankValue << ",";
+	
+	if (indexValue < infrastructureCount)
 	{
 		infMatrix[indexValue][1] = 1.0;
 			// mark the chosen option as triggered
 	}
+	
+	// if (indexValue < infrastructureCount)
+	// {
+		// checkerValueDouble = infMatrix[indexValue][2];
+		// checkerValueInt    = int(infMatrix[indexValue][2]);
+	// }
+	// else
+	// {
+		// checkerValueDouble = 999.0;
+		// checkerValueInt = 999;
+	// }
+	
+	// checker << indexValue << "," << rankValue << ",";
+	// checker << checkerValueDouble << "," << checkerValueInt <<  endl;
+	
 	return indexValue;
 }
-void WaterUtility::addDebt(int year, int realization, double amount, int repaymentYears, double rate)
+void WaterUtility::addDebt(int year, int realization, double amount, int repaymentYears, double rate, double drate)
 {
 	int endYear;
 	if((year + repaymentYears - 1)>terminateYear)
@@ -1120,7 +1272,7 @@ void WaterUtility::addDebt(int year, int realization, double amount, int repayme
 	}
 	if(year < terminateYear)
 	{
-		netPresentCostInfrastructure[realization]+= amount/(pow(1.05,(double(year-3))));
+		netPresentCostInfrastructure[realization]+= amount/(pow((1 + drate),(double(year-3))));
 	}
 }
 void WaterUtility::priceInsurance(int year, int realization)

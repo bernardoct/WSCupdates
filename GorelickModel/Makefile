@@ -37,4 +37,4 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) $(CFLAGS) -o $@ -I$(INCL_DIR) -L$(LIB_DIR) $(LIBS) $(DEFINES)
 
 clean:
-	rm -rf *.o Borg-1.6/*.o $(TARGET)
+	rm -rf *.o cborg/*.o $(TARGET)
