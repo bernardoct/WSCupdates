@@ -288,8 +288,6 @@ void Simulation::importDataFiles()
 	// 82 Years: 1926 - 2007
 	// 83 Years: 1928 - 2010
 	// 83 Years: 1929 - 2011 (little river raleigh)
-
-
 	readFile(michieInflow, directoryName + historicFlowPath + "updatedMichieInflow.csv", 81, 52);
 	readFile(littleRiverInflow, directoryName + historicFlowPath + "updatedLittleRiverInflow.csv", 81, 52);
 	readFile(owasaInflow, directoryName + historicFlowPath + "updatedOWASAInflow.csv", 81, 52);
@@ -732,7 +730,7 @@ void Simulation::fixRDMFactors(int rdm_i)
 	{
 		//MORDM EXTENSION -  int combination = RDMInput[i] + ...
 		
-		string hydrology_folder = "../Final_Gorelick_Model/inputfiles/syntheticflows/";
+		string hydrology_folder = "./inputfiles/syntheticflows/";
 			// set where the synthetic inflow files are
 		
 		string hydrology_number;	
@@ -3069,23 +3067,8 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 			rROFs = riskOfFailureStorageInf.getRaleighStorage();//retrieve overall storage, Raleigh
 			cROFs = riskOfFailureStorageInf.getCaryStorage();
 
-			double wbstorInf = riskOfFailureStorageInf.getLakeWBStorageVol();
-			if (year ==1 || year == 40)
-			{
-				LT_ROF_out << year << "," << week << "," << histRealizations+yearROF-startSimulationYear << "," << weekROF << ",";
-				LT_ROF_out << riskOfFailureStorageInf.StQStorage << "," << riskOfFailureStorageInf.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.StQSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.ULStorage << "," << riskOfFailureStorageInf.ULInflow << "," << riskOfFailureStorageInf.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.ULSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.CCRStorage << "," << riskOfFailureStorageInf.CCRInflow << "," << riskOfFailureStorageInf.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.CCRSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.jordanTotalStorageVol << "," << riskOfFailureStorageInf.jordanInflow << "," << riskOfFailureStorageInf.JLAllDemands << "," << riskOfFailureStorageInf.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageInf.durhamReturn2+riskOfFailureStorageInf.owasaReturn <<"," << riskOfFailureStorageInf.jordanSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageInf.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.durhamSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.TeerDemands << "," << riskOfFailureStorageInf.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageInf.teerQuarryStorage/(riskOfFailureStorageInf.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
-				LT_ROF_out << riskOfFailureStorageInf.fallsLakeSupplyStorage +riskOfFailureStorageInf.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageInf.FallsLakeDemands << "," << riskOfFailureStorageInf.durhamSpillage-riskOfFailureStorageInf.teerDiversion << "," << riskOfFailureStorageInf.fallsArea*fallsROFevap << "," << riskOfFailureStorageInf.durhamReturnOut <<"," << riskOfFailureStorageInf.fallsSpillage<<",";
-				LT_ROF_out << riskOfFailureStorageInf.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.RichlandDemands << "," << riskOfFailureStorageInf.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageInf.raleighQuarryStorage/(riskOfFailureStorageInf.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
-				LT_ROF_out << wbstorInf << "," << wbROFInflow << "," << riskOfFailureStorageInf.WBDemands << "," << 0 << "," << wbstorInf*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageInf.lakeWBSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageInf.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageInf.littleRiverRaleighStorage/(.001+riskOfFailureStorageInf.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageInf.raleighLittleRiverSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.intakeDemand << "," << riskOfFailureStorageInf.durhamReturn2 << "," << riskOfFailureStorageInf.durhamReturnOut << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.jordanQualityFraction << "," << riskOfFailureStorageInf.jordanLakeMinRelease << ",";
-				LT_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << endl;
-			}
+			
+			
 
 
 			if (oROFs<.2)
@@ -3104,6 +3087,27 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 			{
 				thisTimeC = 1;
 			}
+
+			double wbstorInf = riskOfFailureStorageInf.getLakeWBStorageVol();
+			//if (year ==1 || year == 40)
+			if (year == 6 && week ==1 && realization == 0)
+			{
+				LT_ROF_out << year << "," << week << "," << histRealizations+yearROF-startSimulationYear << "," << weekROF << ",";
+				LT_ROF_out << riskOfFailureStorageInf.StQStorage << "," << riskOfFailureStorageInf.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.StQSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.ULStorage << "," << riskOfFailureStorageInf.ULInflow << "," << riskOfFailureStorageInf.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.ULSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.CCRStorage << "," << riskOfFailureStorageInf.CCRInflow << "," << riskOfFailureStorageInf.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.CCRSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.jordanTotalStorageVol << "," << riskOfFailureStorageInf.jordanInflow << "," << riskOfFailureStorageInf.JLAllDemands << "," << riskOfFailureStorageInf.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageInf.durhamReturn2+riskOfFailureStorageInf.owasaReturn <<"," << riskOfFailureStorageInf.jordanSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageInf.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.durhamSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.TeerDemands << "," << riskOfFailureStorageInf.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageInf.teerQuarryStorage/(riskOfFailureStorageInf.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
+				LT_ROF_out << riskOfFailureStorageInf.fallsLakeSupplyStorage +riskOfFailureStorageInf.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageInf.FallsLakeDemands << "," << riskOfFailureStorageInf.durhamSpillage-riskOfFailureStorageInf.teerDiversion << "," << riskOfFailureStorageInf.fallsArea*fallsROFevap << "," << riskOfFailureStorageInf.durhamReturnOut <<"," << riskOfFailureStorageInf.fallsSpillage<<",";
+				LT_ROF_out << riskOfFailureStorageInf.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.RichlandDemands << "," << riskOfFailureStorageInf.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageInf.raleighQuarryStorage/(riskOfFailureStorageInf.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
+				LT_ROF_out << wbstorInf << "," << wbROFInflow << "," << riskOfFailureStorageInf.WBDemands << "," << 0 << "," << wbstorInf*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageInf.lakeWBSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageInf.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageInf.littleRiverRaleighStorage/(.001+riskOfFailureStorageInf.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageInf.raleighLittleRiverSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.intakeDemand << "," << riskOfFailureStorageInf.durhamReturn2 << "," << riskOfFailureStorageInf.durhamReturnOut << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.jordanQualityFraction << "," << riskOfFailureStorageInf.jordanLakeMinRelease << ",";
+				LT_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << ",";
+				LT_ROF_out << thisTimeD << "," << thisTimeO << "," << thisTimeR << "," << thisTimeC <<  endl;
+			}
+
 			if(counter < 52)
 			{
 				riskOfFailureStorageIP.setDemands(durhamROFDemand, owasaROFDemand, raleighROFDemand, caryROFDemand, 	numdaysROF);//passes demands to storage calcs
@@ -3233,6 +3237,7 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 			dROFs = riskOfFailureStorageInf.getDurhamStorage();//retrieve overall storage, Durham
 			rROFs = riskOfFailureStorageInf.getRaleighStorage();//retrieve overall storage, Raleigh
 			cROFs = riskOfFailureStorageInf.getCaryStorage();
+
 			if (oROFs<.2)
 			{
 				thisTimeO = 1;//Mark OWASA failure (not a count, there is no difference between 1 week of failure and 52)
@@ -3249,6 +3254,29 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 			{
 				thisTimeC = 1;
 			}
+			double wbstorInf = riskOfFailureStorageInf.getLakeWBStorageVol();
+
+			//if (year ==1 || year == 40)
+			if (year == 6 && week ==1 && realization ==0)
+			{
+				LT_ROF_out << year << "," << week << "," << yearROF << "," << weekROF << ",";
+				LT_ROF_out << riskOfFailureStorageInf.StQStorage << "," << riskOfFailureStorageInf.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.StQSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.ULStorage << "," << riskOfFailureStorageInf.ULInflow << "," << riskOfFailureStorageInf.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.ULSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.CCRStorage << "," << riskOfFailureStorageInf.CCRInflow << "," << riskOfFailureStorageInf.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.CCRSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.jordanTotalStorageVol << "," << riskOfFailureStorageInf.jordanInflow << "," << riskOfFailureStorageInf.JLAllDemands << "," << riskOfFailureStorageInf.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageInf.durhamReturn2+riskOfFailureStorageInf.owasaReturn <<"," << riskOfFailureStorageInf.jordanSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageInf.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.durhamSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.TeerDemands << "," << riskOfFailureStorageInf.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageInf.teerQuarryStorage/(riskOfFailureStorageInf.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
+				LT_ROF_out << riskOfFailureStorageInf.fallsLakeSupplyStorage +riskOfFailureStorageInf.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageInf.FallsLakeDemands << "," << riskOfFailureStorageInf.durhamSpillage-riskOfFailureStorageInf.teerDiversion << "," << riskOfFailureStorageInf.fallsArea*fallsROFevap << "," << riskOfFailureStorageInf.durhamReturnOut <<"," << riskOfFailureStorageInf.fallsSpillage<<",";
+				LT_ROF_out << riskOfFailureStorageInf.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.RichlandDemands << "," << riskOfFailureStorageInf.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageInf.raleighQuarryStorage/(riskOfFailureStorageInf.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
+				LT_ROF_out << wbstorInf << "," << wbROFInflow << "," << riskOfFailureStorageInf.WBDemands << "," << 0 << "," << wbstorInf*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageInf.lakeWBSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageInf.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageInf.littleRiverRaleighStorage/(.001+riskOfFailureStorageInf.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageInf.raleighLittleRiverSpillage <<",";
+				LT_ROF_out << riskOfFailureStorageInf.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.intakeDemand << "," << riskOfFailureStorageInf.durhamReturn2 << "," << riskOfFailureStorageInf.durhamReturnOut << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.jordanQualityFraction << "," << riskOfFailureStorageInf.jordanLakeMinRelease << ",";
+				LT_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << ",";
+				LT_ROF_out << thisTimeD << "," << thisTimeO << "," << thisTimeR << "," << thisTimeC <<  endl;
+			}
+
+
+
 			if(counter < 52)
 			{
 				riskOfFailureStorageIP.setDemands(durhamROFDemand, owasaROFDemand, raleighROFDemand, caryROFDemand, 	numdaysROF);//passes demands to storage calcs
@@ -3290,24 +3318,9 @@ void Simulation::createInfrastructureRisk(int realization, int synthYear, double
 					cary.probReach += 1.0;
 				}
 			}
-			double wbstorInf = riskOfFailureStorageInf.getLakeWBStorageVol();
+			
 
-			if (year ==1 || year == 40)
-			{
-				LT_ROF_out << year << "," << week << "," << yearROF << "," << weekROF << ",";
-				LT_ROF_out << riskOfFailureStorageInf.StQStorage << "," << riskOfFailureStorageInf.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.StQSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.ULStorage << "," << riskOfFailureStorageInf.ULInflow << "," << riskOfFailureStorageInf.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.ULSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.CCRStorage << "," << riskOfFailureStorageInf.CCRInflow << "," << riskOfFailureStorageInf.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.CCRSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.jordanTotalStorageVol << "," << riskOfFailureStorageInf.jordanInflow << "," << riskOfFailureStorageInf.JLAllDemands << "," << riskOfFailureStorageInf.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageInf.durhamReturn2+riskOfFailureStorageInf.owasaReturn <<"," << riskOfFailureStorageInf.jordanSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageInf.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageInf.durhamSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.TeerDemands << "," << riskOfFailureStorageInf.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageInf.teerQuarryStorage/(riskOfFailureStorageInf.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
-				LT_ROF_out << riskOfFailureStorageInf.fallsLakeSupplyStorage +riskOfFailureStorageInf.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageInf.FallsLakeDemands << "," << riskOfFailureStorageInf.durhamSpillage-riskOfFailureStorageInf.teerDiversion << "," << riskOfFailureStorageInf.fallsArea*fallsROFevap << "," << riskOfFailureStorageInf.durhamReturnOut <<"," << riskOfFailureStorageInf.fallsSpillage<<",";
-				LT_ROF_out << riskOfFailureStorageInf.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageInf.RichlandDemands << "," << riskOfFailureStorageInf.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageInf.raleighQuarryStorage/(riskOfFailureStorageInf.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
-				LT_ROF_out << wbstorInf << "," << wbROFInflow << "," << riskOfFailureStorageInf.WBDemands << "," << 0 << "," << wbstorInf*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageInf.lakeWBSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageInf.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageInf.littleRiverRaleighStorage/(.001+riskOfFailureStorageInf.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageInf.raleighLittleRiverSpillage <<",";
-				LT_ROF_out << riskOfFailureStorageInf.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.intakeDemand << "," << riskOfFailureStorageInf.durhamReturn2 << "," << riskOfFailureStorageInf.durhamReturnOut << "," << riskOfFailureStorageInf.raleighReturnOut << "," << riskOfFailureStorageInf.jordanQualityFraction << "," << riskOfFailureStorageInf.jordanLakeMinRelease << ",";
-				LT_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << endl;
-			}
+			
 
 			riskOfFailureDates.increase();//increase week by one
 			counter++;
@@ -3661,7 +3674,7 @@ return;
 }
 
 void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synthYear, double durhamDemandValue, double owasaDemandValue, double raleighDemandValue, double caryDemandValue,
-													   int discreteintervals)
+													   int discreteintervals, ofstream &IP_ROF_out, ofstream &durham_ROFTable, ofstream &owasa_ROFTable, ofstream &raleigh_ROFTable, ofstream &cary_ROFTable)
 {
 	double durhamROFDemand = 0.0;
 	double owasaROFDemand = 0.0;
@@ -3856,6 +3869,25 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			cIPex += riskOfFailureStorageIP.getExcessC();
                 // if the reservoir was full, what was spilled over as excess
 
+			double wbstorROFIP = riskOfFailureStorageIP.getLakeWBStorageVol();
+			/*if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			{
+				IP_ROF_out << year << "," << week << "," << histRealizations+yearROF-startSimulationYear << "," << weekROF << ",";
+				IP_ROF_out << riskOfFailureStorageIP.StQStorage << "," << riskOfFailureStorageIP.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.StQSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.ULStorage << "," << riskOfFailureStorageIP.ULInflow << "," << riskOfFailureStorageIP.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.ULSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.CCRStorage << "," << riskOfFailureStorageIP.CCRInflow << "," << riskOfFailureStorageIP.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.CCRSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.jordanTotalStorageVol << "," << riskOfFailureStorageIP.jordanInflow << "," << riskOfFailureStorageIP.JLAllDemands << "," << riskOfFailureStorageIP.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageIP.durhamReturn2+riskOfFailureStorageIP.owasaReturn <<"," << riskOfFailureStorageIP.jordanSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageIP.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.durhamSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageIP.TeerDemands << "," << riskOfFailureStorageIP.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageIP.teerQuarryStorage/(riskOfFailureStorageIP.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
+				IP_ROF_out << riskOfFailureStorageIP.fallsLakeSupplyStorage +riskOfFailureStorageIP.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageIP.FallsLakeDemands << "," << riskOfFailureStorageIP.durhamSpillage-riskOfFailureStorageIP.teerDiversion << "," << riskOfFailureStorageIP.fallsArea*fallsROFevap << "," << riskOfFailureStorageIP.durhamReturnOut <<"," << riskOfFailureStorageIP.fallsSpillage<<",";
+				IP_ROF_out << riskOfFailureStorageIP.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageIP.RichlandDemands << "," << riskOfFailureStorageIP.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageIP.raleighQuarryStorage/(riskOfFailureStorageIP.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
+				IP_ROF_out << wbstorROFIP << "," << wbROFInflow << "," << riskOfFailureStorageIP.WBDemands << "," << 0 << "," << wbstorROFIP*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageIP.lakeWBSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageIP.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageIP.littleRiverRaleighStorage/(.001+riskOfFailureStorageIP.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageIP.raleighLittleRiverSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageIP.raleighReturnOut << "," << riskOfFailureStorageIP.intakeDemand << "," << riskOfFailureStorageIP.durhamReturn2 << "," << riskOfFailureStorageIP.durhamReturnOut << "," << riskOfFailureStorageIP.raleighReturnOut << "," << riskOfFailureStorageIP.jordanQualityFraction << "," << riskOfFailureStorageIP.jordanLakeMinRelease << ",";
+				IP_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dIPs << "," << oIPs << "," << rIPs << "," << cIPs << ",";
+				IP_ROF_out << dIPex << "," << oIPex << "," << rIPex << "," << cIPex << "," << endl;
+			}*/
+
 			if(oIPs < 0.2)
 			{
 				for(int x = 0; x < discreteintervals; x++)
@@ -3877,6 +3909,8 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 					}
 				}
 			}
+
+
 
 			// repeat for all utilities....
 
@@ -3947,6 +3981,11 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 				}
 			}
 		}
+		/*if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+		{
+			IP_ROF_out << thisTimeDIP << "," << thisTimeOIP << "," << thisTimeRIP << "," << thisTimeDIP << endl;
+		}*/
+
 		
 		for (int x = 0; x < discreteintervals; x++)
 		{
@@ -4057,6 +4096,27 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			rIPex += riskOfFailureStorageIP.getExcessR();//retrieve overall storage, Raleigh
 			cIPex += riskOfFailureStorageIP.getExcessC();
 
+			double wbstorROFIP = riskOfFailureStorageIP.getLakeWBStorageVol();
+
+			/*if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			{
+				IP_ROF_out << year << "," << week << "," << yearROF << "," << weekROF << ",";
+				IP_ROF_out << riskOfFailureStorageIP.StQStorage << "," << riskOfFailureStorageIP.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.StQSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.ULStorage << "," << riskOfFailureStorageIP.ULInflow << "," << riskOfFailureStorageIP.ULDemands << "," << 0 << "," << 212*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.ULSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.CCRStorage << "," << riskOfFailureStorageIP.CCRInflow << "," << riskOfFailureStorageIP.CCRDemands << "," << 0 << "," << 500*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.CCRSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.jordanTotalStorageVol << "," << riskOfFailureStorageIP.jordanInflow << "," << riskOfFailureStorageIP.JLAllDemands << "," << riskOfFailureStorageIP.OWASASpillage << "," << 13940*ROFevap << "," << riskOfFailureStorageIP.durhamReturn2+riskOfFailureStorageIP.owasaReturn <<"," << riskOfFailureStorageIP.jordanSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.durhamStorage << "," << durhamROFInflow << "," << riskOfFailureStorageIP.DurhamDemands << "," << 0 << "," << 1069*ROFevap << "," << 0 <<"," << riskOfFailureStorageIP.durhamSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.teerQuarryStorage << "," << 0 << "," << riskOfFailureStorageIP.TeerDemands << "," << riskOfFailureStorageIP.teerDiversion << "," << ROFevap *(20+30*(riskOfFailureStorageIP.teerQuarryStorage/(riskOfFailureStorageIP.teerQuarryCapacity+0.001))) << "," << 0 <<"," << 0 <<",";
+				IP_ROF_out << riskOfFailureStorageIP.fallsLakeSupplyStorage +riskOfFailureStorageIP.fallsLakeQualityStorage << "," << raleighROFInflow << "," << riskOfFailureStorageIP.FallsLakeDemands << "," << riskOfFailureStorageIP.durhamSpillage-riskOfFailureStorageIP.teerDiversion << "," << riskOfFailureStorageIP.fallsArea*fallsROFevap << "," << riskOfFailureStorageIP.durhamReturnOut <<"," << riskOfFailureStorageIP.fallsSpillage<<",";
+				IP_ROF_out << riskOfFailureStorageIP.raleighQuarryStorage << "," << 0 << "," << riskOfFailureStorageIP.RichlandDemands << "," << riskOfFailureStorageIP.raleighQuarryDiversion << "," << ROFevap * (20 + 30*(riskOfFailureStorageIP.raleighQuarryStorage/(riskOfFailureStorageIP.raleighQuarryCapacity+.001))) << "," << 0 <<"," << 0 <<",";
+				IP_ROF_out << wbstorROFIP << "," << wbROFInflow << "," << riskOfFailureStorageIP.WBDemands << "," << 0 << "," << wbstorROFIP*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageIP.lakeWBSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageIP.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageIP.littleRiverRaleighStorage/(.001+riskOfFailureStorageIP.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageIP.raleighLittleRiverSpillage <<",";
+				IP_ROF_out << riskOfFailureStorageIP.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageIP.raleighReturnOut << "," << riskOfFailureStorageIP.intakeDemand << "," << riskOfFailureStorageIP.durhamReturn2 << "," << riskOfFailureStorageIP.durhamReturnOut << "," << riskOfFailureStorageIP.raleighReturnOut << "," << riskOfFailureStorageIP.jordanQualityFraction << "," << riskOfFailureStorageIP.jordanLakeMinRelease << ",";
+				IP_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dIPs << "," << oIPs << "," << rIPs << "," << cIPs << ",";
+				IP_ROF_out << dIPex << "," << oIPex << "," << rIPex << "," << cIPex << endl;
+			}*/
+
+
 			if(oIPs < 0.2)
 			{
 				for(int x = 0; x < discreteintervals; x++)
@@ -4148,6 +4208,11 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 				}
 			}
 		}
+
+		/*if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+		{
+			IP_ROF_out << thisTimeDIP << "," << thisTimeOIP << "," << thisTimeRIP<< "," << thisTimeDIP << endl;
+		}*/
 		
 		for (int x = 0; x < discreteintervals; x++)
 		{
@@ -4248,6 +4313,16 @@ void Simulation::createRiskOfFailure_InsuranceReleases(int realization, int synt
 			
 			break;
 		}
+
+		// add storage table output here
+		if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+		{
+			durham_ROFTable << durham.storageRisk[x] << endl;
+			owasa_ROFTable << owasa.storageRisk[x] << endl;
+			raleigh_ROFTable << raleigh.storageRisk[x] << endl;
+			cary_ROFTable << cary.storageRisk[x] << endl;
+		}
+
 	}
 	
 	for(int x = 0; x < discreteintervals; x++)
@@ -4354,10 +4429,10 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
         // runs 52 weeks from current week, to find where levels drop below 20% over this year
         // this is run for 50 years of the immediate past, based on the current year
 	{
-		if (year == 6 && week == 1)
-		{
-			cout << "historical realizations = " << histRealizations << endl;
-		}
+		//if (year == 6 && week == 1)
+		//{
+		//	cout << "historical realizations = " << histRealizations << endl;
+		//}
 
 		counter = 0;
 		
@@ -4429,6 +4504,15 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 				wbROFevap,
 				ROFevap, littleRiverRaleighROFInflow);
 
+
+			if (year == 40 && week == 26 && counter == 0 && solutionNumber == 0)
+			{
+				cout << "durham current storage = " << riskOfFailureStorageROF.getDurhamStorageVol() << endl;
+				cout << "OWASA current storage = " << riskOfFailureStorageROF.getOWASAStorageVol() << endl;
+				cout << "Raleigh current storage = " << riskOfFailureStorageROF.getRaleighStorageVol() << endl;
+				cout << "Cary current storage = " << riskOfFailureStorageROF.getCaryStorageVol() << endl;
+			}
+
 			riskOfFailureStorageROF.setSpillover(weekROF-1);//reservoir releases to meet downstream needs and/or reservoir capacity
 			riskOfFailureStorageROF.updateStorage(weekROF-1, formulation); 
 
@@ -4441,7 +4525,8 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 			// add the output here
 			double wbstorROF = riskOfFailureStorageROF.getLakeWBStorageVol();
 
-			if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			//if (year == 6 && week == 0 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			if (year == 6 && week == 1 && realization ==0)
 			{
 				ST_ROF_out << year << "," << week << "," << histRealizations+yearROF-startSimulationYear << "," << weekROF << ",";
 				ST_ROF_out << riskOfFailureStorageROF.StQStorage << "," << riskOfFailureStorageROF.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageROF.StQSpillage <<",";
@@ -4455,7 +4540,7 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 				ST_ROF_out << wbstorROF << "," << wbROFInflow << "," << riskOfFailureStorageROF.WBDemands << "," << 0 << "," << wbstorROF*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageROF.lakeWBSpillage <<",";
 				ST_ROF_out << riskOfFailureStorageROF.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageROF.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageROF.littleRiverRaleighStorage/(.001+riskOfFailureStorageROF.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageROF.raleighLittleRiverSpillage <<",";
 				ST_ROF_out << riskOfFailureStorageROF.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageROF.raleighReturnOut << "," << riskOfFailureStorageROF.intakeDemand << "," << riskOfFailureStorageROF.durhamReturn2 << "," << riskOfFailureStorageROF.durhamReturnOut << "," << riskOfFailureStorageROF.raleighReturnOut << "," << riskOfFailureStorageROF.jordanQualityFraction << "," << riskOfFailureStorageROF.jordanLakeMinRelease << ",";
-				ST_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << endl;
+				ST_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << ",";
 			}
 
 
@@ -4477,6 +4562,12 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 			}
                 // this was for ROF, insurance is below
                 // they are different because ROF is used to calculate insurance payments?
+
+			//if (year == 6 && week == 0 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			if (year == 6 && week ==1 && realization ==0)
+			{
+				ST_ROF_out << thisTimeD << "," << thisTimeO << "," << thisTimeR << "," << thisTimeC << endl;
+			}
 
 			riskOfFailureDates.increase();//increase week by one
 			counter++;
@@ -4563,6 +4654,15 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 				wbROFevap,
 				ROFevap, littleRiverRaleighROFInflow);
 
+			
+			if (year == 40 && week == 26 && counter == 0 && solutionNumber == 0)
+			{
+				cout << "durham current storage = " << riskOfFailureStorageROF.getDurhamStorageVol() << endl;
+				cout << "OWASA current storage = " << riskOfFailureStorageROF.getOWASAStorageVol() << endl;
+				cout << "Raleigh current storage = " << riskOfFailureStorageROF.getRaleighStorageVol() << endl;
+				cout << "Cary current storage = " << riskOfFailureStorageROF.getCaryStorageVol() << endl;
+			}
+
 			riskOfFailureStorageROF.setSpillover(weekROF-1);//reservoir releases to meet downstream needs and/or reservoir capacity
 			riskOfFailureStorageROF.updateStorage(weekROF-1, formulation);   
 
@@ -4573,7 +4673,8 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 
 			double wbstorROF = riskOfFailureStorageROF.getLakeWBStorageVol();
 
-			if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			//if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			if (year == 6 && week ==1 && realization ==0)
 			{
 				ST_ROF_out << year << "," << week << "," << yearROF << "," << weekROF << ",";
 				ST_ROF_out << riskOfFailureStorageROF.StQStorage << "," << riskOfFailureStorageROF.StQInflow << "," << 0 << "," << 0 << "," << 10*ROFevap << "," << 0 <<"," << riskOfFailureStorageROF.StQSpillage <<",";
@@ -4587,7 +4688,8 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 				ST_ROF_out << wbstorROF << "," << wbROFInflow << "," << riskOfFailureStorageROF.WBDemands << "," << 0 << "," << wbstorROF*0.3675*wbROFevap << "," << 0 <<"," << riskOfFailureStorageROF.lakeWBSpillage <<",";
 				ST_ROF_out << riskOfFailureStorageROF.littleRiverRaleighStorage << "," << littleRiverRaleighROFInflow << "," << riskOfFailureStorageROF.LRRDemands << "," << 0 << "," << fallsROFevap*(320.0+826.0*(riskOfFailureStorageROF.littleRiverRaleighStorage/(.001+riskOfFailureStorageROF.littleRiverRaleighCapacity))) << "," << 0 <<"," << riskOfFailureStorageROF.raleighLittleRiverSpillage <<",";
 				ST_ROF_out << riskOfFailureStorageROF.fallsSpillage << "," << claytonROFInflow + crabtreeROFInflow << "," << riskOfFailureStorageROF.raleighReturnOut << "," << riskOfFailureStorageROF.intakeDemand << "," << riskOfFailureStorageROF.durhamReturn2 << "," << riskOfFailureStorageROF.durhamReturnOut << "," << riskOfFailureStorageROF.raleighReturnOut << "," << riskOfFailureStorageROF.jordanQualityFraction << "," << riskOfFailureStorageROF.jordanLakeMinRelease << ",";
-				ST_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << endl;
+				ST_ROF_out << durhamROFDemand << "," << owasaROFDemand << "," << raleighROFDemand << "," << caryROFDemand << "," << dROFs << "," << oROFs << "," << rROFs << "," << cROFs << ",";
+				
 			}
 
 			if (oROFs<.2)
@@ -4605,6 +4707,12 @@ void Simulation::createRiskOfFailure_RestrictionsTransfers(int realization, int 
 			if (cROFs<.2)
 			{
 				thisTimeC = 1;
+			}
+
+			//if (year == 6 && week == 1 || year == 6 && week == 26 || year == 40 && week == 1 || year == 40 && week == 26 )
+			if (year == 6 && week == 0 && realization == 0)
+			{
+				ST_ROF_out << thisTimeD << "," << thisTimeO << "," << thisTimeR << "," << thisTimeC << endl;
 			}
 
 			riskOfFailureDates.increase();//increase week by one
@@ -5520,15 +5628,21 @@ void Simulation::realizationLoop()
 
 		// create system state output files (added by D. Gold 9/20/16)
 
-		std::string filenameAA = "../Final_Gorelick_Model/output/Diagnostics/DurhamSystemStates";
-		std::string filenameBB = "../Final_Gorelick_Model/output/Diagnostics/OWASASystemStates";
-		std::string filenameCC = "../Final_Gorelick_Model/output/Diagnostics/RaleighSystemStates";
-		std::string filenameDD = "../Final_Gorelick_Model/output/Diagnostics/CarySystemStates";
-		std::string filenameGG = "../Final_Gorelick_Model/output/Diagnostics/Policies";
-		std::string filenameHH = "../Final_Gorelick_Model/output/Diagnostics/realized_params";
-		std::string filenameII = "../Final_Gorelick_Model/output/Continuity/continuity_data";
-		std::string filenameJJ = "../Final_Gorelick_Model/output/ROF/STROF_data";
-		std::string filenameKK = "../Final_Gorelick_Model/output/ROF/LTROF_data";
+		std::string filenameAA = "output/Diagnostics/DurhamSystemStates";
+		std::string filenameBB = "output/Diagnostics/OWASASystemStates";
+		std::string filenameCC = "output/Diagnostics/RaleighSystemStates";
+		std::string filenameDD = "output/Diagnostics/CarySystemStates";
+		std::string filenameGG = "output/Diagnostics/Policies";
+		std::string filenameHH = "output/Diagnostics/realized_params";
+		std::string filenameII = "output/Continuity/continuity_data";
+		std::string filenameJJ = "output/ROF/STROF_data";
+		std::string filenameKK = "output/ROF/LTROF_data";
+		std::string filenameLL = "output/ROF/IPROF_data";
+		std::string filenameMM = "output/ROF/Durham_IPTable";
+		std::string filenameNN = "output/ROF/OWASA_IPTable";
+		std::string filenameOO = "output/ROF/Raleigh_IPTable";
+		std::string filenamePP = "output/ROF/Cary_IPTable";
+
 
 		std::string filenameEND = ".csv";	
 		std::string completeFilenameAA;
@@ -5540,6 +5654,11 @@ void Simulation::realizationLoop()
 		std::string completeFilenameII;
 		std::string completeFilenameJJ;
 		std::string completeFilenameKK;
+		std::string completeFilenameLL;
+		std::string completeFilenameMM;
+		std::string completeFilenameNN;
+		std::string completeFilenameOO;
+		std::string completeFilenamePP;
 
 		std::stringstream sstmAA;
 		std::stringstream sstmBB;
@@ -5550,6 +5669,11 @@ void Simulation::realizationLoop()
 		std::stringstream sstmII;
 		std::stringstream sstmJJ;
 		std::stringstream sstmKK;
+		std::stringstream sstmLL;
+		std::stringstream sstmMM;
+		std::stringstream sstmNN;
+		std::stringstream sstmOO;
+		std::stringstream sstmPP;
 
 		sstmAA << filenameAA << solutionNumber << filenameEND;
 		sstmBB << filenameBB << solutionNumber << filenameEND;
@@ -5560,6 +5684,12 @@ void Simulation::realizationLoop()
 		sstmII << filenameII << solutionNumber << filenameEND;
 		sstmJJ << filenameJJ << solutionNumber << filenameEND;
 		sstmKK << filenameKK << solutionNumber << filenameEND;
+		sstmLL << filenameLL << solutionNumber << filenameEND;
+		sstmMM << filenameMM << solutionNumber << filenameEND;
+		sstmNN << filenameNN << solutionNumber << filenameEND;
+		sstmOO << filenameOO << solutionNumber << filenameEND;
+		sstmPP << filenamePP << solutionNumber << filenameEND;
+
 
 		completeFilenameAA = sstmAA.str();
 		completeFilenameBB = sstmBB.str();
@@ -5570,6 +5700,11 @@ void Simulation::realizationLoop()
 		completeFilenameII = sstmII.str();
 		completeFilenameJJ = sstmJJ.str();
 		completeFilenameKK = sstmKK.str();
+		completeFilenameLL = sstmLL.str();
+		completeFilenameMM = sstmMM.str();
+		completeFilenameNN = sstmNN.str();
+		completeFilenameOO = sstmOO.str();
+		completeFilenamePP = sstmPP.str(); 
 
 		openFile(DurhamSystemStates, completeFilenameAA);
 		openFile(OWASASystemStates, completeFilenameBB);
@@ -5580,6 +5715,11 @@ void Simulation::realizationLoop()
 		openFile(continuity_out, completeFilenameII);
 		openFile(ST_ROF_out, completeFilenameJJ);
 		openFile(LT_ROF_out, completeFilenameKK);
+		openFile(IP_ROF_out, completeFilenameLL);
+		openFile(durham_ROFTable, completeFilenameMM);
+		openFile(owasa_ROFTable, completeFilenameNN);
+		openFile(raleigh_ROFTable, completeFilenameOO);
+		openFile(cary_ROFTable, completeFilenamePP);
 
 
 			// variables that will be written to output. all these are defined as public variables in the header file 
@@ -5639,7 +5779,8 @@ void Simulation::realizationLoop()
 		ST_ROF_out << "LakeWBVolume" << "," << "LakeWBInflow" << "," << "LakeWBDemand" << "," << "LakeWBUpSpillage" << "," << "LakeWBEvap" << "," << "LakeWBWWReturns"<< "," << "LakeWBSpillage" << ",";
 		ST_ROF_out << "LRRVolume" << "," << "LRRInflow" << "," << "LRRDemand" << "," << "LRRUpSpillage" << "," << "LRREvap" << "," << "LRRWWReturns"<< "," << "LRRSpillage" <<",";
 		ST_ROF_out << "ClaytonUpSpill" << "," << "ClaytonInflow" << "," << "raleighReturn" << "," << "IntakeDemand" << "," << "DurhamReturn2" << "," << "DurhamReturn1" << "," << "RaleighReturn" << "," << "jordanQualityFraction" <<"," << "JordanMinRelease" << ",";
-		ST_ROF_out << "DurhamDemand" << "," << "OWASADemand" << "," << "RaleighDemand" << "," << "Cary Demand" << "," << "DurhamStorage" << "," << "OWASAStorage" << "," << "RaleighStorage" << "," << "CaryStorage" << endl;
+		ST_ROF_out << "DurhamDemand" << "," << "OWASADemand" << "," << "RaleighDemand" << "," << "Cary Demand" << "," << "DurhamStorage" << "," << "OWASAStorage" << "," << "RaleighStorage" << "," << "CaryStorage" << ",";
+		ST_ROF_out <<  "DurhamFail" << "," << "OWASAFail" << "," << "RaleighFail" << "," << "CaryFail" << endl;
 
 		LT_ROF_out << "Year" << "," << "Week" << "," << "ROFYear" << "," << "ROFWeek" << ",";
 		LT_ROF_out << "StQVolume" << "," << "StQInflow" << "," << "StQDemand" << "," << "StQUpSpillage" << "," << "StQEvap" << "," << "StQWWReturns"<< "," << "StQSpillage" << ",";
@@ -5653,21 +5794,37 @@ void Simulation::realizationLoop()
 		LT_ROF_out << "LakeWBVolume" << "," << "LakeWBInflow" << "," << "LakeWBDemand" << "," << "LakeWBUpSpillage" << "," << "LakeWBEvap" << "," << "LakeWBWWReturns"<< "," << "LakeWBSpillage" << ",";
 		LT_ROF_out << "LRRVolume" << "," << "LRRInflow" << "," << "LRRDemand" << "," << "LRRUpSpillage" << "," << "LRREvap" << "," << "LRRWWReturns"<< "," << "LRRSpillage" <<",";
 		LT_ROF_out << "ClaytonUpSpill" << "," << "ClaytonInflow" << "," << "raleighReturn" << "," << "IntakeDemand" << "," << "DurhamReturn2" << "," << "DurhamReturn1" << "," << "RaleighReturn" << "," << "jordanQualityFraction" <<"," << "JordanMinRelease" << ",";
-		LT_ROF_out << "DurhamDemand" << "," << "OWASADemand" << "," << "RaleighDemand" << "," << "Cary Demand" << "," << "DurhamStorage" << "," << "OWASAStorage" << "," << "RaleighStorage" << "," << "CaryStorage" << endl;
+		LT_ROF_out << "DurhamDemand" << "," << "OWASADemand" << "," << "RaleighDemand" << "," << "Cary Demand" << "," << "DurhamStorage" << "," << "OWASAStorage" << "," << "RaleighStorage" << "," << "CaryStorage" << ",";
+		LT_ROF_out <<  "DurhamFail" << "," << "OWASAFail" << "," << "RaleighFail" << "," << "CaryFail" << endl;
 
-		
+		IP_ROF_out << "Year" << "," << "Week" << "," << "ROFYear" << "," << "ROFWeek" << ",";
+		IP_ROF_out << "StQVolume" << "," << "StQInflow" << "," << "StQDemand" << "," << "StQUpSpillage" << "," << "StQEvap" << "," << "StQWWReturns"<< "," << "StQSpillage" << ",";
+		IP_ROF_out << "ULVolume" << "," << "ULInflow" << "," << "ULDemand" << "," << "ULUpSpillage" << "," << "ULEvap" << "," << "ULWWReturns"<< "," << "ULSpillage" << ",";
+		IP_ROF_out << "CCRVolume" << "," << "CCRInflow" << "," << "CCRDemand" << "," << "CCRUpSpillage" << "," << "CCREvap" << "," << "CCRWWReturns"<< "," << "CCRSpillage" << ",";
+		IP_ROF_out << "JordanLakeVolume" << "," << "JordanLakeInflow" << "," << "JordanLakeDemand" << "," << "JordanLakeUpSpillage" << "," << "JordanLakeEvap" << "," << "JordanLakeWWReturns"<< "," << "JordanLakeSpillage" << ",";
+		IP_ROF_out << "DurhamVolume" << "," << "DurhamInflow" << "," << "DurhamDemand" << "," << "DurhamUpSpillage" << "," << "DurhamEvap" << "," << "DurhamWWReturns"<< "," << "DurhamSpillage" << ",";
+		IP_ROF_out << "TeerVolume" << "," << "TeerInflow" << "," << "TeerDemand" << "," << "TeerUpSpillage" << "," << "TeerEvap" << "," << "TeerWWReturns"<< "," << "TeerSpillage" << ",";
+		IP_ROF_out << "FallsLakeVolume" << "," << "FallsLakeInflow" << "," << "FallsLakeDemand" << "," << "FallsLakeUpSpillage" << "," << "FallsLakeEvap" << "," << "FallsLakeWWReturns"<< "," << "FallsLakeSpillage" << ",";
+		IP_ROF_out << "RichlandQVolume" << "," << "RichlandQInflow" << "," << "RichlandQDemand" << "," << "RichlandQUpSpillage" << "," << "RichlandQEvap" << "," << "RichlandQWWReturns"<< "," << "RichlandQSpillage" << ",";
+		IP_ROF_out << "LakeWBVolume" << "," << "LakeWBInflow" << "," << "LakeWBDemand" << "," << "LakeWBUpSpillage" << "," << "LakeWBEvap" << "," << "LakeWBWWReturns"<< "," << "LakeWBSpillage" << ",";
+		IP_ROF_out << "LRRVolume" << "," << "LRRInflow" << "," << "LRRDemand" << "," << "LRRUpSpillage" << "," << "LRREvap" << "," << "LRRWWReturns"<< "," << "LRRSpillage" <<",";
+		IP_ROF_out << "ClaytonUpSpill" << "," << "ClaytonInflow" << "," << "raleighReturn" << "," << "IntakeDemand" << "," << "DurhamReturn2" << "," << "DurhamReturn1" << "," << "RaleighReturn" << "," << "jordanQualityFraction" <<"," << "JordanMinRelease" << ",";
+		IP_ROF_out << "DurhamDemand" << "," << "OWASADemand" << "," << "RaleighDemand" << "," << "Cary Demand" << "," << "DurhamStorage" << "," << "OWASAStorage" << "," << "RaleighStorage" << "," << "CaryStorage" << ",";
+		IP_ROF_out << "DurhamExcess" << "," << "OWASAExcess" << "," << "RaleighExcess" << "," << "CaryExcess" << "," << endl;
+		//IP_ROF_out <<  "DurhamFail" << "," << "OWASAFail" << "," << "RaleighFail" << "," << "CaryFail" << endl;
 
-		std::string filenameA = "../Final_Gorelick_Model/output/JLTreatedTransfers";
-		std::string filenameC = "../Final_Gorelick_Model/output/RRfuncOutput";
-		std::string filenameD = "../Final_Gorelick_Model/output/weeklyRiskParams";
-		std::string filenameG = "../Final_Gorelick_Model/output/InfraBuilt";
-		std::string filenameZ = "../Final_Gorelick_Model/output/ReleaseContract";
-		std::string filenameY = "../Final_Gorelick_Model/output/LMrealloc";
-		std::string filenameB = "../Final_Gorelick_Model/output/RestrictionData";
-		std::string filenameE = "../Final_Gorelick_Model/output/ALLtransferData";
-		std::string filenameF = "../Final_Gorelick_Model/output/storagecheck";
-		std::string filenameH = "../Final_Gorelick_Model/output/checker";
-		std::string filenameI = "../Final_Gorelick_Model/output/weeklyevap";
+
+		std::string filenameA = "output/JLTreatedTransfers";
+		std::string filenameC = "output/RRfuncOutput";
+		std::string filenameD = "output/weeklyRiskParams";
+		std::string filenameG = "output/InfraBuilt"; 
+		std::string filenameZ = "output/ReleaseContract";
+		std::string filenameY = "output/LMrealloc";
+		std::string filenameB = "output/RestrictionData";
+		std::string filenameE = "output/ALLtransferData";
+		std::string filenameF = "output/storagecheck";
+		std::string filenameH = "output/checker";
+		std::string filenameI = "output/weeklyevap";
 		
 		//std::string filenameEND = ".csv";
 			
@@ -6051,7 +6208,7 @@ void Simulation::realizationLoop()
 
 
 			createRiskOfFailure_InsuranceReleases(realization, year, durham.averageUse, owasa.averageUse, raleigh.averageUse, cary.averageUse,
-												  numIntervals);
+												  numIntervals, IP_ROF_out, durham_ROFTable, owasa_ROFTable, raleigh_ROFTable, cary_ROFTable);
                 // gives the ROF of this given week
 				// July 2016: this function just does ROF for insurance and releases 
 
@@ -6205,6 +6362,7 @@ void Simulation::realizationLoop()
 			owasa.calculateDemand(realization, week, numdays, year);
 			cary.calculateDemand(realization, week, numdays, year);
 			raleigh.calculateDemand(realization, week, numdays, year);
+
 
 			double durhamUnrestrictedDemand = durham.weeklyDemand; 
 			double owasaUnrestrictedDemand = owasa.weeklyDemand;
@@ -6421,7 +6579,7 @@ void Simulation::realizationLoop()
 				// storcheck << systemStorage.getRaleighStorage() << "," << systemStorage.getDurhamStorage() << ",";
 					// // storage check 7
 			// }
-
+			
 			DurhamSystemStates << solutionNumber << "," << realization << "," << year << "," << week << "," << durham.storageFraction << "," << systemStorage.getDurhamStorageVol() <<",";
 			DurhamSystemStates << durham.riskOfFailure << "," << durham.infRisk << "," << durham.weeklyDemand << "," << durhamUnrestrictedDemand << ",";
 			DurhamSystemStates << durham.weeklyDemand/durhamUnrestrictedDemand << "," << durham.restrictionStage << "," << durham.Fund.fundSize << ",";
@@ -6477,7 +6635,7 @@ void Simulation::realizationLoop()
 			double JLQvol =systemStorage.getJordanQualityStorageVol();
 			double JLSvol = systemStorage.getJordanSupplyStorageVol();
 			double wbstor = systemStorage.getLakeWBStorageVol();
-
+			
 			continuity_out << solutionNumber << "," << realization << "," << year << "," << week << ",";
 			continuity_out << systemStorage.StQStorage << "," << systemStorage.StQInflow << "," << 0 << "," << 0 << "," << 10*actualEvap << "," << 0 <<"," << systemStorage.StQSpillage <<",";
 			continuity_out << systemStorage.ULStorage << "," << systemStorage.ULInflow << "," << systemStorage.ULDemands << "," << 0 << "," << 212*actualEvap << "," << 0 <<"," << systemStorage.ULSpillage <<",";
@@ -6490,7 +6648,7 @@ void Simulation::realizationLoop()
 			continuity_out << wbstor << "," << wbActualInflow << "," << systemStorage.WBDemands << "," << 0 << "," << wbstor*0.3675*actualWBEvap << "," << 0 <<"," << systemStorage.lakeWBSpillage <<",";
 			continuity_out << systemStorage.littleRiverRaleighStorage << "," << littleRiverRaleighActualInflow << "," << systemStorage.LRRDemands << "," << 0 << "," << actualFallsEvap*(320.0+826.0*(systemStorage.littleRiverRaleighStorage/(.001+systemStorage.littleRiverRaleighCapacity))) << "," << 0 <<"," << systemStorage.raleighLittleRiverSpillage <<",";
 			continuity_out << systemStorage.fallsSpillage << "," << claytonActualInflow + crabtreeActualInflow << "," << systemStorage.raleighReturnOut << "," << systemStorage.intakeDemand << "," << systemStorage.durhamReturn2 << "," << systemStorage.durhamReturnOut << "," << systemStorage.raleighReturnOut << "," << systemStorage.jordanQualityFraction << "," << systemStorage.jordanLakeMinRelease << endl;
-
+			
 			//update timestep
 			simDates.increase();
 			year = simDates.getYear();
@@ -6677,6 +6835,11 @@ void Simulation::realizationLoop()
 		continuity_out.close();
 		ST_ROF_out.close();
 		LT_ROF_out.close();
+		IP_ROF_out.close();
+		durham_ROFTable.close();
+		owasa_ROFTable.close();
+		raleigh_ROFTable.close();
+		cary_ROFTable.close();
 
 			// Jan 2017: some of these outputs have been commented or disabled with logicals in other functions...
 			// only the outputs necessary for figures are printed
