@@ -28,8 +28,8 @@ public:
 	double getDurhamBuybackRequest();
 	
 	void getReturnRatios(double raleighR, double durhamR);
-	void updateStorage(int whatWeek);
-	double updateOWASAStorage();
+
+    double updateOWASAStorage();
 	double updateDurhamStorage();
 	double updateRaleighStorage(int whatWeek);
 	void updateJordanLakeStorage(double ow, double dur, double ral);
