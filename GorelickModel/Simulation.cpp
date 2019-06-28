@@ -332,8 +332,8 @@ void Simulation::realizationLoop()
             //pass weekly demand values to reservoir storage update function
 
 			durham_demand << durham.weeklyDemand << ",";
-			raleigh_demand << cary.weeklyDemand << ",";
-			cary_demand << raleigh.weeklyDemand << ",";
+			raleigh_demand << raleigh.weeklyDemand << ",";
+			cary_demand << cary.weeklyDemand << ",";
 
             //update timestep
             simDates.increase();
