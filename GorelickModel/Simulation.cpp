@@ -51,18 +51,30 @@ void Simulation::importDataFiles()
 	// 82 Years: 1926 - 2007
 	// 83 Years: 1928 - 2010
 	// 83 Years: 1929 - 2011 (little river raleigh)
-	readFile(michieInflow, historicFlowPath + "updatedMichieInflow.csv", 81, 52);
-	readFile(littleRiverInflow, historicFlowPath + "updatedLittleRiverInflow.csv", 81, 52);
-	readFile(owasaInflow, historicFlowPath + "updatedOWASAInflow.csv", 81, 52);
-	readFile(fallsLakeInflow, historicFlowPath + "updatedFallsLakeInflow.csv", 81, 52);
-	readFile(lakeWBInflow, historicFlowPath + "updatedLakeWBInflow.csv", 81, 52);
-	readFile(claytonInflow, historicFlowPath + "claytonGageInflow.csv", 81, 52);
-	readFile(crabtreeInflow, historicFlowPath + "crabtreeCreekInflow.csv", 81, 52);
-	readFile(jordanLakeInflow, historicFlowPath + "updatedJordanLakeInflow.csv", 81, 52);
-	readFile(lillingtonGaugeInflow, historicFlowPath + "updatedLillingtonInflow.csv", 81, 52);
-	readFile(littleRiverRaleighInflow, historicFlowPath + "updatedLittleRiverRaleighInflow.csv", 81, 52);
+#pragma omp parallel num_threads(omp_get_thread_num())
+    {
+#pragma omp single
+        readFile(michieInflow, historicFlowPath + "updatedMichieInflow.csv", 81, 52);
+#pragma omp single
+        readFile(littleRiverInflow, historicFlowPath + "updatedLittleRiverInflow.csv", 81, 52);
+#pragma omp single
+        readFile(owasaInflow, historicFlowPath + "updatedOWASAInflow.csv", 81, 52);
+#pragma omp single
+        readFile(fallsLakeInflow, historicFlowPath + "updatedFallsLakeInflow.csv", 81, 52);
+#pragma omp single
+        readFile(lakeWBInflow, historicFlowPath + "updatedLakeWBInflow.csv", 81, 52);
+#pragma omp single
+        readFile(claytonInflow, historicFlowPath + "claytonGageInflow.csv", 81, 52);
+#pragma omp single
+        readFile(crabtreeInflow, historicFlowPath + "crabtreeCreekInflow.csv", 81, 52);
+#pragma omp single
+        readFile(jordanLakeInflow, historicFlowPath + "updatedJordanLakeInflow.csv", 81, 52);
+#pragma omp single
+        readFile(lillingtonGaugeInflow, historicFlowPath + "updatedLillingtonInflow.csv", 81, 52);
+#pragma omp single
+        readFile(littleRiverRaleighInflow, historicFlowPath + "updatedLittleRiverRaleighInflow.csv", 81, 52);
 
-	readFile(streamflowIndex, historicFlowPath + "streamflowSample.csv", 100, 1);
+//	readFile(streamflowIndex, historicFlowPath + "streamflowSample.csv", 100, 1);
 
 	// 18 years (1990-2007) of weekly demand data (18 x 52)
 	// Raleigh does not have enough data, so use Cary's instead
@@ -76,6 +88,41 @@ void Simulation::importDataFiles()
 	readFile(raleighFutureD, demandDataPath + "raleighFutureDemand.csv", 1, 51);
 	readFile(durhamFutureD, demandDataPath + "durhamFutureDemand.csv", 1, 51);
 	readFile(owasaFutureD, demandDataPath + "owasaFutureDemand.csv", 1, 51);
+
+    use_RDM_ext = true;
+
+	if (use_RDM_ext) {
+        //MORDM EXTENSION -  int combination = RDMInput[i] + ...
+        // set where the synthetic inflow files are
+
+        // reads the first element of the row of RDM factors used
+        // if david is just using one row, this isnt needed (hence the if statement)
+
+#pragma omp single
+            readFile(durhamInflowsSYN, synthFlowsPath + "durham_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(owasaInflowSYN1, synthFlowsPath + "cane_creek_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(owasaInflowSYN2, synthFlowsPath + "university_lake_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(owasaInflowSYN3, synthFlowsPath + "stone_quarry_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(fallsLakeInflowSYN, synthFlowsPath + "falls_lake_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(lakeWBInflowSYN, synthFlowsPath + "lake_wb_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(claytonInflowSYN, synthFlowsPath + "clayton_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(crabtreeInflowSYN, synthFlowsPath + "crabtree_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(jordanLakeInflowSYN, synthFlowsPath + "jordan_lake_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(lillingtonGaugeInflowSYN, synthFlowsPath + "lillington_inflows.csv", numRecords, n_syn_records);
+#pragma omp single
+            readFile(littleRiverRaleighInflowSYN, synthFlowsPath + "little_river_raleigh_inflows.csv", numRecords,
+                     n_syn_records);
+        }
+    }
 
 }
 
@@ -187,6 +234,30 @@ void Simulation::preconditionData(double unit_demand_multiplier, double future_d
 		jordanInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
 		lillingtonInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
 		littleRiverRaleighInflows.calculateNormalizations(inflowR, inflowC, streamflowStartYear);
+
+        for (int row = 0; row<numRealizations;row++)
+        {
+            int weekCounter = 0;
+            for (int col = 0; col < terminateYear*52; col++)
+            {
+                durhamInflows.simulatedData[row][col] 	= (log(durhamInflowsSYN[row][col + 2609]) - durhamInflows.averages[weekCounter])/durhamInflows.standardDeviations[weekCounter];
+                owasaInflows.simulatedData[row][col] 	= (log(owasaInflowSYN1[row][col + 2609] + owasaInflowSYN2[row][col + 2609] + owasaInflowSYN3[row][col + 2609]) - owasaInflows.averages[weekCounter])/owasaInflows.standardDeviations[weekCounter];
+                fallsInflows.simulatedData[row][col]	= (log(fallsLakeInflowSYN[row][col + 2609]) - fallsInflows.averages[weekCounter])/fallsInflows.standardDeviations[weekCounter];
+                wheelerInflows.simulatedData[row][col]	= (log(lakeWBInflowSYN[row][col + 2609])-wheelerInflows.averages[weekCounter])/wheelerInflows.standardDeviations[weekCounter];
+                claytonInflows.simulatedData[row][col]	= (log(claytonInflowSYN[row][col + 2609])-claytonInflows.averages[weekCounter])/claytonInflows.standardDeviations[weekCounter];
+                crabtreeInflows.simulatedData[row][col]	= (log(crabtreeInflowSYN[row][col + 2609])-crabtreeInflows.averages[weekCounter])/crabtreeInflows.standardDeviations[weekCounter];
+                jordanInflows.simulatedData[row][col]	= (log(jordanLakeInflowSYN[row][col + 2609])-jordanInflows.averages[weekCounter])/jordanInflows.standardDeviations[weekCounter];
+                lillingtonInflows.simulatedData[row][col] = (log(lillingtonGaugeInflowSYN[row][col + 2609])-lillingtonInflows.averages[weekCounter])/lillingtonInflows.standardDeviations[weekCounter];
+                littleRiverRaleighInflows.simulatedData[row][col] = (log(littleRiverRaleighInflowSYN[row][col + 2609])-littleRiverRaleighInflows.averages[weekCounter])/littleRiverRaleighInflows.standardDeviations[weekCounter];
+                weekCounter = weekCounter + 1;
+                if(weekCounter == 52)
+                {
+                    weekCounter = 0;
+                }
+
+            }
+
+        }
 	}
 
 	// Creating joint probability density functions between the whitened demand and inflow data for each utility
@@ -243,53 +314,53 @@ void Simulation::fixRDMFactors()
 	// cout << "Setting up SOW info." << endl;
 	// cout << "Reading Hydrologies" << endl;
 
-	use_RDM_ext = true;
-
-	data_t littleRiverInflowSYN;
-	data_t durhamInflowsSYN;
-	data_t owasaInflowSYN1, owasaInflowSYN2, owasaInflowSYN3;
-	data_t evaporationSYN;
-	data_t fallsLakeInflowSYN, lakeWBInflowSYN;
-	data_t fallsLakeEvaporationSYN, lakeWheelerEvaporationSYN;
-	data_t claytonInflowSYN, crabtreeInflowSYN;
-	data_t jordanLakeInflowSYN, lillingtonGaugeInflowSYN, littleRiverRaleighInflowSYN;
-	
-	if (use_RDM_ext)
-	{
-		//MORDM EXTENSION -  int combination = RDMInput[i] + ...
-			// set where the synthetic inflow files are
-
-			// reads the first element of the row of RDM factors used 
-			// if david is just using one row, this isnt needed (hence the if statement)
-
-		readFile(durhamInflowsSYN, synthFlowsPath + "durham_inflows.csv", numRecords, 70*52);
-		readFile(owasaInflowSYN1, synthFlowsPath + "cane_creek_inflows.csv", numRecords, 70*52);
-		readFile(owasaInflowSYN2, synthFlowsPath + "university_lake_inflows.csv", numRecords, 70*52);
-		readFile(owasaInflowSYN3, synthFlowsPath + "stone_quarry_inflows.csv", numRecords, 70*52);
-		readFile(fallsLakeInflowSYN, synthFlowsPath + "falls_lake_inflows.csv", numRecords, 70*52);
-		readFile(lakeWBInflowSYN, synthFlowsPath + "lake_wb_inflows.csv", numRecords, 70*52);
-		readFile(claytonInflowSYN, synthFlowsPath + "clayton_inflows.csv", numRecords, 70*52);
-		readFile(crabtreeInflowSYN, synthFlowsPath + "crabtree_inflows.csv", numRecords, 70*52);
-		readFile(jordanLakeInflowSYN, synthFlowsPath + "jordan_lake_inflows.csv", numRecords, 70*52);
-		readFile(lillingtonGaugeInflowSYN, synthFlowsPath + "lillington_inflows.csv", numRecords, 70*52);
-		readFile(littleRiverRaleighInflowSYN, synthFlowsPath + "little_river_raleigh_inflows.csv", numRecords, 70*52);
-	}
+//	use_RDM_ext = true;
+//
+//	data_t littleRiverInflowSYN;
+//	data_t durhamInflowsSYN;
+//	data_t owasaInflowSYN1, owasaInflowSYN2, owasaInflowSYN3;
+//	data_t evaporationSYN;
+//	data_t fallsLakeInflowSYN, lakeWBInflowSYN;
+//	data_t fallsLakeEvaporationSYN, lakeWheelerEvaporationSYN;
+//	data_t claytonInflowSYN, crabtreeInflowSYN;
+//	data_t jordanLakeInflowSYN, lillingtonGaugeInflowSYN, littleRiverRaleighInflowSYN;
+//
+//	if (use_RDM_ext)
+//	{
+//		//MORDM EXTENSION -  int combination = RDMInput[i] + ...
+//			// set where the synthetic inflow files are
+//
+//			// reads the first element of the row of RDM factors used
+//			// if david is just using one row, this isnt needed (hence the if statement)
+//
+//		readFile(durhamInflowsSYN, synthFlowsPath + "durham_inflows.csv", numRecords, n_syn_records);
+//		readFile(owasaInflowSYN1, synthFlowsPath + "cane_creek_inflows.csv", numRecords, n_syn_records);
+//		readFile(owasaInflowSYN2, synthFlowsPath + "university_lake_inflows.csv", numRecords, n_syn_records);
+//		readFile(owasaInflowSYN3, synthFlowsPath + "stone_quarry_inflows.csv", numRecords, n_syn_records);
+//		readFile(fallsLakeInflowSYN, synthFlowsPath + "falls_lake_inflows.csv", numRecords, n_syn_records);
+//		readFile(lakeWBInflowSYN, synthFlowsPath + "lake_wb_inflows.csv", numRecords, n_syn_records);
+//		readFile(claytonInflowSYN, synthFlowsPath + "clayton_inflows.csv", numRecords, n_syn_records);
+//		readFile(crabtreeInflowSYN, synthFlowsPath + "crabtree_inflows.csv", numRecords, n_syn_records);
+//		readFile(jordanLakeInflowSYN, synthFlowsPath + "jordan_lake_inflows.csv", numRecords, n_syn_records);
+//		readFile(lillingtonGaugeInflowSYN, synthFlowsPath + "lillington_inflows.csv", numRecords, n_syn_records);
+//		readFile(littleRiverRaleighInflowSYN, synthFlowsPath + "little_river_raleigh_inflows.csv", numRecords, n_syn_records);
+//	}
 
 	// cout << "Future demand multiplier" << endl;
 	//this section allows for use of historic record of variable length
-	for (int x = 0; x<numFutureYears; x++)
-	{
-//		// MORDM EXTENSION - REPLACE future_demand_multiplier WITH THE RIGHT MULTIPLIERS FROM RDMInput
-//		// Scaling a linear projection -- multiply the slope and subtract off changes to the y-intercept
-//		cary.futureDemand[x] = caryFutureD[0][x]*rdm_factors[0] - caryFutureD[0][0]*(rdm_factors[0]-1);
-//		durham.futureDemand[x] = durhamFutureD[0][x]*rdm_factors[0] - durhamFutureD[0][0]*(rdm_factors[0]-1);
-//		raleigh.futureDemand[x] = raleighFutureD[0][x]*rdm_factors[0] - raleighFutureD[0][0]*(rdm_factors[0]-1);
-//			// default RDM factors here should be 1
-
-		cary.futureDemand[x] = caryFutureD[0][x];
-		durham.futureDemand[x] = durhamFutureD[0][x];
-		raleigh.futureDemand[x] = raleighFutureD[0][x];
-	}
+//	for (int x = 0; x<numFutureYears; x++)
+//	{
+////		// MORDM EXTENSION - REPLACE future_demand_multiplier WITH THE RIGHT MULTIPLIERS FROM RDMInput
+////		// Scaling a linear projection -- multiply the slope and subtract off changes to the y-intercept
+////		cary.futureDemand[x] = caryFutureD[0][x]*rdm_factors[0] - caryFutureD[0][0]*(rdm_factors[0]-1);
+////		durham.futureDemand[x] = durhamFutureD[0][x]*rdm_factors[0] - durhamFutureD[0][0]*(rdm_factors[0]-1);
+////		raleigh.futureDemand[x] = raleighFutureD[0][x]*rdm_factors[0] - raleighFutureD[0][0]*(rdm_factors[0]-1);
+////			// default RDM factors here should be 1
+//
+//		cary.futureDemand[x] = caryFutureD[0][x];
+//		durham.futureDemand[x] = durhamFutureD[0][x];
+//		raleigh.futureDemand[x] = raleighFutureD[0][x];
+//	}
 
 }
 

@@ -84,7 +84,7 @@ int main (int argc, char *argv[])
 	int endYear = simulation.endYear;
 	int currentYear = simulation.currentYear;
 
-	int terminateYear = endYear-startYear + 1;
+	int terminateYear = 48;// endYear-startYear + 1;
 	int startSimulationYear = currentYear - startYear + 1;
 	simulation.setNumYears(terminateYear);
 	simulation.setStartYear(startSimulationYear);

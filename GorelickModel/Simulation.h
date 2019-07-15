@@ -39,7 +39,8 @@ public:
 	string synthFlowsPath;
 	
 	bool use_RDM_ext;
-	int numRecords;
+	int numRecords = 1000;
+	int n_syn_records = 5112;
 	
 	int numRealizations;
 
@@ -57,7 +58,15 @@ private:
 	data_t claytonInflow, crabtreeInflow;
 	data_t jordanLakeInflow, lillingtonGaugeInflow, littleRiverRaleighInflow;
 
-	
+    data_t littleRiverInflowSYN;
+    data_t durhamInflowsSYN;
+    data_t owasaInflowSYN1, owasaInflowSYN2, owasaInflowSYN3;
+    data_t evaporationSYN;
+    data_t fallsLakeInflowSYN, lakeWBInflowSYN;
+    data_t fallsLakeEvaporationSYN, lakeWheelerEvaporationSYN;
+    data_t claytonInflowSYN, crabtreeInflowSYN;
+    data_t jordanLakeInflowSYN, lillingtonGaugeInflowSYN, littleRiverRaleighInflowSYN;
+
 	data_t streamflowIndex;
 	
 	data_t caryFutureD, raleighFutureD, durhamFutureD, owasaFutureD;
