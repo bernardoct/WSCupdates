@@ -238,6 +238,7 @@ void Simulation::preconditionData(double unit_demand_multiplier, double future_d
         for (int row = 0; row<numRealizations;row++)
         {
             int weekCounter = 0;
+            double weekCounterFloat = 0;
             for (int col = 0; col < terminateYear*52; col++)
             {
                 durhamInflows.simulatedData[row][col] 	= (log(durhamInflowsSYN[row][col + 2609]) - durhamInflows.averages[weekCounter])/durhamInflows.standardDeviations[weekCounter];
@@ -250,9 +251,16 @@ void Simulation::preconditionData(double unit_demand_multiplier, double future_d
                 lillingtonInflows.simulatedData[row][col] = (log(lillingtonGaugeInflowSYN[row][col + 2609])-lillingtonInflows.averages[weekCounter])/lillingtonInflows.standardDeviations[weekCounter];
                 littleRiverRaleighInflows.simulatedData[row][col] = (log(littleRiverRaleighInflowSYN[row][col + 2609])-littleRiverRaleighInflows.averages[weekCounter])/littleRiverRaleighInflows.standardDeviations[weekCounter];
                 weekCounter = weekCounter + 1;
+
                 if(weekCounter == 52)
                 {
-                    weekCounter = 0;
+                    if (weekCounterFloat < 1.) {
+                        weekCounter = 0;
+                        weekCounterFloat += 0.178;
+                    } else {
+                        weekCounter = 51;
+                        weekCounterFloat -= 1.;
+                    }
                 }
 
             }
